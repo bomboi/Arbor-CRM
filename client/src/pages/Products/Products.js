@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react'
 import { PageHeader, Button, Row, Col, Card, List, Input } from 'antd';
 import Axios from 'axios';
 import { ProductListItem, ProductListHeader } from './ProductListItem';
-import { Provider, connect } from 'react-redux'
-import store from './Redux/store';
+import { connect } from 'react-redux'
 import { toggleSelectAllProducts, initProducts, toggleShowModal } from './Redux/actions';
 import AddProduct from './Modals/AddProduct';
 import ProductsPDF from './ProductsPDF';
 import UpdateProduct from './Modals/UpdateProduct';
+import { getProducts } from '@selectors/productsSelectors';
 
-const NCProducts = (props) => {
+const Products = (props) => {
 
     const isAdmin = props.isAdmin ? true : false
 
@@ -32,7 +32,7 @@ const NCProducts = (props) => {
     }
 
     return (
-        <div store={store}>
+        <div>
         <PageHeader
         ghost={false}
         title="Proizvodi"
@@ -74,19 +74,12 @@ const NCProducts = (props) => {
         </div>
     )
 }
-const mapStateToProps = (state) => ({
-    products: state.products,
-    allSelected: Object.keys(state.selectProducts).length === state.products.length
+const mapStateToProps = (state) => (()=>{
+    console.log(state.productsReducer.productsSlice)
+    return {
+        products: getProducts(state),
+        allSelected: Object.keys(state.productsReducer.selectProductSlice).length === getProducts(state).length
+    }
 })
 
-const Products = connect(mapStateToProps)(NCProducts)
-
-const AProducts = () => {
-    return (
-        <Provider store={store}>
-            <Products/>
-        </Provider>
-    )
-}
-
-export default AProducts
+export default connect(mapStateToProps)(Products)

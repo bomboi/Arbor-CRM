@@ -13,6 +13,8 @@ import 'antd/dist/antd.css';
 import Seller from './pages/roles/seller/Seller';
 import { store, collect } from 'react-recollect';
 import ProtectedRoute from './routing/ProtectedRoute';
+import { Provider } from 'react-redux'
+import reduxStore from './Redux/store';
 
 store.pages = {
         orders: {
@@ -35,16 +37,18 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route path='/login'>
-            <Login />
-          </Route>
-          <ProtectedRoute path="/">
-            <Seller />
-          </ProtectedRoute>
-        </Switch>
-      </Router>
+      <Provider store={reduxStore}>
+        <Router>
+          <Switch>
+            <Route path='/login'>
+              <Login />
+            </Route>
+            <ProtectedRoute path="/">
+              <Seller />
+            </ProtectedRoute>
+          </Switch>
+        </Router>
+      </Provider>
     )
   }
 }
