@@ -2,8 +2,7 @@ import React from 'react'
 import {
     BrowserRouter as Router,
     Switch,
-    Route,
-    Link, useRouteMatch
+    useRouteMatch
   } from "react-router-dom";
 import Orders from '../Orders/Orders';
 import Customers from '../Customers/Customers';

@@ -1,8 +1,9 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Modal, Row, Input, Col, InputNumber, Alert } from 'antd';
 import Axios from 'axios';
-import { toggleShowModal, updateProduct } from '../Redux/actions';
+import { getCurrentProduct, isModalVisible } from '@selectors/productsSelectors';
+import { modalSlice, productSlice } from '@reducers/productsReducers';
 
 
 const UpdateProduct = (props) => {
@@ -13,12 +14,7 @@ const UpdateProduct = (props) => {
     console.log(product)
 
     useEffect(() => {
-        console.log('render')
-        console.log(product)
-        console.log(props.product)
         setProduct({...props.product})
-        console.log('post-render')
-        console.log(product)
     }, [props.product])
 
     const productsAreSame = () => {
@@ -39,14 +35,14 @@ const UpdateProduct = (props) => {
             .then(res => {
                     console.log(res)
                     setErrorMsg('')
-                    props.dispatch(updateProduct(product))
-                    props.dispatch(toggleShowModal('UpdateProduct'))
+                    props.dispatch(productSlice.actions.updateProduct(product))
+                    props.dispatch(modalSlice.actions.toggleShow('UpdateProduct'))
                 })
         }
     }
 
     const onCancel = () => {
-        props.dispatch(toggleShowModal('UpdateProduct'))
+        props.dispatch(modalSlice.actions.toggleShow('UpdateProduct'))
         setErrorMsg('')
     }
 
@@ -87,8 +83,8 @@ const UpdateProduct = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    product: state.modal.currentProduct,
-    visible: state.modal.show.UpdateProduct
+    product: getCurrentProduct(state),
+    visible: isModalVisible(state, 'UpdateProduct')
 })
 
 export default connect(mapStateToProps)(UpdateProduct)

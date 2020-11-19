@@ -14,13 +14,13 @@
 //                 .then(res => {
 //                     console.log(res)
 //                     props.dispatch(addProducts(res.data))
-//                     props.dispatch(toggleShowModal('AddProduct'))
+//                     props.dispatch(toggleShow('AddProduct'))
 //                 })
 //         }
 //     }
 
 //     const onCancel = () => {
-//         props.dispatch(toggleShowModal('AddProduct'))
+//         props.dispatch(toggleShow('AddProduct'))
 //     }
 
 //     return (

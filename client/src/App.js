@@ -3,11 +3,9 @@ import './App.css'
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import Login from './pages/Login/Login';
-import Invoice from './pages/Invoice/Invoice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 import Seller from './pages/roles/seller/Seller';

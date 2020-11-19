@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session')
 var MongoDBStore = require('connect-mongodb-session')(session);
 
+
 // Create the server
 const app = express()
 
@@ -18,16 +19,22 @@ dotenv.config();
 
 // Connect to database
 mongoose.connect(process.env.DB_CONNECT, 
-{ useNewUrlParser: true, useUnifiedTopology: true },
-() => console.log('Connected to DB'))
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => console.log('Connected to DB'))
+  
+  
+  var store = new MongoDBStore({
+    uri: process.env.DB_CONNECT,
+    collection: 'sessions'
+  });
+  
+app.use((req, res, next) => {
+  console.log(req.method + ' ' + req.url);
+  next();
+})
 
 
-var store = new MongoDBStore({
-  uri: process.env.DB_CONNECT,
-  collection: 'sessions'
-});
-
-// Middlewares
+  // Middlewares
 app.use(express.json())
 app.use(session({
   name: 'sessionId',
@@ -48,10 +55,14 @@ app.use(express.static(path.join(__dirname, 'client/build')))
 const authRoutes = require('./routes/auth').router;
 const materialRoutes = require('./routes/materials');
 const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/users');
+const customerRoutes = require('./routes/customer');
 
 app.use('/api', authRoutes);
 app.use('/api/material', materialRoutes);
 app.use('/api/product', productRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/customer', customerRoutes);
 
 // Anything that doesn't match the above, send back index.html
 app.get('*', (req, res) => {

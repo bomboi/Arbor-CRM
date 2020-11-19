@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true
+        // roles: admin, seller
     },
     active: {
         type: Boolean,

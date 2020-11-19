@@ -1,21 +1,19 @@
 import React from 'react'
-import { Button, Row, Col, List, Select, DatePicker, Input, InputNumber, Checkbox, Card, Descriptions,
-        PageHeader} from 'antd';
-import Label from '../../../components/Label';
+import { Button, Row, Col, PageHeader} from 'antd';
 import CustomerDetails from './CustomerDetails';
 import PaymentDetails from './PaymentDetails';
 import AddArticle from './AddArticle';
 import ArticlesList from './ArticlesList';
-
-const { TextArea } = Input;
-const { Option } = Select;
+import { useHistory } from "react-router-dom";
 
 const OrderDetails = (props) => {
-    return (
-    <div>
+  let history = useHistory();
+
+  return (
+  <div>
     <PageHeader
       ghost={false}
-      onBack={() => props.changeView('list')}
+      onBack={() => history.push('/porudzbine')}
       title="Novi predračun"
       className="mb-3"
       style={{ position: 'relative', zIndex: 1, width: '100%' }}
@@ -37,8 +35,7 @@ const OrderDetails = (props) => {
             <ArticlesList/>
         </Col>
     </Row>
-    </div>
-    )
+  </div>)
 }
 
 export default OrderDetails

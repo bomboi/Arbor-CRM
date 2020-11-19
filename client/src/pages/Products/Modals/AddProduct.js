@@ -1,9 +1,10 @@
-import React, { Component, useState } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import Modal from 'antd/lib/modal/Modal';
 import { Row, Col, Input, InputNumber } from 'antd';
 import Axios from 'axios';
-import { addProducts, toggleShowModal } from '../Redux/actions';
+import { modalSlice, productSlice } from '@reducers/productsReducers';
+import { isModalVisible } from '@selectors/productsSelectors';
 
 const AddProduct = (props) => {
 
@@ -14,14 +15,14 @@ const AddProduct = (props) => {
             Axios.post('/api/product/add', product)
                 .then(res => {
                     console.log(res)
-                    props.dispatch(addProducts(res.data))
-                    props.dispatch(toggleShowModal('AddProduct'))
+                    props.dispatch(productSlice.actions.addProducts(res.data))
+                    props.dispatch(modalSlice.actions.toggleShow('AddProduct'))
                 })
         }
     }
 
     const onCancel = () => {
-        props.dispatch(toggleShowModal('AddProduct'))
+        props.dispatch(modalSlice.actions.toggleShow('AddProduct'))
     }
 
     return (
@@ -52,7 +53,7 @@ const AddProduct = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    visible: state.modal.show.AddProduct
+    visible: isModalVisible(state, 'AddProduct')
 })
 
 export default connect(mapStateToProps)(AddProduct)

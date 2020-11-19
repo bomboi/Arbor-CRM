@@ -1,9 +1,9 @@
-import { createSlice, createReducer, combineReducers } from '@reduxjs/toolkit'
+import { createSlice, combineReducers } from '@reduxjs/toolkit'
 
 // ******* Reducers *******
 // ========================
 
-const productSlice = createSlice({
+export const productSlice = createSlice({
     name: 'productsSlice',
     initialState: [],
     reducers: {
@@ -22,7 +22,7 @@ const productSlice = createSlice({
     }
 });
 
-const modalSlice = createSlice({
+export const modalSlice = createSlice({
     name: 'modalSlice',
     initialState: 
     {
@@ -43,7 +43,7 @@ const modalSlice = createSlice({
     }
 });
 
-const selectProductSlice = createSlice({
+export const selectProductSlice = createSlice({
     name: 'selectProductSlice',
     initialState: {},
     reducers: {
@@ -68,12 +68,6 @@ const selectProductSlice = createSlice({
         }
     }
 });
-
-// const productsReducer = createReducer({}, {
-//     modalSlice: modalSlice.reducer,
-//     productSlice,
-//     selectProductSlice
-// });
 
 const productsReducer = combineReducers({
     modalSlice: modalSlice.reducer,

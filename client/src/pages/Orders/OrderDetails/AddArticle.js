@@ -1,15 +1,12 @@
 import React, { useState } from 'react'
-import { Button, Row, Col, Input, Card, AutoComplete, Typography, Divider, PageHeader, InputNumber } from 'antd';
+import { Button, Row, Col, Input, Card, Typography, Divider, PageHeader, InputNumber } from 'antd';
 import Label from '../../../components/Label';
 import { collect } from 'react-recollect';
-import Axios from 'axios';
 import AddMaterials from './AddMaterials';
 import { AddArticleStore } from '../../stores';
 
 const { TextArea } = Input;
 const { Title } = Typography;
-
-{/* <CheckCircleTwoTone twoToneColor="#52c41a" /> */}
 
 const AddArticle = (props) => {
 

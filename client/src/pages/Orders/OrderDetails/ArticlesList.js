@@ -1,11 +1,8 @@
 import React from 'react'
-import { Button, Row, Col, Input, InputNumber, Checkbox, Card, Descriptions, Typography, Divider, List, Empty } from 'antd';
-import Label from '../../../components/Label';
+import { Button, Row, Col, Card, Descriptions, List } from 'antd';
 import { collect } from 'react-recollect'
 import { DeleteOutlined } from '@ant-design/icons';
 
-const { TextArea } = Input;
-const { Title } = Typography;
 
 const ArticlesList = (props) => {
     

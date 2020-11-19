@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
-import { Button, Row, Col, Input, Card, AutoComplete, Typography, Divider, PageHeader, List } from 'antd';
+import { Button, Row, Col, Input, AutoComplete, Divider, List } from 'antd';
 import Label from '../../../components/Label';
 import { collect } from 'react-recollect';
 import {
-    SaveOutlined, DeleteOutlined, DownloadOutlined, UpOutlined, DownOutlined
+    SaveOutlined, DeleteOutlined
   } from '@ant-design/icons';
 import Axios from 'axios';
 import { AddArticleStore } from '../../stores';
 
 const { TextArea } = Input;
-const { Title } = Typography;
 
 const AddMaterials = (props) => {
 

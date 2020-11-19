@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Button } from 'antd';
 
 import ReactToPrint from 'react-to-print';
+import { isModalVisible, getProducts } from '@selectors/productsSelectors';
 
 export class ComponentToPrint extends React.Component {
 
@@ -54,8 +55,8 @@ export const ProductsPDF = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    visible: state.modal.show.ProductsPDF,
-    products: state.products
+    visible: isModalVisible(state, 'ProductsPDF'),
+    products: getProducts(state)
 })
 
 export default connect(mapStateToProps)(ProductsPDF)

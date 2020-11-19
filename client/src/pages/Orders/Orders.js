@@ -1,11 +1,12 @@
 import React , {useState} from 'react'
-import { Button, Row, Col, List, Select, DatePicker, Input } from 'antd';
-import OrderListItem from './OrderListItem';
+import { DatePicker, Input } from 'antd';
 import OrderList from './OrderList';
 import OrderDetails from './OrderDetails/OrderDetails';
-
-const { RangePicker } = DatePicker;
-const { Search } = Input;
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route
+  } from "react-router-dom";
 
 const Orders = () => {
 
@@ -14,6 +15,7 @@ const Orders = () => {
     const setView = (value) => setListView(value)
 
     const changeView = (value) => {
+        // TODO: Change to <Switch/> component and use urls
         switch (value) {
             case 'list':
                 console.log('list')
@@ -24,7 +26,17 @@ const Orders = () => {
         }
     }
 
-    return changeView(listView);
+    // return changeView(listView);
+    return (
+        <Switch>
+            <Route exact path="/porudzbine">
+                <OrderList/>
+            </Route>
+            <Route exact path="/porudzbine/dodaj">
+                <OrderDetails/>
+            </Route>
+        </Switch>
+    )
 }
 
 export default Orders

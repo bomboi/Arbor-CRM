@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from "react-router-dom";
 import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider } from 'antd';
 import OrderListItem from './OrderListItem';
 
@@ -7,6 +8,8 @@ const { Search } = Input;
 
 
 const OrderList = (props) => {
+    let history = useHistory();
+
     return (
     <div>
         <PageHeader
@@ -14,7 +17,7 @@ const OrderList = (props) => {
       title="Porudzbine"
       className="mb-3"
       extra={[
-        <Button key='1' type="primary" onClick={()=>props.changeView('order details')}>Nova porudzbina</Button>
+        <Button key='1' type="primary" onClick={()=>history.push('/porudzbine/dodaj')}>Nova porudzbina</Button>
       ]}
     ></PageHeader>
         <Card>
