@@ -35,6 +35,9 @@ const Orders = () => {
             <Route exact path="/porudzbine/dodaj">
                 <OrderDetails/>
             </Route>
+            <Route exact path="/porudzbine/izmeni/:orderId">
+                <OrderDetails edit/>
+            </Route>
         </Switch>
     )
 }

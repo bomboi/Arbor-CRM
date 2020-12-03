@@ -6,7 +6,6 @@ import ReactToPrint from 'react-to-print';
 import { isModalVisible, getProducts } from '@selectors/productsSelectors';
 
 export class ComponentToPrint extends React.Component {
-
     render() {
         return (
             <div>

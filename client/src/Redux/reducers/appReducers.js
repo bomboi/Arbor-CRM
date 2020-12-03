@@ -7,6 +7,9 @@ export const userSlice = createSlice({
         initUser: (state, action) => {
             return action.payload;
         },
+        userInitialized: (state, action) => {
+            action.payload(false);
+        },
         logoutUser: (state, action) => {
             return {};
         }

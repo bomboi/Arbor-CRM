@@ -57,12 +57,14 @@ const materialRoutes = require('./routes/materials');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const customerRoutes = require('./routes/customer');
+const orderRoutes = require('./routes/orders');
 
 app.use('/api', authRoutes);
 app.use('/api/material', materialRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/customer', customerRoutes);
+app.use('/api/order', orderRoutes)
 
 // Anything that doesn't match the above, send back index.html
 app.get('*', (req, res) => {

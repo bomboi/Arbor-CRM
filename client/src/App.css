@@ -13,6 +13,26 @@
   }
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #BBB;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #AAA;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -35,4 +55,27 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Print style */
+
+.content-margin {
+  margin: 50px 60px 0px 60px
+}
+
+.footer-margin {
+  margin: 30px 60px 50px
+}
+
+.invoice-title {
+  margin-bottom: 100px;
+  font-size: 50px;
+}
+
+.customer-details {
+  margin-bottom: 50px;
+}
+
+.customer-name {
+  font-size: 20px
 }

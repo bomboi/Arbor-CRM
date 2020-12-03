@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Input, InputNumber, Card, AutoComplete, Divider, Switch, Typography, Select, Checkbox, Alert, Button} from 'antd';
+import React, { useEffect } from 'react'
+import { Input, InputNumber, Card, AutoComplete, Divider, Switch, Typography, Select, Checkbox, Alert } from 'antd';
 import { connect } from 'react-redux';
 import Axios from 'axios';
 import Label from '../../../components/Label';
@@ -25,9 +25,7 @@ const { Title } = Typography;
 
 const CustomerDetails = (props) => {
 
-    let [delivery, setDelivery] = useState(true);
-
-    useEffect(() => {
+    useEffect((_props) => {
         if(!props.areCustomersInitialized) {
             Axios.get('/api/customer/all').then(result => {
                 props.dispatch(customerSlice.actions.initCustomers(result.data))
@@ -56,7 +54,7 @@ const CustomerDetails = (props) => {
                     type="warning" 
                     onClose={()=>props.dispatch(newOrderCustomerSlice.actions.newFromExisting())} 
                     showIcon />}
-            <Label text={'Ime kupca'}/>
+            <Label text={'Ime kupca'} required/>
             <AutoComplete
                 className="w-100"
                 onChange={(value) => onChangeField(value, 'name')}
@@ -73,7 +71,7 @@ const CustomerDetails = (props) => {
                         </AutoComplete.Option>
                     ))}
             </AutoComplete>
-            <Label text={'Broj telefona'}/>
+            <Label text={'Broj telefona'} required/>
             <Input onChange={(e)=>onChangeField(e.target.value, 'phone')} value={props.customer.phone} placeholder={'Broj telefona'}/>
             <Label text={'Email adresa'}/>
             <Input onChange={(e)=>onChangeField(e.target.value, 'email')} value={props.customer.email} placeholder={'Email adresa'}></Input>
@@ -85,7 +83,7 @@ const CustomerDetails = (props) => {
             <Divider className="m-0 mt-1"/>
             <Row>
                 <Col className="w-100">
-                    <Label text={'Adresa'}/>
+                    <Label text={'Adresa'} required/>
                     <Input 
                         onChange={(e)=>onChangeField(e.target.value, 'street', true)} 
                         value={props.customer.address?props.customer.address.street:undefined} 
@@ -93,8 +91,8 @@ const CustomerDetails = (props) => {
                 </Col>
             </Row>
             <Row gutter={10}>
-                <Col span={10}><Label text={'Sprat'}/></Col>
-                <Col span={10}><Label text={'Tip objekta'}/></Col>
+                <Col span={10}><Label text={'Sprat'} required/></Col>
+                <Col span={10}><Label text={'Tip objekta'} required/></Col>
                 <Col span={4}><Label text={'Lift'}/></Col>
             </Row>
             <Row gutter={10}>

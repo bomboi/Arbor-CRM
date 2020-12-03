@@ -1,25 +1,27 @@
 const mongoose = require('mongoose')
-const Customer = require('./Customer');
 
 const orderSchema = new mongoose.Schema({
+    orderId: String,
+    latestVersion: Number,
+    latestVersionDate: Date,
+    latestVersionData: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'OrderData'
+    },
     customer: {
         type: mongoose.Schema.ObjectId,
         ref: 'Customer'
     },
-    articles: [{
-        name: String,
-        description: String,
-        quantity: Number,
-        price: Number
-    }],
     totalAmount: Number,
-    date: String,
-    avans: Number,
-    paymentType: String,
+    state: String,
     comments: [{
-        type: String,
-        required: false
-    }],
+        text: String,
+        writtenBy: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        },
+        datePosted: Date
+    }]
 })
 
 module.exports = mongoose.model('Order', orderSchema);

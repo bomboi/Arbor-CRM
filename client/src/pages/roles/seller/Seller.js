@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Spin } from 'antd';
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -22,8 +22,10 @@ const Seller = (props) => {
   useEffect(() => {
     Axios.get('/api/user/get')
       .then(result => {
-        props.dispatch(userSlice.actions.initUser(result.data))
-        setLoading(false);
+        props.dispatch(userSlice.actions.initUser(result.data));
+        setTimeout(() => {
+          setLoading(false);
+        }, 10);
       })
   }, []);
 
@@ -42,7 +44,7 @@ const Seller = (props) => {
   console.log(history)
   return (
       loading?
-      <div>Loading...</div>
+        <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
       :
       // TODO: Make Sider independent of content
       <Layout style={{ minHeight: '100vh' }} hasSider={true}>
