@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { newOrderInfoSlice } from '@reducers/ordersReducers';
 import { getOrderInfo } from '@selectors/ordersSelectors';
 import moment from 'moment';
+import { usingDelivery } from '../../../Redux/selectors/ordersSelectors';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -16,10 +17,13 @@ const OrderInfo = (props) => {
     const dateFormat = 'DD. MM. YYYY.';
 
     useEffect(() => {
-        props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'date', value: moment()}));
+        if(props.orderInfo.date === undefined) {
+            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'date', value: moment()}));
+        }
     }, []);
 
     const update = (value, key) => {
+        console.log('key')
         props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key, value}));
     }
 
@@ -31,7 +35,7 @@ const OrderInfo = (props) => {
                     <Label text={'Datum'} required/>
                     <DatePicker
                         className="w-100"
-                        value={props.orderInfo.date} 
+                        value={moment(props.orderInfo.date)} 
                         placeholder={'Datum porudzbine'} 
                         format={dateFormat}
                         onChange={value => update(value, 'date')} />
@@ -69,7 +73,17 @@ const OrderInfo = (props) => {
                         placeholder="Avans" 
                         autoSize />
                 </Col>
-                <Col span={12}>
+                {props.hasDelivery &&
+                <Col span={8}>
+                    <Label text={'Cena dostave'}/>
+                    <InputNumber 
+                        value={props.orderInfo.deliveryPrice}
+                        className="w-100" 
+                        placeholder="Cena dostave"
+                        autoSize 
+                        onChange={value=>update(value, 'deliveryPrice')}/>
+                </Col>}
+                <Col span={props.hasDelivery?4:12}>
                     <Label text={'Popust'}/>
                     <InputNumber 
                         formatter={value => `${value}%`} 
@@ -105,7 +119,8 @@ const OrderInfo = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    orderInfo: getOrderInfo(state)
+    orderInfo: getOrderInfo(state),
+    hasDelivery: usingDelivery(state),
 })
 
 export default connect(mapStateToProps)(OrderInfo)

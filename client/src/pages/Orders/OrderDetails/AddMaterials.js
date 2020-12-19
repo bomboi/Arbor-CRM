@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Row, Col, Input, AutoComplete, List } from 'antd';
+import { Button, Row, Col, Input, AutoComplete, List, message } from 'antd';
 import Label from '../../../components/Label';
 import {
     SaveOutlined, DeleteOutlined
@@ -50,6 +50,7 @@ const AddMaterials = (props) => {
         })
         .then((res)=>{
             console.log(res)
+            message.success('Sačuvan proizvođač');
         })
     }
 
@@ -78,6 +79,7 @@ const AddMaterials = (props) => {
         })
         .then((res)=>{
             console.log(res)
+            message.success('Sačuvan naziv')
         })
     }
 

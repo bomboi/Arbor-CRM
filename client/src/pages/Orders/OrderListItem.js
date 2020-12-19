@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Row, Col, Checkbox, Button, Badge, Tag, Card } from 'antd';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { orderPreviewSlice } from '@reducers/ordersReducers';
 import Axios from 'axios';
+import { getTagColor } from '../../utils';
+import { isOrderChecked } from '../../Redux/selectors/ordersSelectors';
+import { orderListSlice } from '../../Redux/reducers/ordersReducers';
 
 export const OrderListHeader = (props) => {
     return (
@@ -36,14 +39,10 @@ export const OrderListHeader = (props) => {
 
 const OrderListItem = (props) => {
 
-    const getTagColor = (state) => {
-        switch(state) {
-            case 'poruceno': return 'magenta';
-        }
-    }
+    let [hasNotification, setHasNotification] = useState(props.item.hasNotification);
 
     return (
-        <Card className="mt-1 mb-1" size={'small'}>
+        <Card className={"mt-1 mb-1 " + (props.checked?"bg-light":"")} size={'small'}>
             <Row align={'middle'}>
                 <Col span = {2}>
                     <b>{props.item.orderId}</b>
@@ -61,10 +60,10 @@ const OrderListItem = (props) => {
                     <Tag color={getTagColor(props.item.state)}>{props.item.state.toUpperCase()}</Tag>
                 </Col>
                 <Col span={2} offset={5}>
-                    <Tag color={'gold'}>NOVE IZMENE</Tag>
+                    {hasNotification && <Tag color={'gold'}>NOVE IZMENE</Tag>}
                 </Col>
-                <Col span = {1} >
-                    <Checkbox/>
+                <Col span = {1}>
+                    <Checkbox checked={props.checked} onClick={(e)=>props.dispatch(orderListSlice.actions.toggleSelectOrder(props.item._id))}/>
                 </Col>
                 <Col span = {2}>
                     <Button onClick={()=>{
@@ -75,11 +74,17 @@ const OrderListItem = (props) => {
                                 orderId: props.item._id
                             }
                         }).then(result => {
-                            console.log('Versions')
-                            console.log(result)
-                            props.dispatch(orderPreviewSlice.actions.initVersions(result.data.orderVersions))
+                            console.log('Versions');
+                            console.log(result);
+                            props.dispatch(orderPreviewSlice.actions.initVersions(result.data.orderVersions));
                             props.dispatch(orderPreviewSlice.actions.setData({...props.item, comments: result.data.comments}));
-                            props.dispatch(orderPreviewSlice.actions.setLoading(false))
+                            props.dispatch(orderPreviewSlice.actions.setIndex(props.index));
+                            props.dispatch(orderPreviewSlice.actions.setLoading(false));
+                            Axios.post('/api/order/read-notification', {
+                                orderId: props.item._id
+                            }).then(res => {
+                                setHasNotification(false);
+                            })
                         })
                     }}>Otvori</Button>
                 </Col>
@@ -88,8 +93,8 @@ const OrderListItem = (props) => {
     )
 }
 
-const mapStateToProps = (state) => ({
-    
+const mapStateToProps = (state, props) => ({
+    checked: isOrderChecked(state, props.index)
 })
 
 export default connect(mapStateToProps)(OrderListItem)

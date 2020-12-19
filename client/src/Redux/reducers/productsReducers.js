@@ -1,4 +1,5 @@
 import { createSlice, combineReducers } from '@reduxjs/toolkit'
+import { logout } from '../actions';
 
 // ******* Reducers *******
 // ========================
@@ -19,20 +20,24 @@ export const productSlice = createSlice({
             let index = state.findIndex(item => item._id === action.payload._id);
             state[index] = action.payload;
         }
+    },
+    extraReducers: {
+        [logout]: state => ([])
     }
 });
 
+const modalSliceInitialState = {
+    show: {
+        AddProduct: false,
+        EditMultipleProducts: false,
+        UpdateProduct: false
+    },
+    currentProduct: {}
+}
+
 export const modalSlice = createSlice({
     name: 'modalSlice',
-    initialState: 
-    {
-        show: {
-            AddProduct: false,
-            EditMultipleProducts: false,
-            UpdateProduct: false
-        },
-        currentProduct: {}
-    },
+    initialState: modalSliceInitialState,
     reducers: {
         toggleShow: (state, action) => {
             state.show[action.payload] = !state.show[action.payload]
@@ -40,6 +45,9 @@ export const modalSlice = createSlice({
         setCurrentProduct: (state, action) => {
             state.currentProduct = action.payload
         }
+    },
+    extraReducers: {
+        [logout]: state => ({...modalSliceInitialState})
     }
 });
 
@@ -66,6 +74,9 @@ export const selectProductSlice = createSlice({
                 return {};
             }
         }
+    },
+    extraReducers: {
+        [logout]: state => ({})
     }
 });
 

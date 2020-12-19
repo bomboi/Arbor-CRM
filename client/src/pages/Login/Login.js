@@ -2,10 +2,10 @@ import React from 'react'
 import { Form, Button, Container } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
-import { store } from 'react-recollect';
-import { collect } from 'react-recollect';
+import { connect } from 'react-redux';
+import { userSlice } from '../../Redux/reducers/appReducers';
 
-const Login = () => {
+const Login = (props) => {
     let history = useHistory();
     return (
         <Container>
@@ -32,13 +32,17 @@ const Login = () => {
                     }
                 })
                 .then(function (response) {
-                  // handle success
-                  console.log(response);
+                    
                   if(response.status == 200) {
-                      store.loggedIn = true;
                       console.log('Loggedin')
-                      console.log(store.loggedIn)
-                      history.push('porudzbine')
+                      axios.get('/api/user/get')
+                            .then(result => {
+                                console.log('INIT_USER')
+                                props.dispatch(userSlice.actions.initUser(result.data));
+                                setTimeout(() => {
+                                }, 10);
+                                history.push('porudzbine');
+                            })
                   }
                 })
             }}>
@@ -49,4 +53,8 @@ const Login = () => {
     )
 }
 
-export default collect(Login)
+const mapStateToProps = (state) => ({
+    
+})
+
+export default connect(mapStateToProps)(Login)

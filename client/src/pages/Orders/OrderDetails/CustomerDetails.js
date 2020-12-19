@@ -56,6 +56,7 @@ const CustomerDetails = (props) => {
                     showIcon />}
             <Label text={'Ime kupca'} required/>
             <AutoComplete
+                value={props.customer.name}
                 className="w-100"
                 onChange={(value) => onChangeField(value, 'name')}
                 onSelect={onSelect}

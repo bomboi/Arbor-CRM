@@ -19,13 +19,19 @@ export const getGlobalDiscount = state => state.ordersReducers.newOrderReducer.o
 // Added Articles Slice
 export const getAddedArticles = state => state.ordersReducers.newOrderReducer.addedArticles;
 
+export const isEditModeInitialized = state => state.ordersReducers.newOrderReducer.orderDetailsSlice.editModeInit;
+
 /* ===== Section: Order List ====== */
 
 export const getOrderList = state => state.ordersReducers.orderManagementReducer.orderListSlice.orders;
 export const getLastOrderDate = state => state.ordersReducers.orderManagementReducer.orderListSlice.lastOrderDate;
+export const isOrderChecked = (state, index) => state.ordersReducers.orderManagementReducer.orderListSlice.selectedIds[state.ordersReducers.orderManagementReducer.orderListSlice.orders[index]._id] !== undefined;
+export const getSelectedIds = (state) => state.ordersReducers.orderManagementReducer.orderListSlice.selectedIds;
+
 
 export const isOrderPreviewVisible = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.visible;
 export const getOrderPreviewData = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.data;
 export const getOrderPreviewVersions = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.versions;
 export const isOrderPreviewLoading = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.loading;
 export const getOrderPreviewId = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.data._id;
+export const getOrderPreviewIndex = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.index;

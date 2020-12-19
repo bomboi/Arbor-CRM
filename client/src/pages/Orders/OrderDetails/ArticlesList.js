@@ -1,22 +1,34 @@
 import React, { useState } from 'react'
-import { Button, Row, Col, Card, List } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Button, Row, Col, Card, List, PageHeader } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { getAddedArticles, getAvans, getGlobalDiscount } from '@selectors/ordersSelectors';
-import { newOrderArticlesSlice } from '../../../Redux/reducers/ordersReducers';
+import { newOrderArticlesSlice, newOrderNewArticleSlice } from '../../../Redux/reducers/ordersReducers';
 import Title from 'antd/lib/typography/Title';
 import Paragraph from 'antd/lib/typography/Paragraph';
+import Modal from 'antd/lib/modal/Modal';
+import AddArticleDescription from './AddArticleDescription';
+import AddArticle from './AddArticle';
 
 
 const ArticlesList = (props) => {
+
+    let [visible, setVisible] = useState(false);
+    let [edit, setEdit] = useState(false);
+    let [currentIndex, setCurrentIndex] = useState(0);
     
     const removeArticle = (index) => {
         props.dispatch(newOrderArticlesSlice.actions.removeArticle(index));
     }
 
-    const calculateTotalPrice = (acc, value) => Number(acc) + Number(value.price) * Number(value.quantity) * (100 - Number(value.discount)) / 100;
+    const editArticle = (index) => {
+        setCurrentIndex(index);
+        setEdit(true);
+        props.dispatch(newOrderNewArticleSlice.actions.setArticle(props.articles[index]));
+        setVisible(true);
+    }
 
-    console.log(props.articles.reduce(calculateTotalPrice, [Number(0)]))
+    const calculateTotalPrice = (acc, value) => Number(acc) + Number(value.price) * Number(value.quantity) * (100 - Number(value.discount)) / 100;
 
     let amount = props.articles.length === 0 ? 0 : props.articles.reduce(calculateTotalPrice, [0]);
     let avans = props.avans === undefined ? 0 : props.avans;
@@ -25,7 +37,14 @@ const ArticlesList = (props) => {
 
     return (
         <Card className='mb-3'>
-            <Title level={4}>Dodati artikli</Title>
+            <PageHeader
+                ghost={true}
+                title="Dodati artikli"
+                className="p-0 pb-2 m-0"
+                extra={[
+                    <Button type={'primary'} onClick={()=>{ setVisible(true);}} key="1">Dodaj artikl</Button>,
+                ]}/>
+            {/* <Title level={4}>Dodati artikli</Title> */}
             <Card>
                 <Row>
                     <Col span={5}>
@@ -67,16 +86,26 @@ const ArticlesList = (props) => {
                             {item.description}
                         </Col>
                         <Col span={9}>
-                            {item.materials?item.materials.map(material=>material.name):"Nema materijala"}
+                            {item.materials?
+                                item.materials.map(material=><div>
+                                    <div>{material.description}</div>
+                                    <div><i><small>{material.name} / {material.producer}</small></i></div>
+                                </div>)
+                                :
+                                "Nema materijala"}
                         </Col>
                         <Col span={2}>
+                            <Button 
+                                className="mr-1" 
+                                onClick={()=>editArticle(index)}
+                                 icon={<EditOutlined />}/>
                             <Button onClick={()=>removeArticle(index)} icon={<DeleteOutlined />}/>
                         </Col>
                     </Row>
                 </List.Item>
                 )}
             />
-            {/* {!store.articles?'':store.articles.map(article=>article.price)} */}
+            <AddArticle index={currentIndex} visible={visible} onCancel={()=>setVisible(false)} edit={edit}/>
         </Card>
     )
 }

@@ -48,17 +48,24 @@ class ComponentToPrint extends React.Component {
                     {this.props.articles.map(article => (
                         <Row>
                             <Col span={4}>{article.name}</Col>
-                            <Col span={5}>{article.description}</Col>
-                            <Col span={5}>
-                                {article.materials.map(material => 
-                                    <div>
-                                        <div>
-                                            {material.description}
-                                        </div>
-                                        <div><i>
-                                            {material.name} / {material.producer}
-                                        </i></div>
-                                    </div>)}
+                            <Col span={10}>
+                                <Row>
+                                    <Col span={12} style={{whiteSpace:'pre'}}>{article.description}</Col>
+                                    <Col span={12}>
+                                        {article.materials.map(material => 
+                                            <div>
+                                                <div>
+                                                    {material.description}
+                                                </div>
+                                                <div><i>
+                                                    {material.name} / {material.producer}
+                                                </i></div>
+                                            </div>)}
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    {article.note}
+                                </Row>
                             </Col>
                             <Col span={3}>{article.price}</Col>
                             <Col span={2}>{article.quantity}</Col>

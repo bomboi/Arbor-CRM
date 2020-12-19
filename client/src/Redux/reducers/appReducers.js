@@ -1,4 +1,5 @@
 import { createSlice, combineReducers } from '@reduxjs/toolkit';
+import { logout } from '../actions';
 
 export const userSlice = createSlice({
     name: 'userSlice',
@@ -13,6 +14,9 @@ export const userSlice = createSlice({
         logoutUser: (state, action) => {
             return {};
         }
+    },
+    extraReducers: {
+        [logout]: state => ({})
     }
 }); 
 
@@ -23,6 +27,9 @@ export const appSettingsSlice = createSlice({
         initApp: (state, action) => {
             return action.payload;
         }
+    },
+    extraReducers: {
+        [logout]: state => ({})
     }
 })
 

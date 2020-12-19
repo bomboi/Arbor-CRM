@@ -28,7 +28,8 @@ const orderDataSchema = new mongoose.Schema({
             paymentType: String,
             deadlineFrom: Number,
             deadlineTo: Number,
-            delivery: Boolean
+            delivery: Boolean,
+            deliveryPrice: Number
         }
     },
     dateCreated: Date,

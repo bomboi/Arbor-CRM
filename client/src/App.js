@@ -9,26 +9,9 @@ import Login from './pages/Login/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 import Seller from './pages/roles/seller/Seller';
-import { store, collect } from 'react-recollect';
 import ProtectedRoute from './routing/ProtectedRoute';
 import { Provider } from 'react-redux'
 import reduxStore from './Redux/store';
-
-store.pages = {
-        orders: {
-          orderDetails: {
-            addArticle: {
-              current:{},
-            },
-            articles: []
-          }
-        },
-        products: {
-          productsList: {
-            selected:[]
-          }
-        }
-      }
 
 
 class App extends Component {
@@ -50,4 +33,4 @@ class App extends Component {
     )
   }
 }
-export default collect(App)
+export default App

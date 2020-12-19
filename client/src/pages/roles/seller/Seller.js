@@ -11,6 +11,7 @@ import Auth from '../../../routing/Auth';
 import Axios from 'axios';
 import { isAdmin, loggedInUser } from '@selectors/appSelectors';
 import { userSlice } from '@reducers/appReducers';
+import { logout } from '../../../Redux/actions';
 
 const { Content, Sider } = Layout;
 
@@ -22,6 +23,7 @@ const Seller = (props) => {
   useEffect(() => {
     Axios.get('/api/user/get')
       .then(result => {
+        console.log('INIT_USER')
         props.dispatch(userSlice.actions.initUser(result.data));
         setTimeout(() => {
           setLoading(false);
@@ -32,6 +34,7 @@ const Seller = (props) => {
   const menuFunction = ({ item, key, keyPath, domEvent }) => {
     switch (key) {
       case 'logout':
+        props.dispatch(logout());
         Auth.logout(history);
         break;
       default:

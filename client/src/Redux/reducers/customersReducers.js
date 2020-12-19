@@ -1,11 +1,14 @@
 import { createSlice, combineReducers } from '@reduxjs/toolkit';
+import { logout } from '../actions';
+
+const customerSliceInitialState = {
+    customers: [],
+    initialized: false
+};
 
 export const customerSlice = createSlice({
     name: 'customerSlice', 
-    initialState: {
-        customers: [],
-        initialized: false
-    },
+    initialState: customerSliceInitialState,
     reducers: {
         addCustomer: (state, action) => {
             state.customers.push(action.payload);
@@ -16,19 +19,23 @@ export const customerSlice = createSlice({
                 initialized: true
             };
         }
+    },
+    extraReducers: {
+        [logout]: state => ({...customerSliceInitialState})
     }
 })
 
+const modalSliceInitialState = {
+    show: {
+        CustomerDetailedView: false,
+        AddCustomerModal: false,
+    },
+    currentCustomer: {}
+}
+
 export const modalSlice = createSlice({
     name: 'modalSlice',
-    initialState: 
-    {
-        show: {
-            CustomerDetailedView: false,
-            AddCustomerModal: false,
-        },
-        currentCustomer: {}
-    },
+    initialState: modalSliceInitialState,
     reducers: {
         toggleShow: (state, action) => {
             state.show[action.payload] = !state.show[action.payload]
@@ -36,6 +43,9 @@ export const modalSlice = createSlice({
         setCurrentProduct: (state, action) => {
             state.currentProduct = action.payload
         }
+    },
+    extraReducers: {
+        [logout]: state => ({...modalSliceInitialState})
     }
 });
 

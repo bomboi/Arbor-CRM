@@ -6,6 +6,7 @@ const Order = require('../models/Order');
 const OrderData = require('../models/OrderData');   
 const Setting = require('../models/Settings');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
+const Notification = require('../models/Notification');
 
 router.use(isAuthenticated);
 
@@ -50,6 +51,62 @@ router.post('/post-comment', async (req, res) => {
     res.send(data)
 });
 
+router.post('/update-state', async (req, res) => {
+    let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
+    for(let order of orders) {
+        order.state = req.body.state;
+        await order.save();
+    }
+    res.sendStatus(200);
+})
+
+router.post('/add-version', async (req, res) => {
+    console.log(req.body)
+    let order = await Order.findOne({orderId: req.body.orderId}).exec();
+
+    const reqData = req.body;
+
+    let orderData = new OrderData();
+    orderData.orderId = order._id;
+    orderData.version = order.latestVersion + 1;
+    orderData.dateCreated = new Date();
+    orderData.changedBy = req.session.user;
+    orderData.data.articles = reqData.articles;
+    orderData.data.orderInfo = reqData.orderInfo;
+    await orderData.save();
+
+    order.latestVersionData = orderData._id;
+    order.latestVersion = orderData.version;
+    order.latestVersionDate = orderData.data.orderInfo.date;
+    console.log('customer: ');
+    console.log(req.customer);
+    if(req.customer !== undefined && req.customer._id !== undefined) {
+        order.customer = reqData.customer._id;
+    }
+    order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
+    await order.save();
+
+    let users = await User.find({}).select('_id').exec();
+
+    let notification = new Notification();
+    notification.dateChanged = new Date();
+    notification.orderId = order._id;
+    notification.readBy = users;
+    await notification.save();
+
+    res.sendStatus(200);
+})
+
+router.post('/read-notification', async (req, res) => {
+    let notification = await Notification.findOne({orderId: req.body.orderId}).exec();
+
+    notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
+    if(notification.readBy.length > 0) await notification.save();
+    else await Notification.deleteOne({orderId: req.body.orderId}).exec();
+
+    res.sendStatus(200);
+})
+
 router.get('/get-versions', async (req, res) => {
     let orderVersions = await OrderData.find({orderId: req.query.orderId})
                                  .sort({version: 1})
@@ -62,9 +119,38 @@ router.get('/get-versions', async (req, res) => {
     res.send(data);
 })
 
+router.post('/delete', async (req, res) => {
+    let orders = await Order.find({_id: {$in: req.body.ids}}).exec();
+    let deletedOrderIds = orders.map(order => order._id);
+    for(order of orders) {
+        let customer = await Customer.findOne({_id: order.customer}).exec();
+        let index = customer.orders.findIndex(item => item === order._id);
+        customer.orders.splice(index, 1);
+        await customer.save();
+
+        await OrderData.deleteMany({orderId: order._id}).exec();
+
+        await Order.deleteOne({_id: order._id}).exec();
+    }
+
+    let notification = new Notification();
+    if(deletedOrderIds.length > 1) {
+        notification.text = 'Obrisane su sledece porudzbine: \n';
+        for(let id of deletedOrderIds) notification.text += id + '\n';
+    }
+    else {
+        notification.text = 'Obrisana je porudzbina broj ' + deletedOrderIds[0] + '.';
+    }
+    notification.dateChanged = new Date();
+    notification.readBy = [];
+    notification.changedBy = req.session.user;
+    await notification.save();
+
+    res.sendStatus(200);
+})
+
 router.get('/search', async (req, res) => {
     req.query.filters = JSON.parse(req.query.filters)
-    console.log(req.query)
     let orders = [];
     let filters = {};
 
@@ -79,6 +165,11 @@ router.get('/search', async (req, res) => {
     if(hasRange) {
         filters.latestVersionDate = {$gte: req.query.filters.range[0], $lte: req.query.filters.range[1]}
     }
+    if(req.query.filters.status !== '' && req.query.filters.status !== 'sve' ) {
+        filters.state = req.query.filters.status;
+    }
+    console.log('Filters: ')
+    console.log(filters)
     if(req.query.lastOrderDate == null) {
         orders = await Order.find({...filters})
                             .populate('customer', '-_id -__v -orders')
@@ -97,13 +188,15 @@ router.get('/search', async (req, res) => {
                             .limit(parseInt(req.query.pageSize))
                             .exec();
     }
-    console.log(orders)
+    
+    let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
+    let data = orders.map(order => ({ 
+        ...order.toObject(), 
+        hasNotification: notifications.some(item => item.orderId.equals(order._id) && item.readBy.some(item => item.equals(req.session.user)))
+    }))
+
     res.status(200);
-    res.send(orders);
-})
-
-router.post('/remove', async (req, res) => {
-
+    res.send(data);
 })
 
 router.post('/add', async (req, res) => {
@@ -121,11 +214,10 @@ router.post('/add', async (req, res) => {
 
     let orderId = shuffle('' + date.getFullYear() + date.getDate() + ('0000' + (setting.value)).slice(-2)); 
 
-    order.state = 'ordered';
+    order.state = 'poruceno';
     order.latestVersion = 0;
     order.orderId = orderId;
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
-
 
     let customer = reqData.customer;
     if(customer._id === undefined) {
@@ -147,7 +239,6 @@ router.post('/add', async (req, res) => {
     orderData.version = 0;
     orderData.dateCreated = new Date();
     orderData.changedBy = req.session.user;
-    orderData.data.customer = customer._id;
     orderData.data.articles = reqData.articles;
     orderData.data.orderInfo = reqData.orderInfo;
     await orderData.save();
@@ -161,6 +252,17 @@ router.post('/add', async (req, res) => {
     customer.orders.push(order._id);
     await customer.save();
     res.sendStatus(200);
+})
+
+router.get('/:id', async (req, res) => {
+    console.log(req.params.id);
+    let order = await Order.findOne({orderId: req.params.id})
+                            .select('-comments')
+                            .populate('customer')
+                            .populate('latestVersionData').exec();
+    console.log(order)
+    res.status(200)
+    res.send(order);
 })
 
 module.exports = router;

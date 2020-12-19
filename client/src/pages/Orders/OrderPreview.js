@@ -1,28 +1,47 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Row, Col, Input, Divider, Button, Card, Tag, List, Select, Spin, Skeleton } from 'antd';
-import { isOrderPreviewVisible, getOrderPreviewData, getOrderPreviewVersions, isOrderPreviewLoading } from '@selectors/ordersSelectors';
+import { 
+    isOrderPreviewVisible, 
+    getOrderPreviewData, 
+    getOrderPreviewVersions, 
+    isOrderPreviewLoading, 
+    getOrderPreviewIndex 
+} from '@selectors/ordersSelectors';
 import { connect } from 'react-redux';
 import Title from 'antd/lib/typography/Title';
 import OrderPreviewComments from './OrderPreviewComments';
 import { Collapse } from 'antd';
-import { orderPreviewSlice } from '@reducers/ordersReducers';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
-import { newOrderArticlesSlice } from '../../Redux/reducers/ordersReducers';
+import { 
+    orderPreviewSlice,
+    newOrderArticlesSlice, 
+    newOrderInfoSlice, 
+    newOrderCustomerSlice, 
+    orderDetails, 
+    orderListSlice
+} from '@reducers/ordersReducers';
+import { isAdmin } from '@selectors/appSelectors';
+import { getTagColor } from '../../utils';
+import Axios from 'axios';
 
 const SelectVersion = (props) => {
     const genOptions = (number) => {
-        let i = number + 1;
+        let i = number;
         let options = []
         while(i > 0) {
-            options.push(<Select.Option className="text-secondary" value={i}>{i} Verzija</Select.Option>)
+            options.push(<Select.Option className="text-secondary" value={i}>Verzija {i}</Select.Option>)
             i--;
         }
         return options
     }
 
     return (
-        <Select className="text-secondary" bordered={false} defaultValue={props.number + 1}>
+        <Select 
+            className="text-secondary" 
+            bordered={false} 
+            defaultValue={props.number}
+            onSelect={props.onSelect}>
             {genOptions(props.number)}
         </Select>
     )
@@ -37,10 +56,48 @@ const SkeletonRow = (props) => {
 
 const OrderPreview = (props) => {
 
-    let [version, setVersion] = useState(props.versions.length);
+    let [version, setVersion] = useState(props.versions?props.versions.length:0);
     let history = useHistory();
+    let [firstState, setFirstState] = useState('');
+
+    const selectVersion = (value) => {
+        setVersion(value - 1);
+    };
+
+    useEffect(()=> {
+        if(props.order != null && firstState === '') {
+            setFirstState(props.order.state);
+        }
+    }, [props.order])
+
+    useEffect(()=> {
+        if(props.versions) {
+            setVersion(props.versions.length - 1);
+        }
+    }, [props.versions])
+
+    const onSelectOrderState = (value) => {
+        Axios.post('/api/order/update-state', {
+            orderId: props.order._id,
+            state: value
+        }).then(() => {
+            setFirstState(value)
+        })
+    }
+
+    const deleteOrder = () => {
+        // TODO: Set spinner while deleting
+        Axios.post('/api/order/delete', {
+            ids: [props.order._id]
+        }).then(res => {
+            // TODO: Check if deleted
+            props.dispatch(orderListSlice.actions.deleteOrder(props.orderIndex));
+            props.dispatch(orderPreviewSlice.actions.toggleShow());
+        });
+    }
 
     return (
+        props.order === undefined ? <></> :
         <Modal 
             bodyStyle={{padding: 0}}
             width={1200}
@@ -51,29 +108,66 @@ const OrderPreview = (props) => {
             <Spin spinning={props.loading}>
             <Row justify={'space-between'} className="pl-4 pr-4 pt-3 pb-3">
                 <div>
-                    <Button type={'primary'} className="mr-2" danger>Obrisi</Button>
+                    <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>
+                    <Button className="mr-2">Štampaj</Button>
+                    {props.isAdmin && <Button className="mr-2">Štampaj nalog</Button>}
+                    {!props.isAdmin && <Button className="mr-2">Prijavi reklamaciju</Button>}
                     <Button onClick={()=>{
-                        props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[version].data.articles))
+                        props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[props.versions.length - 1].data.articles))
+                        props.dispatch(newOrderInfoSlice.actions.setOrderInfo(props.versions[props.versions.length - 1].data.orderInfo))
+                        props.dispatch(newOrderCustomerSlice.actions.setCustomer({customer: props.order.customer, delivery: props.versions[props.versions.length - 1].data.orderInfo.delivery}));
+                        props.dispatch(orderDetails.actions.initEditMode(true))
                         history.push('/porudzbine/izmeni/'+props.order.orderId);
                     }}>Izmeni</Button>
                 </div>
-                <Button onClick={()=>props.dispatch(orderPreviewSlice.actions.toggleShow())}>Zatvori</Button>
+                <Button onClick={()=>{
+                    props.dispatch(orderPreviewSlice.actions.toggleShow());
+                    props.dispatch(orderListSlice.actions.updateOrderState({index: props.orderIndex, state: firstState}))
+                }}>Zatvori</Button>
             </Row>
             <Divider className="m-0"/>
             <Row>
                 <Col className="pl-4 pr-4 pb-4 pt-2" span={18}>
                     {props.loading? <Skeleton active paragraph={{rows:0}}/> :<>
-                        <small className="text-secondary mt-0">izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName}</small>
+                        <small className="text-secondary mt-0">
+                            <div>
+                                izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName} 
+                            </div>
+                            <div>
+                                trenutna verzija: {props.versions[version].changedBy.firstName} {props.versions[version].changedBy.lastName}
+                            </div>
+                        </small>
                         <div className="d-flex justify-content-between mb-2">
                             <div className="d-flex align-items-end">
                                 <Title level={4} className="mb-0">#{props.order.orderId}</Title>
                             </div>
                             <div className="align-self-center">
-                                <SelectVersion number={version}/>
-                                <Tag color={'blue'} style={{fontSize:14}} className="mr-0">{props.order.state.toUpperCase()}</Tag>
+                                <SelectVersion 
+                                    onSelect={selectVersion}
+                                    number={props.versions.length}/>
+                                {!props.isAdmin ? 
+                                <Tag color={'blue'} style={{fontSize:14}} className="mr-0">
+                                    {props.order.state.toUpperCase()}
+                                </Tag>
+                                :
+                                <Select 
+                                    bordered={false} 
+                                    value={firstState.toUpperCase()} 
+                                    className={"ant-tag ant-tag-" + getTagColor(firstState)}
+                                    onSelect={onSelectOrderState}>
+                                    <Select.Option value="poruceno">Poruceno</Select.Option>
+                                    <Select.Option value="u izradi">U izradi</Select.Option>
+                                    <Select.Option value="za isporuku">Za isporuku</Select.Option>
+                                    <Select.Option value="isporuceno">Isporuceno</Select.Option>
+                                    <Select.Option value="reklamacija">Reklamacija</Select.Option>
+                                    <Select.Option value="arhivirano">Arhivirano</Select.Option>
+                                </Select>
+                                }
                             </div>
                         </div>
                     </>}
+            <Card bodyStyle={{padding:0}}>
+
                     <Collapse ghost style={{overflowY:'scroll', height:470}} defaultActiveKey={['customer', 'info', 'articles']}>
                         <Collapse.Panel key={'customer'} header={'Kupac' }>
                             <Card>
@@ -117,7 +211,7 @@ const OrderPreview = (props) => {
                                 </SkeletonRow>
                             </Card>
                         </Collapse.Panel>
-                        <Collapse.Panel key={'articles'} header={'Artikli'}>
+                        <Collapse.Panel className="mb-3" key={'articles'} header={'Artikli'}>
                             <List
                                 header={<Row className="w-100">
                                     <Col span={4}>
@@ -158,6 +252,8 @@ const OrderPreview = (props) => {
                             </List>
                         </Collapse.Panel>
                     </Collapse>
+            </Card>
+
                 </Col>
                 <Col className="p-4 bg-light" span={6}>
                     {!props.loading && <OrderPreviewComments comments = {props.order.comments}/> }
@@ -172,7 +268,9 @@ const mapStateToProps = (state) => ({
     versions: getOrderPreviewVersions(state),
     visible: isOrderPreviewVisible(state),
     order: getOrderPreviewData(state),
-    loading: isOrderPreviewLoading(state)
+    loading: isOrderPreviewLoading(state),
+    orderIndex: getOrderPreviewIndex(state),
+    isAdmin: isAdmin(state)
 })
 
 export default connect(mapStateToProps)(OrderPreview);

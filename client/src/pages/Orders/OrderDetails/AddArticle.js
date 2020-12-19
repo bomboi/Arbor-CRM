@@ -5,6 +5,7 @@ import AddArticleDescription from './AddArticleDescription';
 import { connect } from 'react-redux';
 import { newOrderArticlesSlice, newOrderNewArticleSlice } from '@reducers/ordersReducers';
 import { getNewOrderNewArticle } from '@selectors/ordersSelectors';
+import Modal from 'antd/lib/modal/Modal';
 
 const { TabPane } = Tabs;
 
@@ -29,14 +30,29 @@ const AddArticle = (props) => {
     }
 
     return (
-        <Card className='mb-3'>
+        <Modal
+            visible={props.visible}
+            width={1200}
+            okText={props.edit?'Izmeni artikl':'Dodaj artikl'}
+            onOk={()=>{
+                if(props.edit) {
+                    props.dispatch(newOrderArticlesSlice.actions.editArticle({article: props.currentArticle, index: props.index}))
+                }
+                else {
+                    addToList() 
+                }
+                props.onCancel();
+            }}
+            onCancel={props.onCancel}
+            closable = {false}
+            cancelText={'Zatvori'}
+            >
             <PageHeader
                 ghost={true}
                 title="Artikl"
                 className="p-0"
                 extra={[
                     <Button key="1">Cenovnik</Button>,
-                    <Button key="2" onClick={addToList} type="primary">Dodaj u porudzbinu</Button>,
                 ]}/>
             <Tabs centered>
                 <TabPane tab="Opis artikla" key="1">
@@ -46,7 +62,7 @@ const AddArticle = (props) => {
                     <AddMaterials/>
                 </TabPane>
             </Tabs>
-        </Card>
+        </Modal>
     )
 }
 

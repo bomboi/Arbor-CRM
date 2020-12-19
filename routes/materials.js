@@ -19,7 +19,7 @@ router.get('/producers', async (req, res) => {
 router.post('/producers/save', async (req, res) => {
     console.log(req.body)
     // TODO: Do not save if it exists
-    Material.find({producer: { "$regex": req.query.value, "$options": "i" }},
+    Material.find({producer: req.query.value},
         (err, materials) => {
             console.log(err)
             console.log(materials)

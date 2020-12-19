@@ -29,7 +29,7 @@ const OrderPreviewComments = (props) => {
                                     <small className="text-secondary">{item.writtenBy.firstName} {item.writtenBy.lastName}</small>
                                     <small className="text-secondary">{moment(item.datePosted).format('HH:mm / DD.MM.YY.').toString()}</small>
                                 </div>
-                                <div>
+                                <div style={{whiteSpace: 'pre-line'}}>
                                     {item.text}
                                 </div>
                             </Card>).reverse()
@@ -46,14 +46,16 @@ const OrderPreviewComments = (props) => {
                         type={'primary'} 
                         className="mt-2 w-100"
                         onClick={()=>{
-                            Axios.post('/api/order/post-comment', {
-                                    orderId: props.orderId,
-                                    comment: comment
-                            }).then(result => {
-                                // TODO: Check if everything ok. Also check this everywhere!
-                                props.dispatch(orderPreviewSlice.actions.postComment({...result.data, writtenBy: props.user}))
-                                setComment('');
-                            })
+                            if(comment !== '') {
+                                Axios.post('/api/order/post-comment', {
+                                        orderId: props.orderId,
+                                        comment: comment
+                                }).then(result => {
+                                    // TODO: Check if everything ok. Also check this everywhere!
+                                    props.dispatch(orderPreviewSlice.actions.postComment({...result.data, writtenBy: props.user}))
+                                    setComment('');
+                                })
+                            }
                         }}>
                             Dodaj komentar
                         </Button>
