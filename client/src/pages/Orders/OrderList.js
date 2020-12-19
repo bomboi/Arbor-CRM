@@ -11,6 +11,8 @@ import { isAdmin } from '@selectors/appSelectors';
 import MultipleOrderStateModal from './MultipleOrderStateModal';
 import { getSelectedIds } from '../../Redux/selectors/ordersSelectors';
 import { DeleteOutlined } from '@ant-design/icons';
+import { clearNewOrder } from '../../Redux/reducers/ordersReducers';
+import { isMobile } from 'react-device-detect';
 
 const { RangePicker } = DatePicker;
 const { Search } = Input;
@@ -80,25 +82,32 @@ const OrderList = (props) => {
       title="Porudžbine"
       className="mb-3"
       extra={[
-        <Button key='1' type="primary" onClick={()=>history.push('/porudzbine/dodaj')}>Nova porudžbina</Button>,
+        <Button key='1' type="primary" onClick={()=>{
+            props.dispatch(clearNewOrder());
+            history.push('/porudzbine/dodaj');
+        }}>Nova porudžbina</Button>,
       ]}
     ></PageHeader>
         <Card>
             <Row>
                 <Col flex={'auto'} className='mb-3'>
                         <Search
-                            className='mr-3'
+                            className={isMobile?'mb-2 w-100':'mr-3'}
                             value={filters.orderId}
                             placeholder="Unesite broj porudžbine"
                             onChange={e => update(e.target.value, 'orderId')}
                             style={{ width: 300 }} />
                         <RangePicker
-                            className='mr-3'
+                            className={isMobile?'mb-2 w-100':'mr-3'}
                             value={filters.range}
                             onChange={value => updateRange(value)}
                             placeholder={['Pocetni datum', 'Krajnji datum']}
                             format={'DD/MM/YYYY'}/>
-                        <Select value={filters.status} onSelect={value => update(value, 'status')} className='mr-3' style={{ width: 120 }}>
+                        <Select 
+                            value={filters.status} 
+                            onSelect={value => update(value, 'status')} 
+                            className={isMobile?'mb-2 w-100':'mr-3'} 
+                            style={{ width: 120 }}>
                             <Select.Option value="sve">Sve</Select.Option>
                             <Select.Option value="poruceno">Poručeno</Select.Option>
                             <Select.Option value="u izradi">U izradi</Select.Option>
@@ -112,16 +121,16 @@ const OrderList = (props) => {
             <Divider className="mt-1 mb-3"/>
             <div className="mb-2 d-flex justify-content-between">
                 <div>
-                    <Button onClick={unselect} disabled={Object.keys(props.selectedIds).length === 0} className="mr-2">Odselektuj sve</Button>
-                    {props.isAdmin && <Button className="mr-2" onClick={()=>{
+                    <Button onClick={unselect} disabled={Object.keys(props.selectedIds).length === 0} className={isMobile?'mb-2 w-100':'mr-2'} >Odselektuj sve</Button>
+                    {props.isAdmin && <Button className={isMobile?'mb-2 w-100':'mr-2'}  onClick={()=>{
                         if(Object.keys(props.selectedIds).length === 0) {
                             message.error('Niste selektovali nijednu porudzbinu!');
                             return;
                         }
                         setMultipleOrderStateModalVisibility(true)
                     }}>Promeni status selektovanih</Button>}
-                    {props.isAdmin && <Button className="mr-2">Štampaj naloge za selektovane</Button>}
-                    <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className="mr-2" type='primary' danger>Obriši selektovane</Button>
+                    {props.isAdmin && <Button className={isMobile?'mb-2 w-100':'mr-2'} >Štampaj naloge za selektovane</Button>}
+                    <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>
                 </div>
                 <div>
                     {Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>

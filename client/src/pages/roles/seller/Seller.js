@@ -12,6 +12,7 @@ import Axios from 'axios';
 import { isAdmin, loggedInUser } from '@selectors/appSelectors';
 import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
+import { isBrowser } from 'react-device-detect';
 
 const { Content, Sider } = Layout;
 
@@ -51,6 +52,7 @@ const Seller = (props) => {
       :
       // TODO: Make Sider independent of content
       <Layout style={{ minHeight: '100vh' }} hasSider={true}>
+      {isBrowser && 
       <Sider theme="light" style={{
         overflow: 'auto',
         height: '100vh',
@@ -82,8 +84,8 @@ const Seller = (props) => {
             Izloguj se
           </Menu.Item>
         </Menu>
-      </Sider>
-      <Layout style={{ marginLeft: 200 }} className="site-layout">
+      </Sider>}
+      <Layout style={{ marginLeft: isBrowser?200:0 }} className="site-layout">
         <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
               <MenuSwitch/>
         </Content>

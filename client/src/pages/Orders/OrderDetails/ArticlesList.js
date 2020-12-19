@@ -9,6 +9,7 @@ import Paragraph from 'antd/lib/typography/Paragraph';
 import Modal from 'antd/lib/modal/Modal';
 import AddArticleDescription from './AddArticleDescription';
 import AddArticle from './AddArticle';
+import { usingDelivery, getDeliveryPrice } from '../../../Redux/selectors/ordersSelectors';
 
 
 const ArticlesList = (props) => {
@@ -31,6 +32,8 @@ const ArticlesList = (props) => {
     const calculateTotalPrice = (acc, value) => Number(acc) + Number(value.price) * Number(value.quantity) * (100 - Number(value.discount)) / 100;
 
     let amount = props.articles.length === 0 ? 0 : props.articles.reduce(calculateTotalPrice, [0]);
+    let deliveryCondition = props.hasDelivery && props.deliveryPrice!==undefined && props.deliveryPrice !== '';
+    amount += (deliveryCondition?props.deliveryPrice:0);
     let avans = props.avans === undefined ? 0 : props.avans;
     let globalDiscount = props.globalDiscount === 0 ? '' : (' (-' + props.globalDiscount + '%)'); 
     let finalAmount = amount*(100-props.globalDiscount)/100;
@@ -44,15 +47,14 @@ const ArticlesList = (props) => {
                 extra={[
                     <Button type={'primary'} onClick={()=>{ setVisible(true);}} key="1">Dodaj artikl</Button>,
                 ]}/>
-            {/* <Title level={4}>Dodati artikli</Title> */}
             <Card>
                 <Row>
-                    <Col span={5}>
+                    <Col span={6}>
                         <Paragraph className='mb-0 pb-0' type={'secondary'} level={5}>Ukupan iznos</Paragraph>
-                        <small><Paragraph className='mb-0 pb-0' type={'secondary'}>{amount} RSD {globalDiscount} = </Paragraph></small>
+                        <small><Paragraph className='mb-0 pb-0' type={'secondary'}>{amount} RSD {globalDiscount} {deliveryCondition?(' + ' + props.deliveryPrice + ' RSD'):''}= </Paragraph></small>
                         <Title className='mt-0' level={5}>{finalAmount} RSD</Title>
                     </Col>
-                    <Col span={5}>
+                    <Col span={6}>
                         <Paragraph className='mb-0 pb-0' type={'secondary'} level={5}>Preostali iznos</Paragraph>
                         <small><Paragraph className='mb-0 pb-0' type={'secondary'}>{finalAmount} RSD - {avans} RSD =</Paragraph></small>
                         <Title className='mt-0' level={5}>{finalAmount - avans} RSD</Title>
@@ -113,7 +115,9 @@ const ArticlesList = (props) => {
 const mapStateToProps = (state) => ({
     articles: getAddedArticles(state),
     avans: getAvans(state),
-    globalDiscount: getGlobalDiscount(state)
+    globalDiscount: getGlobalDiscount(state),
+    hasDelivery: usingDelivery(state),
+    deliveryPrice: getDeliveryPrice(state)
 })
 
 export default connect(mapStateToProps)(ArticlesList)

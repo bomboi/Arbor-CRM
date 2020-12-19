@@ -15,6 +15,7 @@ export const getArticleMaterials = state => state.ordersReducers.newOrderReducer
 export const getOrderInfo = state => state.ordersReducers.newOrderReducer.orderInfoSlice;
 export const getAvans = state => state.ordersReducers.newOrderReducer.orderInfoSlice.avans;
 export const getGlobalDiscount = state => state.ordersReducers.newOrderReducer.orderInfoSlice.discount;
+export const getDeliveryPrice = state => state.ordersReducers.newOrderReducer.orderInfoSlice.deliveryPrice;
 
 // Added Articles Slice
 export const getAddedArticles = state => state.ordersReducers.newOrderReducer.addedArticles;
