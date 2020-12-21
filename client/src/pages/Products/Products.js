@@ -16,9 +16,11 @@ const Products = (props) => {
     const [searchString, setSearchString] = useState('')
 
     useEffect(() => {
-        Axios.get('/api/product/all').then(result => {
-            props.dispatch(productSlice.actions.initProducts(result.data))
-        })
+        if(props.products.length === 0) {
+            Axios.get('/api/product/all').then(result => {
+                props.dispatch(productSlice.actions.initProducts(result.data))
+            })
+        }
     }, [])
 
     const onSearch = (e) => {

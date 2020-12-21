@@ -218,6 +218,7 @@ router.post('/add', async (req, res) => {
     order.latestVersion = 0;
     order.orderId = orderId;
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
+    if(reqData.orderInfo.delivery) order.totalAmount += reqData.orderInfo.deliveryPrice;
 
     let customer = reqData.customer;
     if(customer._id === undefined) {

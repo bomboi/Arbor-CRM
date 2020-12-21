@@ -12,7 +12,8 @@ import Axios from 'axios';
 import { isAdmin, loggedInUser } from '@selectors/appSelectors';
 import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
-import { isBrowser } from 'react-device-detect';
+import { isBrowser, MobileView, BrowserView } from 'react-device-detect';
+import { NavBar } from 'antd-mobile';
 
 const { Content, Sider } = Layout;
 
@@ -51,40 +52,42 @@ const Seller = (props) => {
         <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
       :
       // TODO: Make Sider independent of content
-      <Layout style={{ minHeight: '100vh' }} hasSider={true}>
-      {isBrowser && 
-      <Sider theme="light" style={{
-        overflow: 'auto',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-      }}>
-        <div className="logo" />
-        <Menu defaultSelectedKeys={['porudzbine']} mode="inline" onSelect={menuFunction}>
-          <Menu.Item key="porudzbine" icon={<PieChartOutlined />}>
-            Porudzbine
-          </Menu.Item>
-          <Menu.Item key="kupci" icon={<DesktopOutlined />}>
-            Kupci
-          </Menu.Item>
-          <Menu.Item key="proizvodi" icon={<DesktopOutlined />}>
-            Proizvodi
-          </Menu.Item>
-          <Menu.Item key="podesavanja" icon={<DesktopOutlined />}>
-            Podesavanja
-          </Menu.Item>
-          {props.isAdmin && <Menu.Item key="statistika" icon={<DesktopOutlined />}>
-            Statistika
-          </Menu.Item>}
-          {/* TODO: Put name and logout on the lower end of sider */}
-          <Menu.Item>
-            {props.loggedInUser.firstName}
-          </Menu.Item>
-          <Menu.Item key="logout" icon={<DesktopOutlined />}>
-            Izloguj se
-          </Menu.Item>
-        </Menu>
-      </Sider>}
+      <Layout style={{ minHeight: '100vh' }} hasSider={isBrowser}>
+      <BrowserView>
+        <Sider theme="light" style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+        }}>
+          <div className="logo" />
+          <Menu defaultSelectedKeys={['porudzbine']} mode="inline" onSelect={menuFunction}>
+            <Menu.Item key="porudzbine" icon={<PieChartOutlined />}>
+              Porudzbine
+            </Menu.Item>
+            <Menu.Item key="kupci" icon={<DesktopOutlined />}>
+              Kupci
+            </Menu.Item>
+            <Menu.Item key="proizvodi" icon={<DesktopOutlined />}>
+              Proizvodi
+            </Menu.Item>
+            <Menu.Item key="podesavanja" icon={<DesktopOutlined />}>
+              Podesavanja
+            </Menu.Item>
+            {props.isAdmin && <Menu.Item key="statistika" icon={<DesktopOutlined />}>
+              Statistika
+            </Menu.Item>}
+            {/* TODO: Put name and logout on the lower end of sider */}
+            <Menu.Item>
+              {props.loggedInUser.firstName}
+            </Menu.Item>
+            <Menu.Item key="logout" icon={<DesktopOutlined />}>
+              Izloguj se
+            </Menu.Item>
+          </Menu>
+        </Sider>
+      </BrowserView>
+      
       <Layout style={{ marginLeft: isBrowser?200:0 }} className="site-layout">
         <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
               <MenuSwitch/>

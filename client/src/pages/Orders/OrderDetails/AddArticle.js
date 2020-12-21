@@ -6,10 +6,13 @@ import { connect } from 'react-redux';
 import { newOrderArticlesSlice, newOrderNewArticleSlice } from '@reducers/ordersReducers';
 import { getNewOrderNewArticle } from '@selectors/ordersSelectors';
 import Modal from 'antd/lib/modal/Modal';
+import ProductsListModal from './ProductsListModal';
 
 const { TabPane } = Tabs;
 
 const AddArticle = (props) => {
+
+    let [productsModalVisible, setProductsModalVisibility] = useState(false);
 
     const isArticleOk = () => {
         if(props.currentArticle.name === undefined) return false;
@@ -52,8 +55,9 @@ const AddArticle = (props) => {
                 title="Artikl"
                 className="p-0"
                 extra={[
-                    <Button key="1">Cenovnik</Button>,
+                    <Button key="1" onClick={()=>setProductsModalVisibility(true)}>Cenovnik</Button>,
                 ]}/>
+            <ProductsListModal visible={productsModalVisible} onCancel={()=>setProductsModalVisibility(false)}/>
             <Tabs centered>
                 <TabPane tab="Opis artikla" key="1">
                     <AddArticleDescription/>

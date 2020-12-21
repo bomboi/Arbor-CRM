@@ -77,6 +77,10 @@ export const newOrderNewArticleSlice = createSlice({
         },
         setArticle: (state, action) => {
             return ({article:{...action.payload}, currentMaterial: {}});
+        },
+        selectProduct: (state, action) => {
+            state.article.name = action.payload.productName;
+            state.article.price = action.payload.price;
         }
     },
     extraReducers: {
