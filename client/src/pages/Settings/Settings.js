@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 import { PageHeader, Card, InputNumber, Divider, Button } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import TextArea from 'antd/lib/input/TextArea';
+import DeadlineModal from './DeadlineModal';
+import CompanyInfoModal from './CompanyInfoModal';
+import OrderNoteModal from './OrderNoteModal';
+import UserSettingsModal from './UserSettingsModal';
 
 const Settings = (props) => {
 
-    useEffect(()=> {
-
-    }, [])
+    let [visible, setVisible] = useState({
+        deadline: false,
+        companyInfo: false,
+        orderNote: false,
+        userSettings: false
+    });
 
     return (
         <div>
@@ -21,33 +28,28 @@ const Settings = (props) => {
                 <Divider className="mb-3 mt-3"/>
                 <div className="d-flex justify-content-between">
                     <div>Podrazumevani rok isporuke</div>
-                    <div>
-                        <InputNumber placeholder='Od'></InputNumber>
-                        <InputNumber placeholder='Do'></InputNumber>
-                    </div>
+                    <Button onClick={()=>setVisible({deadline:true})}>Izmeni</Button>
+                    <DeadlineModal visible={visible.deadline} onCancel={()=>setVisible({deadline:false})}/>
                 </div>
                 <Divider className="mb-3 mt-3"/>
                 <div className="d-flex justify-content-between">
                     <div>Informacije o firmi na predracunu</div>
-                    <div>
-                        <TextArea></TextArea>
-                    </div>
+                    <Button onClick={()=>setVisible({companyInfo:true})}>Izmeni</Button>
+                    <CompanyInfoModal visible={visible.companyInfo} onCancel={()=>setVisible({companyInfo:false})}/>
                 </div>
                 <Divider className="mb-3 mt-3"/>
                 <div className="d-flex justify-content-between">
                     <div>Tekst za napomenu</div>
-                    <div>
-                        <TextArea></TextArea>
-                    </div>
+                    <Button onClick={()=>setVisible({orderNote:true})}>Izmeni</Button>
+                    <OrderNoteModal visible={visible.orderNote} onCancel={()=>setVisible({orderNote:false})}/>
                 </div>
                 
                 <Title className="mt-4" level={5}>Nalog</Title>
                 <Divider className="mb-3 mt-3"/>
                 <div className="d-flex justify-content-between">
                     <div>Promena informacija o nalogu</div>
-                    <div>
-                        <Button>Promeni</Button>
-                    </div>
+                    <Button onClick={()=>setVisible({userSettings:true})}>Izmeni</Button>
+                    <UserSettingsModal visible={visible.userSettings} onCancel={()=>setVisible({userSettings:false})}/>
                 </div>
                 <Divider className="mb-3 mt-3"/>
                 {/* Admin */}

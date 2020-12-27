@@ -75,18 +75,21 @@ const OrderList = (props) => {
             props.dispatch(orderListSlice.actions.deleteOrder());
         });
     }
+
+    const extraList = [
+        <Button key='1' type="primary" onClick={()=>{
+            props.dispatch(clearNewOrder());
+            history.push('/porudzbine/dodaj');
+        }}>Nova porudžbina</Button>,
+    ];
+
     return (
     <div>
         <PageHeader
       ghost={false}
       title="Porudžbine"
       className="mb-3"
-      extra={[
-        <Button key='1' type="primary" onClick={()=>{
-            props.dispatch(clearNewOrder());
-            history.push('/porudzbine/dodaj');
-        }}>Nova porudžbina</Button>,
-      ]}
+      extra={isMobile?[]:extraList}
     ></PageHeader>
         <Card>
             <Row>
