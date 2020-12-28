@@ -21,4 +21,28 @@ router.post('/default-deadline', async (req, res) => {
     res.sendStatus(200);
 })
 
+router.get('/company-info', async (req, res) => {
+    const info = await Setting.findOne({name: 'DefaultCompanyInfo'}).exec();
+    res.status(200).send(info.value);
+})
+
+router.post('/company-info', async (req, res) => {
+    const info = await Setting.findOne({name: 'DefaultCompanyInfo'}).exec();
+    info.value = req.body.text;
+    info.save();
+    res.sendStatus(200);
+})
+
+router.get('/order-note', async (req, res) => {
+    const note = await Setting.findOne({name: 'DefaultOrderNote'}).exec();
+    res.status(200).send(note.value);
+})
+
+router.post('/order-note', async (req, res) => {
+    const note = await Setting.findOne({name: 'DefaultOrderNote'}).exec();
+    note.value = req.body.text;
+    note.save();
+    res.sendStatus(200);
+})
+
 module.exports = router;

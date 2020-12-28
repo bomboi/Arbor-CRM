@@ -9,6 +9,7 @@ import Customers from '../Customers/Customers';
 import Products from '../Products/Products';
 import ProtectedRoute from '../../routing/ProtectedRoute';
 import Settings from '../Settings/Settings';
+import Statistics from '../Statistics/Statistics';
 
 export default function MenuSwitch() {
     let match = useRouteMatch();
@@ -27,6 +28,9 @@ export default function MenuSwitch() {
                 </ProtectedRoute>
                 <ProtectedRoute path="/podesavanja">
                     <Settings />
+                </ProtectedRoute>
+                <ProtectedRoute path="/statistika">
+                    <Statistics />
                 </ProtectedRoute>
             </Switch>
         // </Router>

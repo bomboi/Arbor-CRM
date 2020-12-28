@@ -52,11 +52,18 @@ const Settings = (props) => {
                     <UserSettingsModal visible={visible.userSettings} onCancel={()=>setVisible({userSettings:false})}/>
                 </div>
                 <Divider className="mb-3 mt-3"/>
+                <div className="d-flex justify-content-between">
+                    <div>Promena šifre</div>
+                    {/* TODO: Create a new modal */}
+                    <Button onClick={()=>setVisible({userSettings:true})}>Izmeni</Button>
+                    <UserSettingsModal visible={visible.userSettings} onCancel={()=>setVisible({userSettings:false})}/>
+                </div>
+                <Divider className="mb-3 mt-3"/>
                 {/* Admin */}
                 <div className="d-flex justify-content-between">
                     <div>Gasenje naloga prodavaca</div>
                     <div>
-                        <Button>Promeni</Button>
+                        <Button>Izmeni</Button>
                     </div>
                 </div>
             </Card>
