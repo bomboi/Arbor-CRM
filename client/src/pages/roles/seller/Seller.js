@@ -13,7 +13,6 @@ import { isAdmin, loggedInUser } from '@selectors/appSelectors';
 import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
 import { isBrowser, MobileView, BrowserView } from 'react-device-detect';
-import { NavBar } from 'antd-mobile';
 import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 
 const { Content, Sider } = Layout;
@@ -26,7 +25,6 @@ const Seller = (props) => {
   useEffect(() => {
     Axios.get('/api/user/get')
       .then(result => {
-        console.log('INIT_USER')
         props.dispatch(userSlice.actions.initUser(result.data));
         setTimeout(() => {
           setLoading(false);
@@ -42,13 +40,11 @@ const Seller = (props) => {
         Auth.logout(history);
         break;
       default:
-        console.log('push')
         history.push('/' + key);
         break;
     }
   };
 
-  console.log(history)
   return (
       loading?
         <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>

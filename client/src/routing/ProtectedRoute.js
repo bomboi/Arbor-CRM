@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Route,
     Redirect
@@ -11,9 +11,15 @@ function ProtectedRoute ({ children, designatedRole, userRole, ...rest }) {
 
     const [authenticated, setAuthenticated] = useState(true);
 
+    useEffect(() => {
+        console.log('ProtectedRoute: useEffects')
+        Auth.isAuthenticated().then(res => {
+            setAuthenticated(res);
+        });
+    });
+
     return (
         <Route {...rest} render={() => {
-            Auth.isAuthenticated().then(res => setAuthenticated(res));
             if(authenticated) {
                 let allowed = designatedRole === undefined || userRole === designatedRole;
                 if(allowed) {

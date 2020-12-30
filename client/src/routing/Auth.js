@@ -2,8 +2,15 @@ import axios from 'axios'
 
 class Auth {
     static async isAuthenticated() {
-        const response = await axios.get('/api/authenticated');
-        return response.status === 200;
+        try {
+
+            const response = await axios.get('/api/authenticated');
+            return response.status === 200;
+        }
+        catch(e) {
+
+            return false;
+        }
     }
 
     static async logout(history) {
