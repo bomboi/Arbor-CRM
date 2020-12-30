@@ -6,6 +6,7 @@ import { newOrderInfoSlice } from '@reducers/ordersReducers';
 import { getOrderInfo } from '@selectors/ordersSelectors';
 import moment from 'moment';
 import { usingDelivery } from '../../../Redux/selectors/ordersSelectors';
+import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -20,6 +21,11 @@ const OrderInfo = (props) => {
         if(props.orderInfo.date === undefined) {
             props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'date', value: moment()}));
         }
+        if(!props.edit){
+            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineFrom', value: props.orderDefaults.DefaultDeadlineFrom}));
+            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineTo', value: props.orderDefaults.DefaultDeadlineTo}));
+        }
+        console.log('Mounted!');
     }, []);
 
     const update = (value, key) => {
@@ -121,6 +127,7 @@ const OrderInfo = (props) => {
 const mapStateToProps = (state) => ({
     orderInfo: getOrderInfo(state),
     hasDelivery: usingDelivery(state),
+    orderDefaults: getOrderDefaults(state),
 })
 
 export default connect(mapStateToProps)(OrderInfo)

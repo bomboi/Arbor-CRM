@@ -4,41 +4,52 @@ import { Button, Row, Col, Divider } from 'antd';
 
 import ReactToPrint from 'react-to-print';
 import { getAddedArticles } from '@selectors/ordersSelectors';
+import { getNewOrderCustomer, usingDelivery } from '../../../Redux/selectors/ordersSelectors';
+import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 
 class ComponentToPrint extends React.Component {
 
+
     render() {
         return (
+            Object.keys(this.props.customer).length === 0?
+            <></>
+            :
             <div className="d-flex flex-column justify-content-between" style={{height: '100%'}}>
-                <div className="content-margin">
-                    <Row>
-                        <div className="invoice-title">PREDRACUN</div>
-                    </Row>
+                <div>
+                    <div className="bg-light">
+                        <div className="d-flex justify-content-between header-margin">
+                            <div className="invoice-title">PREDRACUN</div>
+                            <div style={{whiteSpace:'pre', textAlign: 'right'}}>{this.props.defaults.DefaultCompanyInfo}</div>
+                        </div>
+                    </div>
+                    <div className="content-margin">
                     <div className="customer-details d-flex justify-content-between align-items-end">
                         <div>
                             <div className="customer-name">
-                                Matija Bojovic
+                                {this.props.customer.name}
                             </div>
                             <div>
-                                0605222023
+                                {this.props.customer.phone}
                             </div>
                             <div>
-                                matija7amg@gmail.com
+                                {this.props.customer.email}
                             </div>
                         </div>
+                        {this.props.usingDelivery &&
                         <div className="text-right">
                             <div className="">
-                                Platana 3 (stan) 
+                                {this.props.customer.address.street} ({this.props.customer.address.homeType}) 
                             </div>
                             <div>
-                                3. sprat (nema lift)
+                                {this.props.customer.address.floor}. sprat ({this.props.customer.address.elevator?"ima lift":"nema lift"})
                             </div>
                         </div>
+                        }
                     </div>
                     <Row>
                         <Col span={4}>Naziv proizvoda</Col>
-                        <Col span={5}>Opis</Col>
-                        <Col span={5}>Materijali</Col>
+                        <Col span={10}>Opis</Col>
                         <Col span={3}>Cena</Col>
                         <Col span={2}>Kolicina</Col>
                         <Col span={2}>Popust</Col>
@@ -72,6 +83,7 @@ class ComponentToPrint extends React.Component {
                             <Col span={2}>{article.discount}</Col>
                             <Col span={3}>{article.quantity}</Col>
                         </Row>))}
+                    </div>
                 </div>
                 <div className="bg-light">
                     <Row className="footer-margin" justify={'center'}>
@@ -82,6 +94,15 @@ class ComponentToPrint extends React.Component {
         );
     }
 }
+
+const mapStateToProps = (state) => ({
+    articles: getAddedArticles(state),
+    customer: getNewOrderCustomer(state),
+    usingDelivery: usingDelivery(state),
+    defaults: getOrderDefaults(state)
+})
+
+const ComponentToPrintConnected = connect(mapStateToProps)(ComponentToPrint)
 
 export const OrderInvoicePDF = (props) => {
 
@@ -94,14 +115,17 @@ export const OrderInvoicePDF = (props) => {
                 content={() => componentRef.current}
             />
             <div style={{ display: "none" }}>
-                <ComponentToPrint articles={props.articles} ref={componentRef} />
+                <ComponentToPrint  
+                    articles={props.articles} 
+                    customer={props.customer}
+                    usingDelivery={props.usingDelivery}
+                    defaults={props.defaults}
+                    ref={componentRef} />
             </div>
         </div>
     )
 }
 
-const mapStateToProps = (state) => ({
-    articles: getAddedArticles(state)
-})
+
 
 export default connect(mapStateToProps)(OrderInvoicePDF)

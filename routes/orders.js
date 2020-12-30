@@ -7,6 +7,7 @@ const OrderData = require('../models/OrderData');
 const Setting = require('../models/Settings');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Notification = require('../models/Notification');
+const mongoose = require('mongoose');
 
 router.use(isAuthenticated);
 
@@ -61,7 +62,9 @@ router.post('/update-state', async (req, res) => {
 })
 
 router.post('/add-version', async (req, res) => {
-    console.log(req.body)
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     let order = await Order.findOne({orderId: req.body.orderId}).exec();
 
     const reqData = req.body;
@@ -78,11 +81,26 @@ router.post('/add-version', async (req, res) => {
     order.latestVersionData = orderData._id;
     order.latestVersion = orderData.version;
     order.latestVersionDate = orderData.data.orderInfo.date;
-    console.log('customer: ');
-    console.log(req.customer);
-    if(req.customer !== undefined && req.customer._id !== undefined) {
+
+    let customer = null;
+
+    console.log('customer:')
+    console.log(reqData.customer)
+    if(reqData.customer !== undefined && reqData.customer._id !== undefined) {
+        console.log('Existing')
         order.customer = reqData.customer._id;
+        customer = await Customer.findOne({_id: order.customer}).exec();
     }
+    else {
+        console.log('New')
+        customer = new Customer();
+    }
+    customer.name = reqData.customer.name;
+    customer.phone = reqData.customer.phone;
+    customer.email = reqData.customer.email;
+    customer.address = reqData.customer.address;
+    await customer.save();
+
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
     await order.save();
 
@@ -93,6 +111,9 @@ router.post('/add-version', async (req, res) => {
     notification.orderId = order._id;
     notification.readBy = users;
     await notification.save();
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.sendStatus(200);
 })
@@ -172,7 +193,7 @@ router.get('/search', async (req, res) => {
     console.log(filters)
     if(req.query.lastOrderDate == null) {
         orders = await Order.find({...filters})
-                            .populate('customer', '-_id -__v -orders')
+                            .populate('customer', ' -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
                             .limit(parseInt(req.query.pageSize))
@@ -182,7 +203,7 @@ router.get('/search', async (req, res) => {
         let latestVersionDate = {$gt: req.query.lastOrderDate};
         if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
         orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
-                            .populate('customer', '-_id -__v -orders')
+                            .populate('customer', ' -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
                             .limit(parseInt(req.query.pageSize))

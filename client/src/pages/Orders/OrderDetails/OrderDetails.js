@@ -12,6 +12,8 @@ import { getAddedArticles, getOrderInfo, getNewOrderCustomer, usingDelivery } fr
 import { getOrderPreviewVersions, getOrderPreviewData, isEditModeInitialized } from '@selectors/ordersSelectors';
 import lo from 'lodash';
 import { orderDetails, newOrderArticlesSlice, newOrderInfoSlice, newOrderCustomerSlice } from '../../../Redux/reducers/ordersReducers';
+import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
+import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 
 
 const compareObjectsRecursive = (obj1, obj2) => {
@@ -155,7 +157,7 @@ const OrderDetails = (props) => {
       <Row gutter={[20]}>
           <Col span={8}>
               <CustomerDetails/>
-              <OrderInfo/>
+              <OrderInfo edit={props.edit}/>
           </Col>
           <Col span={16}>
               <ArticlesList/>
@@ -170,7 +172,8 @@ const mapStateToProps = (state, props) => ({
     orderInfo: getOrderInfo(state),
     customer: getNewOrderCustomer(state),
     usingDelivery: usingDelivery(state),
-    isEditModeInitialized: isEditModeInitialized(state)
+    isEditModeInitialized: isEditModeInitialized(state),
+    orderDefaults: getOrderDefaults(state),
 })
 
 export default connect(mapStateToProps)(OrderDetails)

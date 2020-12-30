@@ -20,6 +20,16 @@ export const userSlice = createSlice({
     }
 }); 
 
+export const orderDefaultsSlice = createSlice({
+    name: 'orderDefaultsSlice',
+    initialState: {},
+    reducers: {
+        init: (state, action) => {
+            return action.payload;
+        }
+    }
+})
+
 export const appSettingsSlice = createSlice({
     name: 'appSettingsSlice',
     initialState: {},
@@ -35,7 +45,8 @@ export const appSettingsSlice = createSlice({
 
 const appReducer = combineReducers({
     userSlice: userSlice.reducer,
-    appSettingsSlice: appSettingsSlice.reducer
+    appSettingsSlice: appSettingsSlice.reducer,
+    orderDefaultsSlice: orderDefaultsSlice.reducer,
 })
 
 export default appReducer;

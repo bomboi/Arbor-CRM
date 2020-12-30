@@ -14,6 +14,7 @@ import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
 import { isBrowser, MobileView, BrowserView } from 'react-device-detect';
 import { NavBar } from 'antd-mobile';
+import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 
 const { Content, Sider } = Layout;
 
@@ -31,6 +32,7 @@ const Seller = (props) => {
           setLoading(false);
         }, 10);
       })
+    Axios.get('/api/setting/order-defaults').then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)));
   }, []);
 
   const menuFunction = ({ item, key, keyPath, domEvent }) => {

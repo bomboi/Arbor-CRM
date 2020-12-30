@@ -4,6 +4,15 @@ const Setting = require('../models/Settings');
 
 router.use(isAuthenticated);
 
+router.get('/order-defaults', async (req, res) => {
+    const defaults = await Setting.find({name: {$in: ['DefaultDeadlineTo', 'DefaultDeadlineFrom', 'DefaultCompanyInfo', 'DefaultOrderNote']}}).exec();
+    const reducer = (acc, value) => { acc[value.name] = value.value; return acc};
+    const data = defaults.reduce(reducer, {})
+    console.log(data)
+    res.status(200).send(data);
+
+})
+
 router.get('/default-deadline', async (req, res) => {
     const defaultDeadlineTo = await Setting.findOne({name: 'DefaultDeadlineTo'}).exec();
     const defaultDeadlineFrom = await Setting.findOne({name: 'DefaultDeadlineFrom'}).exec();

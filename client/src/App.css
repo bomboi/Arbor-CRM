@@ -60,11 +60,15 @@
 /* Print style */
 
 .content-margin {
-  margin: 50px 60px 0px 60px
+  margin: 10px 60px 0px 60px
 }
 
 .footer-margin {
   margin: 30px 60px 50px
+}
+
+.header-margin {
+  margin: 50px 60px 30px
 }
 
 .invoice-title {

@@ -10,9 +10,9 @@ import {
 
 const Orders = () => {
 
-    let [listView, setListView] = useState('list')
+    let [listView, setListView] = useState('list');
 
-    const setView = (value) => setListView(value)
+    const setView = (value) => setListView(value);
 
     const changeView = (value) => {
         // TODO: Change to <Switch/> component and use urls
