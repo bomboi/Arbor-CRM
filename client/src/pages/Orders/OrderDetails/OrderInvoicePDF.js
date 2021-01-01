@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Row, Col, Divider } from 'antd';
 
@@ -12,10 +12,10 @@ class ComponentToPrint extends React.Component {
 
     render() {
         return (
-            Object.keys(this.props.customer).length === 0?
+            !this.props.show?
             <></>
             :
-            <div className="d-flex flex-column justify-content-between" style={{height: '100%'}}>
+            <div className="d-flex flex-column justify-content-between mt-0 pt-0" style={{height: '100%'}}>
                 <div>
                     <div className="bg-light">
                         <div className="d-flex justify-content-between header-margin">
@@ -107,15 +107,19 @@ const ComponentToPrintConnected = connect(mapStateToProps)(ComponentToPrint)
 export const OrderInvoicePDF = (props) => {
 
     const componentRef = useRef();
+    let [show, setShow] = useState(false)
 
     return (
         <div className="d-inline">
             <ReactToPrint
                 trigger={() => <Button>Stampaj</Button>}
                 content={() => componentRef.current}
+                onBeforeGetContent={()=>setShow(true)}
+                onAfterPrint={()=>setShow(false)}
             />
             <div style={{ display: "none" }}>
                 <ComponentToPrint  
+                    show={show}
                     articles={props.articles} 
                     customer={props.customer}
                     usingDelivery={props.usingDelivery}

@@ -179,13 +179,11 @@ const OrderPreview = (props) => {
                                         <div>{props.order.customer.phone}</div>
                                         <div>{props.order.customer.email}</div>
                                     </Col>
-                                    {
-                                        props.versions[version - 1].data.orderInfo.delivery &&
+                                    {props.versions[version - 1].data.orderInfo.delivery &&
                                         <Col span={6}>
                                             <div>Milana Grola 5</div>
                                             <div>Sprat 5</div>
-                                        </Col>
-                                    }
+                                        </Col>}
                                     </>}
                                 </SkeletonRow>
                             </Card>
