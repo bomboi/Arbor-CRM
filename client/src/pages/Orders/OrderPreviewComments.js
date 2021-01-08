@@ -8,6 +8,7 @@ import Axios from 'axios';
 import { getOrderPreviewId, isOrderPreviewLoading } from '@selectors/ordersSelectors';
 import { orderPreviewSlice } from '@reducers/ordersReducers';
 import { getUser } from '@selectors/appSelectors';
+import { isBrowser } from 'react-device-detect';
 
 const OrderPreviewComments = (props) => {
 
@@ -17,9 +18,9 @@ const OrderPreviewComments = (props) => {
 
     return (
         <div className="d-flex flex-column justify-content-between overflow-auto h-100">
-            <div>
+            {isBrowser && <div>
                 <Title level={4}>Komentari</Title>
-            </div>
+            </div>}
             <div className="d-flex flex-column justify-content-end pr-1 h-100">
                 {props.loading? <Skeleton  className="d-flex justify-content-center align-items-center h-100" active/>:
                     <div className={flexClassPosition} style={{overflowY:'scroll', height:400}}>

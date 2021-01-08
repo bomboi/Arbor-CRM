@@ -229,7 +229,7 @@ router.post('/add', async (req, res) => {
     const date = new Date(req.body.orderInfo.date);
 
     let setting = await Setting.findOne({name: 'MonthlyNumberOfOrders', owner: 'app'}).exec();
-    setting.value = '' + (parseInt(setting.value) + 1);
+    setting.value = '' + ((parseInt(setting.value) + 1)%100);
     console.log(setting)
     await setting.save();
     

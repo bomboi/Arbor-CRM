@@ -33,10 +33,10 @@ const ArticlesList = (props) => {
 
     let amountTotal = props.articles.length === 0 ? 0 : props.articles.reduce(calculateTotalPrice, [0]);
     let deliveryCondition = props.hasDelivery && props.deliveryPrice!==undefined && props.deliveryPrice !== '';
-    let amount = amountTotal + (deliveryCondition?props.deliveryPrice:0);
+    let amount = amountTotal;
     let avans = props.avans === undefined ? 0 : props.avans;
     let globalDiscount = props.globalDiscount === 0 ? '' : (' (-' + props.globalDiscount + '%)'); 
-    let finalAmount = amount*(100-props.globalDiscount)/100;
+    let finalAmount = amount*(100-props.globalDiscount)/100 + (deliveryCondition?props.deliveryPrice:0);
 
     return (
         <Card className='mb-3'>

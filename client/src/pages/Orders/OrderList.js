@@ -12,7 +12,7 @@ import MultipleOrderStateModal from './MultipleOrderStateModal';
 import { getSelectedIds } from '../../Redux/selectors/ordersSelectors';
 import { DeleteOutlined } from '@ant-design/icons';
 import { clearNewOrder } from '../../Redux/reducers/ordersReducers';
-import { isMobile } from 'react-device-detect';
+import { isMobile, isBrowser } from 'react-device-detect';
 
 const { RangePicker } = DatePicker;
 const { Search } = Input;
@@ -134,9 +134,12 @@ const OrderList = (props) => {
                     }}>Promeni status selektovanih</Button>}
                     {props.isAdmin && <Button className={isMobile?'mb-2 w-100':'mr-2'} >Štampaj naloge za selektovane</Button>}
                     <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>
+                    {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
+                        Selektovane porudžbine: {Object.keys(props.selectedIds).length}
+                    </div>}
                 </div>
                 <div>
-                    {Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
+                    {isBrowser && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
                         Selektovane porudžbine: {Object.keys(props.selectedIds).length}
                     </div>}
                 </div>

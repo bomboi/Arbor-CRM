@@ -60,6 +60,7 @@ class ComponentToPrint extends React.Component {
                                     <b>#{this.props.orderId}</b>
                                 </div>}
                                 <div className="text-right">Datum: {moment(this.props.orderInfo.date).format('DD. MM. YYYY.').toString()}</div>
+                                <div>Način plaćanja: {this.props.orderInfo.paymentType}</div>
                             </div>
                         </div>
                         <Row gutter={20} className="mt-5 mb-0">
