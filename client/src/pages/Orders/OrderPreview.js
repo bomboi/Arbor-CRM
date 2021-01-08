@@ -56,7 +56,7 @@ const SkeletonRow = (props) => {
 
 const OrderPreview = (props) => {
 
-    let [version, setVersion] = useState(props.versions?props.versions.length:0);
+    let [version, setVersion] = useState(props.versions?props.versions.length - 1:0);
     let history = useHistory();
     let [firstState, setFirstState] = useState('');
 
@@ -135,7 +135,7 @@ const OrderPreview = (props) => {
                                 izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName} 
                             </div>
                             <div>
-                                trenutna verzija: {props.versions[version - 1].changedBy.firstName} {props.versions[version - 1].changedBy.lastName}
+                                trenutna verzija: {props.versions[version].changedBy.firstName} {props.versions[version].changedBy.lastName}
                             </div>
                         </small>
                         <div className="d-flex justify-content-between mb-2">
@@ -179,7 +179,7 @@ const OrderPreview = (props) => {
                                         <div>{props.order.customer.phone}</div>
                                         <div>{props.order.customer.email}</div>
                                     </Col>
-                                    {props.versions[version - 1].data.orderInfo.delivery &&
+                                    {props.versions[version].data.orderInfo.delivery &&
                                         <Col span={6}>
                                             <div>Milana Grola 5</div>
                                             <div>Sprat 5</div>
@@ -194,15 +194,14 @@ const OrderPreview = (props) => {
                                 {!props.loading && <>
                                     <Col span={5}>
                                         <Title level={5} className="pb-0 mb-0" type={'secondary'}>Ukupan iznos</Title>
-                                        <Title level={4} className="mt-1">{props.order.totalAmount}00 RSD</Title>
+                                        <Title level={4} className="mt-1">{props.order.totalAmount} RSD</Title>
                                     </Col>
                                     <Col span={5}>
                                         <Title level={5} className="pb-0 mb-0" type={'secondary'}>Avans</Title>
-                                        <Title level={4} className="mt-1">{props.versions[version - 1].data.orderInfo.avans} RSD</Title>
+                                        <Title level={4} className="mt-1">{props.versions[version].data.orderInfo.avans} RSD</Title>
                                     </Col>
                                     <Col span={6}>
-                                        <div>Avans: 15000 RSD</div>
-                                        <div>Popust: 20%</div>
+                                        <div>Popust: {props.versions[version].data.orderInfo.discount}%</div>
                                         <div>Rok isporuke: 30 - 40 dana.</div>
                                         <div>Nacin placanja: Gotovina</div>
                                     </Col>
@@ -229,7 +228,7 @@ const OrderPreview = (props) => {
                                         <b>Cena</b>
                                     </Col>
                                 </Row>}
-                                dataSource={props.loading?[]:props.versions[version - 1].data.articles}
+                                dataSource={props.loading?[]:props.versions[version].data.articles}
                                 renderItem={item => 
                                 <Row className="w-100 mt-1" align={'middle'}>
                                     <Col span={4}>

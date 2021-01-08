@@ -23,8 +23,8 @@ const shuffle = (string) => {
 }
 
 const calculateTotalPrice = (acc, value) => {
-    let articlePrice = value.price * value.quantity * (100 - value.discount) / 100;
-    return acc + articlePrice;
+    let articlePrice = parseInt(value.price) * parseInt(value.quantity) * (100 - parseInt(value.discount)) / 100;
+    return parseInt(acc) + parseInt(articlePrice);
 }
 
 router.get('/all', async (req, res) => {
@@ -222,6 +222,9 @@ router.get('/search', async (req, res) => {
 
 router.post('/add', async (req, res) => {
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     console.log((new Date(req.body.orderInfo.date)).getFullYear())
     const date = new Date(req.body.orderInfo.date);
 
@@ -240,6 +243,8 @@ router.post('/add', async (req, res) => {
     order.orderId = orderId;
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
     if(reqData.orderInfo.delivery) order.totalAmount += reqData.orderInfo.deliveryPrice;
+
+    console.log('Total amount:' +  order.totalAmount);
 
     let customer = reqData.customer;
     if(customer._id === undefined) {
@@ -273,7 +278,11 @@ router.post('/add', async (req, res) => {
     if(customer.orders === undefined) customer.orders = [];
     customer.orders.push(order._id);
     await customer.save();
-    res.sendStatus(200);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.send(orderId).status(200);
 })
 
 router.get('/:id', async (req, res) => {

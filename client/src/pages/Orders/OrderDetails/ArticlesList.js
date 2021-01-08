@@ -31,9 +31,9 @@ const ArticlesList = (props) => {
 
     const calculateTotalPrice = (acc, value) => Number(acc) + Number(value.price) * Number(value.quantity) * (100 - Number(value.discount)) / 100;
 
-    let amount = props.articles.length === 0 ? 0 : props.articles.reduce(calculateTotalPrice, [0]);
+    let amountTotal = props.articles.length === 0 ? 0 : props.articles.reduce(calculateTotalPrice, [0]);
     let deliveryCondition = props.hasDelivery && props.deliveryPrice!==undefined && props.deliveryPrice !== '';
-    amount += (deliveryCondition?props.deliveryPrice:0);
+    let amount = amountTotal + (deliveryCondition?props.deliveryPrice:0);
     let avans = props.avans === undefined ? 0 : props.avans;
     let globalDiscount = props.globalDiscount === 0 ? '' : (' (-' + props.globalDiscount + '%)'); 
     let finalAmount = amount*(100-props.globalDiscount)/100;
@@ -51,7 +51,7 @@ const ArticlesList = (props) => {
                 <Row>
                     <Col span={6}>
                         <Paragraph className='mb-0 pb-0' type={'secondary'} level={5}>Ukupan iznos</Paragraph>
-                        <small><Paragraph className='mb-0 pb-0' type={'secondary'}>{amount} RSD {globalDiscount} {deliveryCondition?(' + ' + props.deliveryPrice + ' RSD'):''}= </Paragraph></small>
+                        <small><Paragraph className='mb-0 pb-0' type={'secondary'}>{amountTotal} RSD {globalDiscount} {deliveryCondition?(' + ' + props.deliveryPrice + ' RSD'):''}= </Paragraph></small>
                         <Title className='mt-0' level={5}>{finalAmount} RSD</Title>
                     </Col>
                     <Col span={6}>
@@ -66,37 +66,44 @@ const ArticlesList = (props) => {
                 locale={{ emptyText: 'Niste dodali nijedan artikl.' }}
                 dataSource={props.articles}
                 header={<Row className="w-100">
-                        <Col span={4}>
+                        <Col span={5}>
                             <b>Naziv i cena</b>
                         </Col>
-                        <Col span={9}>
+                        <Col span={8}>
                             <b>Opis</b>
                         </Col>
-                        <Col span={9}>
+                        <Col span={8}>
                             <b>Materijali</b>
                         </Col>
                     </Row>}
                 renderItem={(item, index) => (
                 <List.Item key={item.price}> 
-                    <Row className="w-100">
-                        <Col span={4}>
-                            <Row>{item.name}</Row>
+                    <Row className="w-100" gutter={10}>
+                        <Col span={5}>
+                            <Row style={{whiteSpace:'pre-wrap'}}>{item.name}</Row>
                             <Row><small>{item.quantity} x {item.price} RSD {item.discount !== 0 ? (' (-'+item.discount + '%)'):''} </small></Row>
                             <Row><small><b>= {item.quantity*item.price*(100-item.discount)/100} RSD</b></small></Row>
                         </Col>
-                        <Col span={9} style={{whiteSpace:'pre'}}>
-                            {item.description}
+                        <Col span={16}>
+                            <Row>
+                                <Col span={12} style={{whiteSpace:'pre'}}>
+                                    {item.description}
+                                </Col>
+                                <Col span={12}>
+                                    {item.materials?
+                                        item.materials.map(material=><div>
+                                            <div>{material.description}</div>
+                                            <div><i><small>{material.name} / {material.producer}</small></i></div>
+                                        </div>)
+                                        :
+                                        "Nema materijala"}
+                                </Col>
+                            </Row>
+                            {item.note && <Row>
+                                <Col span={24} style={{whiteSpace:'pre'}}><b>Napomena:</b> {item.note}</Col>
+                            </Row>}
                         </Col>
-                        <Col span={9}>
-                            {item.materials?
-                                item.materials.map(material=><div>
-                                    <div>{material.description}</div>
-                                    <div><i><small>{material.name} / {material.producer}</small></i></div>
-                                </div>)
-                                :
-                                "Nema materijala"}
-                        </Col>
-                        <Col span={2}>
+                        <Col span={3}>
                             <Button 
                                 className="mr-1" 
                                 onClick={()=>editArticle(index)}

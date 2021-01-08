@@ -5,13 +5,13 @@ import OrderInfo from './OrderInfo';
 import AddArticle from './AddArticle';
 import ArticlesList from './ArticlesList';
 import { useHistory, useParams } from "react-router-dom";
-import OrderInvoicePDF from './OrderInvoicePDF';
+import { OrderInvoicePDF, OrderInvoiceSavePDF } from './OrderInvoicePDF';
 import Axios from 'axios';
 import { connect } from 'react-redux';
 import { getAddedArticles, getOrderInfo, getNewOrderCustomer, usingDelivery } from '@selectors/ordersSelectors';
 import { getOrderPreviewVersions, getOrderPreviewData, isEditModeInitialized } from '@selectors/ordersSelectors';
 import lo from 'lodash';
-import { orderDetails, newOrderArticlesSlice, newOrderInfoSlice, newOrderCustomerSlice } from '../../../Redux/reducers/ordersReducers';
+import { orderDetails, newOrderArticlesSlice, newOrderInfoSlice, newOrderCustomerSlice, clearNewOrder } from '../../../Redux/reducers/ordersReducers';
 import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 
@@ -67,8 +67,6 @@ const OrderDetails = (props) => {
     }
   }, [])
 
-  // console.log("Comparison: " + compareObjects(obj, obj))
-
   const isCustomerOk = () => {
     if(props.customer.name === undefined) return false;
     if(props.customer.phone === undefined) return false;
@@ -101,10 +99,7 @@ const OrderDetails = (props) => {
     return true;
   }
 
-  const isOrderChanged = () => {
-  }
-
-  const saveOrder = () => {
+  const saveOrder = (callback, print = false) => {
     if(!isOrderOk()) message.error('Niste uneli sve potrebne podatke!');
     else {
       let data = {};
@@ -117,7 +112,9 @@ const OrderDetails = (props) => {
           data.orderId = orderId;
           Axios.post('/api/order/add-version', data)
             .then(() => {
-              history.push('/porudzbine');
+              message.success('Sačuvana porudzbina!');
+              setTimeout(() => callback(), 80); 
+              if(!print) history.push('/porudzbine');
             })
         }
         else {
@@ -126,11 +123,18 @@ const OrderDetails = (props) => {
         }
       }
       else {
-        Axios.post('/api/order/add', data);
+        Axios.post('/api/order/add', data).then(res => {
+          message.success('Dodata porudzbina!');
+          setTimeout(()=> callback(res.data), 50)
+        });
       }
       console.log('save order')
-
     }
+  }
+  
+  const afterPrint = () => {
+    props.dispatch(clearNewOrder());
+    history.push('/porudzbine')
   }
 
   return (
@@ -143,11 +147,9 @@ const OrderDetails = (props) => {
       className="mb-3"
       style={{ position: 'relative', zIndex: 1, width: '100%' }}
       extra={[
-        <OrderInvoicePDF/>,
+        <OrderInvoicePDF check={isOrderOk} orderId={props.edit?orderId:''}/>,
         <Button key="2" onClick={saveOrder}>{props.edit?'Sačuvaj izmenu':'Sačuvaj'}</Button>,
-        <Button key="1"  onClick={saveOrder} type="primary">
-          Sačuvaj i štampaj
-        </Button>,
+        <OrderInvoiceSavePDF afterPrint={afterPrint} save={saveOrder} orderId={props.edit?orderId:''}/>,
     ]}/>
     {props.edit && !props.isEditModeInitialized ? 
       <div className="h-100 d-flex justify-content-center align-items-center">

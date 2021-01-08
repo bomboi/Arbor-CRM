@@ -7,7 +7,7 @@ import Auth from './Auth';
 import { getUserRole } from '@selectors/appSelectors';
 import { connect } from 'react-redux';
 
-function ProtectedRoute ({ children, designatedRole, userRole, ...rest }) {
+function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest }) {
 
     const [authenticated, setAuthenticated] = useState(true);
 
@@ -21,6 +21,7 @@ function ProtectedRoute ({ children, designatedRole, userRole, ...rest }) {
     return (
         <Route {...rest} render={() => {
             if(authenticated) {
+                if(login) return <Redirect to='/porudzbine'/>
                 let allowed = designatedRole === undefined || userRole === designatedRole;
                 if(allowed) {
                     return children;
@@ -28,7 +29,8 @@ function ProtectedRoute ({ children, designatedRole, userRole, ...rest }) {
                 else return children;
                 // else redirect to not allowed
             }
-            else return <Redirect to='/login' />;
+            else if(!login) return <Redirect to='/login' />;
+            else return children;
         }} />
     )
 }

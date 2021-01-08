@@ -21,9 +21,9 @@ class App extends Component {
       <Provider store={reduxStore}>
         <Router>
           <Switch>
-            <Route path='/login'>
+            <ProtectedRoute login path='/login'>
               <Login />
-            </Route>
+            </ProtectedRoute>
             <ProtectedRoute path="/">
               <Seller />
             </ProtectedRoute>
