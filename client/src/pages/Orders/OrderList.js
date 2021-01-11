@@ -13,6 +13,7 @@ import { getSelectedIds } from '../../Redux/selectors/ordersSelectors';
 import { DeleteOutlined } from '@ant-design/icons';
 import { clearNewOrder } from '../../Redux/reducers/ordersReducers';
 import { isMobile, isBrowser } from 'react-device-detect';
+import { OrderFactoryPDFMultiple } from './OrderFactoryPDF';
 
 const { RangePicker } = DatePicker;
 const { Search } = Input;
@@ -25,7 +26,8 @@ const OrderList = (props) => {
     let [filters, setFilters] = useState({
         status: 'sve',
         orderId: '',
-        range: ['', '']
+        range: ['', ''],
+        sort: 'Najnovije'
     });
 
     let [multipleOrderStateModalVisible, setMultipleOrderStateModalVisibility] = useState(false);
@@ -119,6 +121,14 @@ const OrderList = (props) => {
                             <Select.Option value="reklamacija">Reklamacija</Select.Option>
                             <Select.Option value="arhivirano">Arhivirano</Select.Option>
                         </Select>
+                        <Select 
+                            value={filters.sort} 
+                            onSelect={value => update(value, 'sort')} 
+                            className={isMobile?'mb-2 w-100':'mr-3'} 
+                            style={{ width: 120 }}>
+                            <Select.Option value="Najnovije">Najnovije</Select.Option>
+                            <Select.Option value="Najstarije">Najstarije</Select.Option>
+                        </Select>
                 </Col>
             </Row>
             <Divider className="mt-1 mb-3"/>
@@ -132,7 +142,7 @@ const OrderList = (props) => {
                         }
                         setMultipleOrderStateModalVisibility(true)
                     }}>Promeni status selektovanih</Button>}
-                    {props.isAdmin && <Button className={isMobile?'mb-2 w-100':'mr-2'} >Štampaj naloge za selektovane</Button>}
+                    {props.isAdmin && <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2 w-100'} />}
                     <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>
                     {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
                         Selektovane porudžbine: {Object.keys(props.selectedIds).length}

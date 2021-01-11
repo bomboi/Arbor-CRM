@@ -3,10 +3,7 @@ login:
 	centriraj login formu
 
 dodaj/izmeni porudzbinu:
-	sacuvaj izmene i stampaj
 	dodaj napomenu u listu artikala
-	dodaj deo kreveta za stof u materijale
-	obavestenje da je dodat stof
 	promeni dodavanje stofova, bekend modele i frontend po potrebi
 
 backend:
@@ -16,18 +13,17 @@ backend:
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
 	skini csv cenovnik - admin
+	obrisi selektovane
 
 lista poruzdbina:
-	stampaj naloge za selektovane - admin
-	eksportuj porudzbine u fajl - admin
+	eksportuj porudzbine u fajl - admin ?
 	vrati porudzbine od najskorije
-	kad se obrise porudzbina, ostaju nove izmene
-	problem sa ne brisanjem novih izmena
+	kad se obrise porudzbina, ostaju 'nove izmene'
+	problem sa nebrisanjem novih izmena
 	kod brisanja skloni selektovane
 
 pregled porudzbine:
-	dodaj sve informacije za kupce(adresa...)
-	stampa naloga
+	prijavi reklamaciju
 
 statistika:
 	prikaz broja porudzbina za odredjeni mesec, godinu

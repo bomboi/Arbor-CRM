@@ -25,6 +25,7 @@ import { isAdmin } from '@selectors/appSelectors';
 import { getTagColor } from '../../utils';
 import Axios from 'axios';
 import { isBrowser, isMobile, BrowserView, MobileView } from 'react-device-detect';
+import OrderFactoryPDF from './OrderFactoryPDF';
 
 const SelectVersion = (props) => {
     const genOptions = (number) => {
@@ -112,8 +113,8 @@ const OrderPreview = (props) => {
                 <div>
                     <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>
                     <Button className="mr-2">Štampaj</Button>
-                    {props.isAdmin && <Button className="mr-2">Štampaj nalog</Button>}
-                    {!props.isAdmin && <Button className="mr-2">Prijavi reklamaciju</Button>}
+                    {props.isAdmin && <OrderFactoryPDF version={version}/>}
+                    <Button className="mr-2">Prijavi reklamaciju</Button>
                     <Button onClick={()=>{
                         props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[props.versions.length - 1].data.articles))
                         props.dispatch(newOrderInfoSlice.actions.setOrderInfo(props.versions[props.versions.length - 1].data.orderInfo))
@@ -133,8 +134,8 @@ const OrderPreview = (props) => {
                         <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
                         <Button onClick={deleteOrder} type={'primary'} className="mb-2" danger>Obrisi</Button>
                         <Button className="mb-2">Štampaj</Button>
-                        {props.isAdmin && <Button className="mb-2">Štampaj nalog</Button>}
-                        {!props.isAdmin && <Button className="mb-2">Prijavi reklamaciju</Button>}
+                        {props.isAdmin && <OrderFactoryPDF version={version}/>}
+                        <Button className="mb-2">Prijavi reklamaciju</Button>
                         <Button className="mb-2" onClick={()=>{
                             props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[props.versions.length - 1].data.articles))
                             props.dispatch(newOrderInfoSlice.actions.setOrderInfo(props.versions[props.versions.length - 1].data.orderInfo))
@@ -208,18 +209,20 @@ const OrderPreview = (props) => {
                         <Collapse.Panel key={'customer'} header={'Kupac' }>
                             <Card>
                                 <SkeletonRow loading={props.loading}>
-                                    <BrowserView>
+                                    <BrowserView viewClassName="w-100">
                                         {!props.loading && <>
-                                        <Col span={6}>
-                                            <Title level={4} className="mb-1">{props.order.customer.name}</Title>
-                                            <div>{props.order.customer.phone}</div>
-                                            <div>{props.order.customer.email}</div>
-                                        </Col>
-                                        {props.versions[version].data.orderInfo.delivery &&
+                                        <Row>
                                             <Col span={6}>
-                                                <div>{props.order.customer.address.street} ({props.order.customer.address.homeType})</div>
-                                                <div>{props.order.customer.address.floor} ({props.order.customer.address.elevator?'ima lift':'nema lift'})</div>
-                                            </Col>}
+                                                <Title level={4} className="mb-1">{props.order.customer.name}</Title>
+                                                <div>{props.order.customer.phone}</div>
+                                                <div>{props.order.customer.email}</div>
+                                            </Col>
+                                            {props.versions[version].data.orderInfo.delivery &&
+                                                <Col span={6}>
+                                                    <div>{props.order.customer.address.street} ({props.order.customer.address.homeType})</div>
+                                                    <div>{props.order.customer.address.floor}. sprat ({props.order.customer.address.elevator?'ima lift':'nema lift'})</div>
+                                                </Col>}
+                                        </Row>
                                         </>}
                                     </BrowserView>
                                     <MobileView>
@@ -230,7 +233,7 @@ const OrderPreview = (props) => {
                                         {props.versions[version].data.orderInfo.delivery &&
                                             <>
                                                 <div>{props.order.customer.address.street} ({props.order.customer.address.homeType})</div>
-                                                <div>{props.order.customer.address.floor} ({props.order.customer.address.elevator?'ima lift':'nema lift'})</div>
+                                                <div>{props.order.customer.address.floor}. sprat ({props.order.customer.address.elevator?'ima lift':'nema lift'})</div>
                                             </>}
                                         </>}
                                     </MobileView>
@@ -240,8 +243,8 @@ const OrderPreview = (props) => {
                         <Collapse.Panel key={'info'} header={'Informacije'}>
                             <Card>
                                 <SkeletonRow loading={props.loading}>
-                                <BrowserView>
-                                    {!props.loading && <>
+                                <BrowserView viewClassName="w-100">
+                                    {!props.loading && <Row>
                                         <Col span={5}>
                                             <Title level={5} className="pb-0 mb-0" type={'secondary'}>Ukupan iznos</Title>
                                             <Title level={4} className="mt-1">{props.order.totalAmount} RSD</Title>
@@ -253,9 +256,9 @@ const OrderPreview = (props) => {
                                         <Col span={6}>
                                             <div>Popust: {props.versions[version].data.orderInfo.discount}%</div>
                                             <div>Rok isporuke: {props.versions[version].data.orderInfo.deadlineFrom} - {props.versions[version].data.orderInfo.deadlineTo} dana.</div>
-                                            <div>Nacin placanja: Gotovina</div>
+                                            <div>Nacin placanja: {props.versions[version].data.orderInfo.paymentType}</div>
                                         </Col>
-                                        </>}
+                                        </Row>}
                                 </BrowserView>
                                 <MobileView>
                                     {!props.loading && <>
@@ -304,22 +307,27 @@ const OrderPreview = (props) => {
                                 dataSource={props.loading?[]:props.versions[version].data.articles}
                                 renderItem={(item, index) => 
                                 <Row className="w-100 mt-1" align={'middle'}>
-                                    <BrowserView>
-                                        <Col span={4}>
-                                            {item.name}
-                                        </Col>
-                                        <Col span={8} style={{whiteSpace:'pre'}}>
-                                            {item.description}
-                                        </Col>
-                                        <Col span={8}>
-                                            {item.materials?item.materials.map(material=>material.name):"Nema materijala"}
-                                        </Col>
-                                        <Col span={1}>
-                                            {item.quantity}
-                                        </Col>
-                                        <Col span={3}>
-                                            {item.price}
-                                        </Col>
+                                    <BrowserView viewClassName="w-100">
+                                        <Row>
+                                            <Col span={4}>
+                                                {item.name}
+                                            </Col>
+                                            <Col span={8} style={{whiteSpace:'pre'}}>
+                                                {item.description}
+                                            </Col>
+                                            <Col span={8}>
+                                                {item.materials?item.materials.map(material=><>
+                                                    <div>{material.description}</div>
+                                                    <div><i>{material.name} ({material.producer})</i></div>
+                                                </>):"Nema materijala"}
+                                            </Col>
+                                            <Col span={1}>
+                                                {item.quantity}
+                                            </Col>
+                                            <Col span={3}>
+                                                {item.price}
+                                            </Col>
+                                        </Row>
                                     </BrowserView>
                                     <MobileView viewClassName="w-100">
                                         <div><b>#{index + 1}</b></div>
@@ -333,7 +341,10 @@ const OrderPreview = (props) => {
                                         </div>
                                         <div className="mt-0 mb-1">
                                             <div><b>Materijali</b></div>
-                                            <div>{item.materials?item.materials.map(material=>material.name):"Nema materijala"}</div>
+                                            <div>{item.materials?item.materials.map(material=><>
+                                                    <div>{material.description}</div>
+                                                    <div><i>{material.name} ({material.producer})</i></div>
+                                            </>):"Nema materijala"}</div>
                                         </div>
                                         <div>
                                             <div><b>Cena</b></div>

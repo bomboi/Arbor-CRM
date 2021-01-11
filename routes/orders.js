@@ -182,6 +182,8 @@ router.get('/search', async (req, res) => {
         }
         filters.orderId = req.query.filters.orderId; 
     }
+    let sort = req.query.filters.sort === 'Najnovije' ? -1 : 1;
+
     const hasRange = req.query.filters.range !== null && req.query.filters.range[0] !== '' && req.query.filters.range[1] !== ''; 
     if(hasRange) {
         filters.latestVersionDate = {$gte: req.query.filters.range[0], $lte: req.query.filters.range[1]}
@@ -193,6 +195,7 @@ router.get('/search', async (req, res) => {
     console.log(filters)
     if(req.query.lastOrderDate == null) {
         orders = await Order.find({...filters})
+                            .sort([['latestVersionDate', sort]])
                             .populate('customer', ' -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
@@ -203,6 +206,7 @@ router.get('/search', async (req, res) => {
         let latestVersionDate = {$gt: req.query.lastOrderDate};
         if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
         orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
+                            .sort([['latestVersionDate', sort]])
                             .populate('customer', ' -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
@@ -287,7 +291,7 @@ router.post('/add', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     console.log(req.params.id);
-    let order = await Order.findOne({orderId: req.params.id})
+    let order = await Order.findOne({$or: [{orderId: req.params.id}, {_id: req.params.id}]})
                             .select('-comments')
                             .populate('customer')
                             .populate('latestVersionData').exec();
