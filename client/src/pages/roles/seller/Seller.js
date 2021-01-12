@@ -4,6 +4,10 @@ import { Layout, Menu, Spin } from 'antd';
 import {
   DesktopOutlined,
   PieChartOutlined,
+  UserOutlined,
+  AppstoreOutlined,
+  ContainerOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
 import MenuSwitch from '../MenuSwitch';
@@ -21,6 +25,7 @@ const Seller = (props) => {
 
   let history = useHistory();
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(history.location.pathname.substring(1));
 
   useEffect(() => {
     Axios.get('/api/user/get')
@@ -34,6 +39,7 @@ const Seller = (props) => {
   }, []);
 
   const menuFunction = ({ item, key, keyPath, domEvent }) => {
+    setSelected(key);
     switch (key) {
       case 'logout':
         props.dispatch(logout());
@@ -59,20 +65,20 @@ const Seller = (props) => {
           left: 0,
         }}>
           <div className="logo" />
-          <Menu defaultSelectedKeys={['porudzbine']} mode="inline" onSelect={menuFunction}>
-            <Menu.Item key="porudzbine" icon={<PieChartOutlined />}>
+          <Menu selectedKeys={[selected]} mode="inline" onSelect={menuFunction}>
+            <Menu.Item key="porudzbine" icon={<ContainerOutlined />}>
               Porudzbine
             </Menu.Item>
-            <Menu.Item key="kupci" icon={<DesktopOutlined />}>
+            <Menu.Item key="kupci" icon={<UserOutlined />}>
               Kupci
             </Menu.Item>
-            <Menu.Item key="proizvodi" icon={<DesktopOutlined />}>
+            <Menu.Item key="proizvodi" icon={<AppstoreOutlined />}>
               Proizvodi
             </Menu.Item>
-            <Menu.Item key="podesavanja" icon={<DesktopOutlined />}>
+            <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
               Podesavanja
             </Menu.Item>
-            {props.isAdmin && <Menu.Item key="statistika" icon={<DesktopOutlined />}>
+            {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
               Statistika
             </Menu.Item>}
             {/* TODO: Put name and logout on the lower end of sider */}

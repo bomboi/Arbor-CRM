@@ -75,6 +75,7 @@ const OrderList = (props) => {
         }).then(res => {
             // TODO: Check if deleted
             props.dispatch(orderListSlice.actions.deleteOrder());
+            unselect();
         });
     }
 

@@ -59,6 +59,7 @@ const userRoutes = require('./routes/users');
 const customerRoutes = require('./routes/customer');
 const orderRoutes = require('./routes/orders');
 const settingRoutes = require('./routes/settings');
+const statisticRoutes = require('./routes/statistics');
 
 app.use('/api', authRoutes);
 app.use('/api/material', materialRoutes);
@@ -67,6 +68,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/customer', customerRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/setting', settingRoutes);
+app.use('/api/statistic', statisticRoutes);
 
 // Anything that doesn't match the above, send back index.html
 app.get('*', (req, res) => {

@@ -26,6 +26,7 @@ import { getTagColor } from '../../utils';
 import Axios from 'axios';
 import { isBrowser, isMobile, BrowserView, MobileView } from 'react-device-detect';
 import OrderFactoryPDF from './OrderFactoryPDF';
+import { OrderInvoicePDF } from './OrderDetails/OrderInvoicePDF';
 
 const SelectVersion = (props) => {
     const genOptions = (number) => {
@@ -87,6 +88,15 @@ const OrderPreview = (props) => {
         })
     }
 
+    const complaint = () => {
+        Axios.post('/api/order/update-state', {
+            orderId: props.order._id,
+            state: 'reklamacija'
+        }).then(() => {
+            setFirstState('reklamacija')
+        })
+    }
+
     const deleteOrder = () => {
         // TODO: Set spinner while deleting
         Axios.post('/api/order/delete', {
@@ -112,9 +122,9 @@ const OrderPreview = (props) => {
             <BrowserView><Row justify={'space-between'} className="pl-4 pr-4 pt-3 pb-3">
                 <div>
                     <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>
-                    <Button className="mr-2">Štampaj</Button>
+                    <OrderInvoicePDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                     {props.isAdmin && <OrderFactoryPDF version={version}/>}
-                    <Button className="mr-2">Prijavi reklamaciju</Button>
+                    <Button onClick={complaint} className="mr-2">Prijavi reklamaciju</Button>
                     <Button onClick={()=>{
                         props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[props.versions.length - 1].data.articles))
                         props.dispatch(newOrderInfoSlice.actions.setOrderInfo(props.versions[props.versions.length - 1].data.orderInfo))

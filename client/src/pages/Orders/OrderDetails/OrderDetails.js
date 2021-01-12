@@ -125,7 +125,7 @@ const OrderDetails = (props) => {
       else {
         Axios.post('/api/order/add', data).then(res => {
           message.success('Dodata porudzbina!');
-          setTimeout(()=> callback(res.data), 50)
+          if(callback) setTimeout(()=> callback(res.data), 50)
         });
       }
       console.log('save order')
