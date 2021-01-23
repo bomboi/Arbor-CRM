@@ -4,6 +4,7 @@ login:
 
 dodaj/izmeni porudzbinu:
 	dodaj napomenu na pdf
+	kad se doda artikl, pa izmeni, ne moze opet da se doda artikl
 
 backend:
 	dodaj provere u svim rutama
