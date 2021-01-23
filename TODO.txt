@@ -3,10 +3,7 @@ login:
 	centriraj login formu
 
 dodaj/izmeni porudzbinu:
-	dodaj napomenu u listu artikala
 	dodaj napomenu na pdf
-	promeni dodavanje stofova, bekend modele i frontend po potrebi ?
-	greska pri cuvanju porudzbina
 
 backend:
 	dodaj provere u svim rutama
@@ -14,21 +11,18 @@ backend:
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
-	skini csv cenovnik - admin ?
 	obrisi selektovane
 
+pregled porudzbine:
+	stampaj ne radi kad se promeni porudzbina
+	ne radi
+
 lista poruzdbina:
-	eksportuj porudzbine u fajl - admin ?
 	kad se obrise porudzbina, ostaju 'nove izmene'
 	problem sa nebrisanjem novih izmena
-
-statistika:
-	prikaz broja porudzbina za odredjeni mesec, godinu
-	prikaz prometa
-	prikaz broja reklamacija
+	ne menja se status porudzbine
 
 podesavanja:
 	menjanje sifre
-	dodaj stofove
 	
 	

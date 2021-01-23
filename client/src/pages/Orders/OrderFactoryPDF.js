@@ -195,7 +195,7 @@ class MultipleComponentsToPrint extends React.Component {
             this.props.ids.map((id, index) => {
                 if(!orders.some(item => item._id === id)) {
                     Axios.get('/api/order/get-versions', {params:{orderId:id}}).then(resVersions => {
-                        Axios.get('/api/order/'+id).then(res => {
+                        Axios.get('/api/order/by-id/'+id).then(res => {
                             orders.push({
                                 _id: res.data._id,
                                 id: res.data.orderId,
@@ -241,14 +241,14 @@ export const OrderFactoryPDFMultiple = (props) => {
     let [show, setShow] = useState(false)
 
     return (
-    <div className={"d-inline " + props.className}>
+    <div className={"d-inline "}>
         <ReactToPrint
             content={() => componentRef.current}
             onBeforeGetContent={()=>setShow(true)}
             onAfterPrint={()=>setShow(false)}>
             <PrintContextConsumer>
                 {({ handlePrint }) => (
-                    <Button onClick={() => {
+                    <Button className={props.className} onClick={() => {
                         console.log('PDF')
                         setShow(true);
                         setTimeout(()=> handlePrint(), 5)
@@ -270,14 +270,14 @@ const OrderFactoryPDF = (props) => {
     let [show, setShow] = useState(false)
 
     return (
-        <div className="d-inline">
+        <div className={"d-inline "}>
             <ReactToPrint
                 content={() => componentRef.current}
                 onBeforeGetContent={()=>setShow(true)}
                 onAfterPrint={()=>setShow(false)}>
                 <PrintContextConsumer>
                     {({ handlePrint }) => (
-                        <Button onClick={() => {
+                        <Button className={props.className} onClick={() => {
                             console.log('PDF')
                             setShow(true);
                             setTimeout(()=> handlePrint(), 5)

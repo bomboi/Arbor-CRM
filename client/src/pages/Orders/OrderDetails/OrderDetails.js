@@ -40,9 +40,12 @@ const OrderDetails = (props) => {
 
   let [loading, setLoading] = useState(false);
 
+  let [saveClicked, setSaveClicked] = useState(false);
+
   let [obj, setObj] = useState(null);
 
   useEffect(() => {
+    setSaveClicked(false);
     if(props.edit){
       // Editing existing order
       if(!props.isEditModeInitialized) {
@@ -77,7 +80,6 @@ const OrderDetails = (props) => {
       if(props.customer.address.elevator === undefined) return false;
       if(props.customer.address.homeType === undefined) return false;
     }
-    console.log('Customer Ok!');
     return true;
   }
 
@@ -87,13 +89,11 @@ const OrderDetails = (props) => {
     if(props.orderInfo.deadlineTo === undefined) return false;
     if(props.orderInfo.avans === undefined) return false;
     if(props.orderInfo.paymentType === undefined) return false;
-    console.log('Order Info Ok!');
     return true;
   }
 
   const isOrderOk = () => {
     if(props.addedArticles === undefined || props.addedArticles.length === 0) return false;
-    console.log('Articles Ok')
     if(!isCustomerOk()) return false;
     if(!isOrderInfoOk()) return false;
     return true;
@@ -102,31 +102,40 @@ const OrderDetails = (props) => {
   const saveOrder = (callback, print = false) => {
     if(!isOrderOk()) message.error('Niste uneli sve potrebne podatke!');
     else {
+      setSaveClicked(true);
       let data = {};
       data.articles = props.addedArticles;
       data.orderInfo = {...props.orderInfo};
       data.orderInfo.delivery = props.usingDelivery;
       data.customer = props.customer;
       if(props.edit){
-        if(!compareObjects(obj, data)) {
+        if(!saveClicked && !compareObjects(obj, data)) {
           data.orderId = orderId;
+          setSaveClicked(true);
           Axios.post('/api/order/add-version', data)
             .then(() => {
               message.success('Sačuvana porudzbina!');
-              setTimeout(() => callback(), 80); 
+              if(typeof(callback) == "function") setTimeout(() => callback(), 80); 
               if(!print) history.push('/porudzbine');
             })
         }
         else {
+          setSaveClicked(false);
           message.error('Niste promenili porudzbinu!');
           return;
         }
       }
       else {
-        Axios.post('/api/order/add', data).then(res => {
-          message.success('Dodata porudzbina!');
-          if(callback) setTimeout(()=> callback(res.data), 50)
-        });
+        if(!saveClicked) {
+          setSaveClicked(true);
+          Axios.post('/api/order/add', data).then(res => {
+            message.success('Dodata porudzbina!');
+            console.log('Callback:')
+            console.log(callback)
+            if(typeof(callback) == "function") setTimeout(()=> callback(res.data), 50)
+            if(!print) history.push('/porudzbine');
+          });
+        }
       }
       console.log('save order')
     }

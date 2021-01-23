@@ -144,7 +144,7 @@ const OrderPreview = (props) => {
                         <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
                         <Button onClick={deleteOrder} type={'primary'} className="mb-2" danger>Obrisi</Button>
                         <Button className="mb-2">Štampaj</Button>
-                        {props.isAdmin && <OrderFactoryPDF version={version}/>}
+                        {props.isAdmin && <OrderFactoryPDF className="mb-2 w-100" version={version}/>}
                         <Button className="mb-2">Prijavi reklamaciju</Button>
                         <Button className="mb-2" onClick={()=>{
                             props.dispatch(newOrderArticlesSlice.actions.setArticles(props.versions[props.versions.length - 1].data.articles))

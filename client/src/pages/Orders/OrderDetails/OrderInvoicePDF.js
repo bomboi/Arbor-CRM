@@ -114,6 +114,10 @@ class ComponentToPrint extends React.Component {
                             <Col offset={17} span={3} className=" p-1 total-text-small">UKUPNO</Col>
                             <Col span={4} className="p-2 text-right total-text-small">{amount} RSD</Col>
                         </Row>
+                        {this.props.orderInfo.discount != 0 && <Row>
+                            <Col offset={17} span={3} className=" p-1 total-text-small">POPUST</Col>
+                            <Col span={4} className="p-2 text-right total-text-small">- {this.props.orderInfo.discount} %</Col>
+                        </Row>}
                         {this.props.usingDelivery &&
                         <Row className="">
                             <Col offset={17} span={3} className=" p-1 total-text-small">MONTAŽA</Col>
@@ -130,7 +134,7 @@ class ComponentToPrint extends React.Component {
                         
                         <Row className="">
                             <Col offset={16} span={3} className=" p-2 total-text">PREOSTALO</Col>
-                            <Col span={5} className="p-2 text-right total-text">{Number(amount) + (this.props.deliveryPrice?Number(this.props.deliveryPrice):0) - Number(this.props.avans) } RSD</Col>
+                            <Col span={5} className="p-2 text-right total-text">{Number(amount)*(100 - this.props.orderInfo.discount)/100 + (this.props.deliveryPrice?Number(this.props.deliveryPrice):0) - Number(this.props.avans) } RSD</Col>
                         </Row>
                     </div>
                 </div>

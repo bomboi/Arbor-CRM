@@ -289,9 +289,20 @@ router.post('/add', async (req, res) => {
     res.send(orderId).status(200);
 })
 
+router.get('/by-id/:id', async (req, res) => {
+    console.log(req.params.id);
+    let order = await Order.findOne({_id: req.params.id})
+                            .select('-comments')
+                            .populate('customer')
+                            .populate('latestVersionData').exec();
+    console.log(order)
+    res.status(200)
+    res.send(order);
+})
+
 router.get('/:id', async (req, res) => {
     console.log(req.params.id);
-    let order = await Order.findOne({$or: [{orderId: req.params.id}, {_id: req.params.id}]})
+    let order = await Order.findOne({orderId: req.params.id}    )
                             .select('-comments')
                             .populate('customer')
                             .populate('latestVersionData').exec();
