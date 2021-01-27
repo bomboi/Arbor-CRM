@@ -4,7 +4,6 @@ login:
 
 dodaj/izmeni porudzbinu:
 	dodaj napomenu na pdf
-	kad se doda artikl, pa izmeni, ne moze opet da se doda artikl
 
 backend:
 	dodaj provere u svim rutama
@@ -21,7 +20,7 @@ pregled porudzbine:
 lista poruzdbina:
 	kad se obrise porudzbina, ostaju 'nove izmene'
 	problem sa nebrisanjem novih izmena
-	ne menja se status porudzbine
+	stampaj naloge ne radi kako treba - admin
 
 podesavanja:
 	menjanje sifre

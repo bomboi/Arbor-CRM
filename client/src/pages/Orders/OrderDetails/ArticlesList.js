@@ -114,7 +114,10 @@ const ArticlesList = (props) => {
                 </List.Item>
                 )}
             />
-            <AddArticle index={currentIndex} visible={visible} onCancel={()=>setVisible(false)} edit={edit}/>
+            <AddArticle index={currentIndex} visible={visible} onCancel={()=> {
+                    setVisible(false)
+                    props.dispatch(newOrderNewArticleSlice.actions.clearArticle())
+                }} edit={edit}/>
         </Card>
     )
 }

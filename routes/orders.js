@@ -54,6 +54,7 @@ router.post('/post-comment', async (req, res) => {
 
 router.post('/update-state', async (req, res) => {
     let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
+    console.log(orders)
     for(let order of orders) {
         order.state = req.body.state;
         await order.save();
@@ -193,7 +194,9 @@ router.get('/search', async (req, res) => {
     }
     console.log('Filters: ')
     console.log(filters)
-    if(req.query.lastOrderDate == null) {
+    console.log('Last order date: ')
+    console.log(req.query.lastOrderDate)
+    if(!req.query.lastOrderDate) {
         orders = await Order.find({...filters})
                             .sort([['latestVersionDate', sort]])
                             .populate('customer', ' -__v -orders')
@@ -203,7 +206,7 @@ router.get('/search', async (req, res) => {
                             .exec();
     }
     else {
-        let latestVersionDate = {$gt: req.query.lastOrderDate};
+        let latestVersionDate = {$lt: req.query.lastOrderDate};
         if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
         orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
                             .sort([['latestVersionDate', sort]])

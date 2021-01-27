@@ -3,14 +3,24 @@ import { connect } from 'react-redux';
 import { PageHeader, Row, Card, Col, Statistic } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { Bar } from 'react-chartjs-2';
-import { ArrowUpOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import Axios from 'axios';
+import { useState } from 'react';
 
 
 const Statistics = () => {
-
+    let [data, setData] = useState({});
     useEffect(() => {
         // Axios
+        Axios.get('/api/statistic/get')
+        .then(res => {
+            console.log(res.data)
+            setData(res.data);
+        })
     }, [])
+
+    let thisMonthHigherPrice = data.orderPrice > data.orderPriceLastMonth;
+    let thisMonthHigherCount = data.orderCount > data.orderCountLastMonth;
 
     return (
         <div>
@@ -26,40 +36,19 @@ const Statistics = () => {
                         <Row gutter={[10]}>
                             <Col span={8}>
                                 <Statistic
-                                title="Trenutna godina"
-                                value={270000}
+                                title="Trenutni mesec"
+                                value={data.orderPrice}
                                 precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
+                                valueStyle={{ color: thisMonthHigherPrice ? '#3f8600' : '#d10f0f'}}
+                                prefix={thisMonthHigherPrice ? <ArrowUpOutlined /> : <ArrowDownOutlined/>}
                                 suffix="RSD"/>
                             </Col>
                             <Col span={8}>
                                 <Statistic
-                                title="Prošla godina"
-                                value={150000}
+                                title="Prošli mesec"
+                                value={data.orderPriceLastMonth}
                                 precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="RSD"/>
-                            </Col>
-                        </Row>
-                        <Row gutter={[10]} className="mt-3">
-                            <Col span={8}>
-                                <Statistic
-                                title="Trenutna godina"
-                                value={270000}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="RSD"/>
-                            </Col>
-                            <Col span={8}>
-                                <Statistic
-                                title="Prošla godina"
-                                value={150000}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
+                                valueStyle={{ color: '#999' }}
                                 suffix="RSD"/>
                             </Col>
                         </Row>
@@ -68,68 +57,21 @@ const Statistics = () => {
                 <Col span={12}>
                     <Card>
                         <Title level={4}>Broj porudžbina</Title>
-                        <Row gutter={[10, 10]}>
+                        <Row gutter={[10]}>
                             <Col span={8}>
                                 <Statistic
                                 title="Trenutni mesec"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
+                                value={data.orderCount}
+                                precision={0}
+                                valueStyle={{ color: thisMonthHigherPrice ? '#3f8600' : '#d10f0f' }}
+                                prefix={thisMonthHigherPrice ? <ArrowUpOutlined /> : <ArrowDownOutlined/>}/>
                             </Col>
                             <Col span={8}>
                                 <Statistic
                                 title="Prošli mesec"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
-                            </Col>
-                        </Row>
-                        <Row gutter={[10, 10]}>
-                            <Col span={8}>
-                                <Statistic
-                                title="Trenutna godina"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
-                            </Col>
-                            <Col span={8}>
-                                <Statistic
-                                title="Prošla godina"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
-                            </Col>
-                        </Row>
-                    </Card>
-                    
-                    <Card className="mt-4">
-                        <Title level={4}>Reklamacije</Title>
-                        <Row gutter={[10, 10]}>
-                            <Col span={8}>
-                                <Statistic
-                                title="Trenutni mesec"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
-                            </Col>
-                            <Col span={8}>
-                                <Statistic
-                                title="Prošli mesec"
-                                value={11.28}
-                                precision={2}
-                                valueStyle={{ color: '#3f8600' }}
-                                prefix={<ArrowUpOutlined />}
-                                suffix="%"/>
+                                value={data.orderCountLastMonth}
+                                precision={0}
+                                valueStyle={{ color: '#999' }}/>
                             </Col>
                         </Row>
                     </Card>

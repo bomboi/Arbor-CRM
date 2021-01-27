@@ -81,7 +81,7 @@ const OrderPreview = (props) => {
 
     const onSelectOrderState = (value) => {
         Axios.post('/api/order/update-state', {
-            orderId: props.order._id,
+            selectedIds: [props.order._id],
             state: value
         }).then(() => {
             setFirstState(value)

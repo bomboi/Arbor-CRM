@@ -5,14 +5,55 @@ const Order = require('../models/Order');
 router.use(isAuthenticated);
 
 router.get('/get', async (req, res) => {
-    const thisYear = await Order.aggregate([{ $group: {
-        _id: { month:{$month: "$latestVersionDate"} , year: {$year: "$latestVersionDate"}},
-        total: { $sum: 1 }
-      }}]).exec();
-    // const lastYear = await Order.and({latestVersionDate: {$gt: }})
-    console.log(thisYear)
+    let today = new Date();
+    let beginning = new Date(today.getFullYear(), today.getMonth(), 1);
+    let prevMonthBeginning = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+    const orderCount = await Order.aggregate([
+        { 
+            $match: {
+                $expr: {
+                    $and: [
+                        { $gt: ['$latestVersionDate', beginning] },
+                        { $lt: ['$latestVersionDate', today] }
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { month: { $month: '$latestVersionDate' }},
+                total: { $sum: 1 },
+                price: { $sum: '$totalAmount' }
+            }
+        }
+    ]).exec();
+
+    const orderCountLastMonth = await Order.aggregate([
+        { 
+            $match: {
+                $expr: {
+                    $and: [
+                        { $gt: ['$latestVersionDate', prevMonthBeginning] },
+                        { $lt: ['$latestVersionDate', beginning] }
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { month: { $month: '$latestVersionDate' }},
+                total: { $sum: 1 },
+                price: { $sum: '$totalAmount' }
+            }
+        }
+    ]).exec();
+
     res.status(200).send({
-        first: thisYear
+        orderCount: orderCount.length == 0 ? 0 : orderCount[0].total,
+        orderPrice: orderCount.length == 0 ? 0 : orderCount[0].price,
+        orderCountLastMonth: orderCountLastMonth.length == 0 ? 0 : orderCountLastMonth[0].total,
+        orderPriceLastMonth: orderCountLastMonth.length == 0 ? 0 : orderCountLastMonth[0].price
     });
 })
 
