@@ -7,6 +7,7 @@ import DeadlineModal from './DeadlineModal';
 import CompanyInfoModal from './CompanyInfoModal';
 import OrderNoteModal from './OrderNoteModal';
 import UserSettingsModal from './UserSettingsModal';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const Settings = (props) => {
 
@@ -14,7 +15,7 @@ const Settings = (props) => {
         deadline: false,
         companyInfo: false,
         orderNote: false,
-        userSettings: false
+        changePassword: false
     });
 
     return (
@@ -47,24 +48,10 @@ const Settings = (props) => {
                 <Title className="mt-4" level={5}>Nalog</Title>
                 <Divider className="mb-3 mt-3"/>
                 <div className="d-flex justify-content-between">
-                    <div>Promena informacija o nalogu</div>
-                    <Button onClick={()=>setVisible({userSettings:true})}>Izmeni</Button>
-                    <UserSettingsModal visible={visible.userSettings} onCancel={()=>setVisible({userSettings:false})}/>
-                </div>
-                <Divider className="mb-3 mt-3"/>
-                <div className="d-flex justify-content-between">
                     <div>Promena šifre</div>
                     {/* TODO: Create a new modal */}
-                    <Button onClick={()=>setVisible({userSettings:true})}>Izmeni</Button>
-                    <UserSettingsModal visible={visible.userSettings} onCancel={()=>setVisible({userSettings:false})}/>
-                </div>
-                <Divider className="mb-3 mt-3"/>
-                {/* Admin */}
-                <div className="d-flex justify-content-between">
-                    <div>Gasenje naloga prodavaca</div>
-                    <div>
-                        <Button>Izmeni</Button>
-                    </div>
+                    <Button onClick={()=>setVisible({changePassword:true})}>Izmeni</Button>
+                    <ChangePasswordModal visible={visible.changePassword} onCancel={()=>setVisible({changePassword:false})}/>
                 </div>
             </Card>
         </div>

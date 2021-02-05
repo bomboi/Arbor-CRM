@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import { connect } from 'react-redux';
 import { userSlice } from '../../Redux/reducers/appReducers';
+import { message } from 'antd';
 
 const Login = (props) => {
     let history = useHistory();
@@ -44,6 +45,8 @@ const Login = (props) => {
                                 history.push('porudzbine');
                             })
                   }
+                }).catch(error => {
+                    message.error(error.response.data)
                 })
             }}>
                 Submit

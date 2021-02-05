@@ -43,10 +43,16 @@ router.post('/login', async (req, res) => {
             bcrypt.compare(req.body.password, user.password, function(err, result) {
                 if(err) {
                     console.log(err);
-                    res.send();
+                    res.sendStatus(500);
                 }
-                req.session.user = user._id;
-                res.sendStatus(200);
+                else if(result) {
+                    req.session.user = user._id;
+                    res.sendStatus(200);
+                }
+                else {
+                    res.status(500);
+                    res.send("Uneta sifra je pogresna.")
+                }
             });
         }
     });
