@@ -20,8 +20,7 @@ const UpdateProduct = (props) => {
     const productsAreSame = () => {
         if(props.product.productName === product.productName && 
             props.product.price === product.price &&
-            props.product.materialLength === product.materialLength &&
-            props.product.category === product.category) {
+            props.product.discountedPrice === product.discountedPrice) {
                 setErrorMsg('Niste promenili proizvod')
                 return true;
             }
@@ -68,15 +67,10 @@ const UpdateProduct = (props) => {
                 }} className='w-100' placeholder="Cena"/>
               </Col></Row>
             <Row gutter={[20,10]}><Col flex={'auto'}>
-              <InputNumber value={product.materialLength} onChange={e => {
-                    setProduct({...product, materialLength:e})
-                }} className='w-100' placeholder="Kolicina stofa[m]"/>
+              <InputNumber value={product.discountedPrice} onChange={e => {
+                    setProduct({...product, discountedPrice:e})
+                }} className='w-100' placeholder="Cena za gotovinsko"/>
               </Col></Row>
-            <Row gutter={[20,10]}><Col flex={'auto'}>
-              <Input value={product.category} onChange={e => {
-                    setProduct({...product, category:e.target.value})
-                }} placeholder="Kategorija"/>
-            </Col></Row>
             {errorMsg!=='' && <Alert className="mt-3" message={errorMsg} type="error" showIcon />}
       </Modal>
     )
