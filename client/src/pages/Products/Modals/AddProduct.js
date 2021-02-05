@@ -43,11 +43,8 @@ const AddProduct = (props) => {
               <InputNumber onChange={e=>{product.price=e; setProduct(product)}} className='w-100' placeholder="Cena"/>
               </Col></Row>
           <Row gutter={[20,10]}><Col flex={'auto'}>
-              <InputNumber onChange={e=>{product.material=e; setProduct(product)}} className='w-100' placeholder="Kolicina stofa[m]"/>
+              <InputNumber onChange={e=>{product.discountedPrice=e; setProduct(product)}} className='w-100' placeholder="Cena za gotovinsko"/>
               </Col></Row>
-          <Row gutter={[20,10]}><Col flex={'auto'}>
-              <Input onChange={e=>{product.category=e.target.value; setProduct(product)}} placeholder="Kategorija"/>
-          </Col></Row>
       </Modal>
     )
 }

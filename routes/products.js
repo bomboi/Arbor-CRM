@@ -21,6 +21,7 @@ router.post('/add', async (req, res) => {
                 let product = new Product();
                 product.productName = req.body.name;
                 product.price = req.body.price;
+                product.discountedPrice = req.body.discountedPrice;
                 product.save(err=>console.log(err));
                 res.status(200).send(product)
             }

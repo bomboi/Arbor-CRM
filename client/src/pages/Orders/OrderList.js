@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
-import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge } from 'antd';
+import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge, notification } from 'antd';
 import OrderListItem from './OrderListItem';
 import Axios from 'axios';
 import { connect } from 'react-redux';
@@ -26,6 +26,7 @@ const OrderList = (props) => {
     let [filters, setFilters] = useState({
         status: 'sve',
         orderId: '',
+        customerName: '',
         range: ['', ''],
         sort: 'Najnovije'
     });
@@ -52,6 +53,9 @@ const OrderList = (props) => {
             console.log(res.data)
             if(init) props.dispatch(orderListSlice.actions.init(res.data))
             else props.dispatch(orderListSlice.actions.update(res.data))
+        })
+        .catch(error => {
+            message.error(error.response.data);
         })
     }
 
@@ -102,6 +106,12 @@ const OrderList = (props) => {
                             value={filters.orderId}
                             placeholder="Unesite broj porudžbine"
                             onChange={e => update(e.target.value, 'orderId')}
+                            style={{ width: 300 }} />
+                        <Search
+                            className={isMobile?'mb-2 w-100':'mr-3'}
+                            value={filters.customerName}
+                            placeholder="Unesite ime kupca"
+                            onChange={e => update(e.target.value, 'customerName')}
                             style={{ width: 300 }} />
                         <RangePicker
                             className={isMobile?'mb-2 w-100':'mr-3'}

@@ -8,7 +8,7 @@ const NCCustomerListHeader = () => {
         <Row className="pl-3 pr-3 pb-0">
             <Col xs><b>Ime i prezime</b></Col>
             <Col xs><b>Broj telefona</b></Col>
-            <Col xs></Col>
+            <Col xs><b>Adresa</b></Col>
         </Row>
     )
 }
@@ -18,11 +18,7 @@ const NCCustomerListItem = (props) => {
         <Row className="p-3">
             <Col xs>{props.item.name}</Col>
             <Col xs>{props.item.phone}</Col>
-            <Col xs>
-                <Row end="xs">
-                    <Button>Otvori</Button>
-                </Row>
-            </Col>
+            <Col xs>{props.item.address.street}</Col>
         </Row>
     )
 }

@@ -8,8 +8,11 @@ import AddCustomerModal from './AddCustomerModal';
 import Axios from 'axios';
 import { customerSlice } from '@reducers/customersReducers';
 import { getCustomers, areCustomersInitialized } from '@selectors/customersSelectors';
+import { useState } from 'react';
 
 const Customers = (props) => {
+
+    let [serachText, setSearchText] = useState('');
 
     useEffect(() => {
         if(!props.areCustomersInitialized) {
@@ -20,6 +23,10 @@ const Customers = (props) => {
     }, []);
 
     const extraPageHeaderElements  = [<Button type="primary" onClick={()=>props.dispatch(modalSlice.actions.toggleShow('AddCustomerModal'))}>Dodaj kupca</Button>];
+
+    const onSearch = (e) => {
+        setSearchText(e.target.value)
+    }
 
     return (
         <div>
@@ -33,9 +40,10 @@ const Customers = (props) => {
                 <Row>
                     <Col flex={'auto'} className='mb-3'>
                             <Input
+                                value={serachText}
                                 className='mr-3'
                                 placeholder="Unesite ime kupca"
-                                // onChange={onSearch}
+                                onChange={onSearch}
                                 style={{ width: 300 }}/>
                     </Col>
                 </Row>
@@ -43,7 +51,7 @@ const Customers = (props) => {
                     <Col flex={'auto'}>
                         <List
                             header={<CustomerListHeader />}
-                            dataSource={props.customers} 
+                            dataSource={props.customers.filter(item => item.name.toLowerCase().includes(serachText.toLowerCase()))} 
                             renderItem={item => 
                                 <div>
                                     <CustomerListItem id={item._id} item={item}/>

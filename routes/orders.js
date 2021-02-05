@@ -186,56 +186,74 @@ router.post('/delete', async (req, res) => {
 })
 
 router.get('/search', async (req, res) => {
-    req.query.filters = JSON.parse(req.query.filters)
-    let orders = [];
-    let filters = {};
-
-    // Set filters if sent
-    if(req.query.filters.orderId !== '') {
-        if(req.query.filters.orderId.startsWith('arh')) {
-            req.query.filters.orderId = req.query.filters.orderId.substring(3);
-        }
-        filters.orderId = req.query.filters.orderId; 
-    }
-    let sort = req.query.filters.sort === 'Najnovije' ? -1 : 1;
-
-    const hasRange = req.query.filters.range !== null && req.query.filters.range[0] !== '' && req.query.filters.range[1] !== ''; 
-    if(hasRange) {
-        filters.latestVersionDate = {$gte: req.query.filters.range[0], $lte: req.query.filters.range[1]}
-    }
-    if(req.query.filters.status !== '' && req.query.filters.status !== 'sve' ) {
-        filters.state = req.query.filters.status;
-    }
-
-    if(!req.query.lastOrderDate) {
-        orders = await Order.find({...filters})
-                            .sort([['latestVersionDate', sort]])
-                            .populate('customer', ' -__v -orders')
-                            .populate('latestVersionData', 'data.orderInfo.date')
-                            .select('-__v -comments')
-                            .limit(parseInt(req.query.pageSize))
-                            .exec();
-    }
-    else {
-        let latestVersionDate = {$lt: req.query.lastOrderDate};
-        if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
-        orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
-                            .sort([['latestVersionDate', sort]])
-                            .populate('customer', ' -__v -orders')
-                            .populate('latestVersionData', 'data.orderInfo.date')
-                            .select('-__v -comments')
-                            .limit(parseInt(req.query.pageSize))
-                            .exec();
-    }
+    try {
+        req.query.filters = JSON.parse(req.query.filters)
+        let orders = [];
+        let filters = {};
     
-    let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
-    let data = orders.map(order => ({ 
-        ...order.toObject(), 
-        hasNotification: notifications.some(item => item.orderId.equals(order._id) && item.readBy.some(item => item.equals(req.session.user)))
-    }))
+        // Set filters if sent
+        // Set orderId filter
+        if(req.query.filters.orderId !== '') {
+            if(req.query.filters.orderId.startsWith('arh')) {
+                req.query.filters.orderId = req.query.filters.orderId.substring(3);
+            }
+            filters.orderId = req.query.filters.orderId; 
+        }
+    
+        // Sort orders according to filter
+        let sort = req.query.filters.sort === 'Najnovije' ? -1 : 1;
+    
+        // Check if date range is used and set filters accordingly
+        const hasRange = req.query.filters.range !== null && req.query.filters.range[0] !== '' && req.query.filters.range[1] !== ''; 
+        if(hasRange) {
+            filters.latestVersionDate = {$gte: req.query.filters.range[0], $lte: req.query.filters.range[1]}
+        }
+        if(req.query.filters.status !== '' && req.query.filters.status !== 'sve' ) {
+            filters.state = req.query.filters.status;
+        }
+        
+        let orderIds = [];
+        if(req.query.filters.customerName !== '') {
+            var regexp = new RegExp("^"+ req.query.filters.customerName);
+            orderIds = await Customer.find({name: regexp}).select('orders -_id').exec();
+            orderIds = orderIds.reduce((acc, val) => {return acc.concat(val.orders)}, []);
+            filters._id = {$in: orderIds};
+        }
 
-    res.status(200);
-    res.send(data);
+        if(!req.query.lastOrderDate) {
+            orders = await Order.find({...filters})
+                                .sort([['latestVersionDate', sort]])
+                                .populate('customer', ' -__v -orders')
+                                .populate('latestVersionData', 'data.orderInfo.date')
+                                .select('-__v -comments')
+                                .limit(parseInt(req.query.pageSize))
+                                .exec();
+        }
+        else {
+            let latestVersionDate = {$lt: req.query.lastOrderDate};
+            if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
+            orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
+                                .sort([['latestVersionDate', sort]])
+                                .populate('customer', ' -__v -orders')
+                                .populate('latestVersionData', 'data.orderInfo.date')
+                                .select('-__v -comments')
+                                .limit(parseInt(req.query.pageSize))
+                                .exec();
+        }
+        
+        let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
+        let data = orders.map(order => ({ 
+            ...order.toObject(), 
+            hasNotification: notifications.some(item => item.orderId.equals(order._id) && item.readBy.some(item => item.equals(req.session.user)))
+        }))
+    
+        res.status(200);
+        res.send(data);
+    }
+    catch(error) {
+        res.status(500);
+        res.send(error.message);
+    }
 })
 
 router.post('/add', async (req, res) => {
