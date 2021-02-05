@@ -54,7 +54,7 @@ router.post('/post-comment', async (req, res) => {
 
 router.post('/update-state', async (req, res) => {
     let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
-    console.log(orders)
+    console.log(req.body.selectedIds)
     for(let order of orders) {
         order.state = req.body.state;
         await order.save();
@@ -63,68 +63,82 @@ router.post('/update-state', async (req, res) => {
 })
 
 router.post('/add-version', async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    try {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+    
+        let order = await Order.findOne({orderId: req.body.orderId}).exec();
+    
+        const reqData = req.body;
+    
+        // Creating Order Data for new version
+        let orderData = new OrderData();
+        orderData.orderId = order._id;
+        orderData.version = order.latestVersion + 1;
+        orderData.dateCreated = new Date();
+        orderData.changedBy = req.session.user;
+        orderData.data.articles = reqData.articles;
+        orderData.data.orderInfo = reqData.orderInfo;
+        await orderData.save();
+    
+        // Copying new data to Order
+        order.latestVersionData = orderData._id;
+        order.latestVersion = orderData.version;
+        order.latestVersionDate = orderData.data.orderInfo.date;
+    
+        // Check if customer exists and update accordingly, otherwise create new customer
+        let customer = null;
+        if(reqData.customer !== undefined && reqData.customer._id !== undefined) {
+            order.customer = reqData.customer._id;
+            customer = await Customer.findOne({_id: order.customer}).exec();
+            customer.orders.push(order._id);
+            await customer.save();
+        }
+        else {
+            customer = new Customer();
+        }
+        customer.name = reqData.customer.name;
+        customer.phone = reqData.customer.phone;
+        customer.email = reqData.customer.email;
+        customer.address = reqData.customer.address;
+        await customer.save();
+    
+        // Calculate new Order amount
+        order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
+        await order.save();
+    
+        // Delete old notification if exists
+        await Notification.deleteOne({orderId: order._id}).exec();
 
-    let order = await Order.findOne({orderId: req.body.orderId}).exec();
-
-    const reqData = req.body;
-
-    let orderData = new OrderData();
-    orderData.orderId = order._id;
-    orderData.version = order.latestVersion + 1;
-    orderData.dateCreated = new Date();
-    orderData.changedBy = req.session.user;
-    orderData.data.articles = reqData.articles;
-    orderData.data.orderInfo = reqData.orderInfo;
-    await orderData.save();
-
-    order.latestVersionData = orderData._id;
-    order.latestVersion = orderData.version;
-    order.latestVersionDate = orderData.data.orderInfo.date;
-
-    let customer = null;
-
-    console.log('customer:')
-    console.log(reqData.customer)
-    if(reqData.customer !== undefined && reqData.customer._id !== undefined) {
-        console.log('Existing')
-        order.customer = reqData.customer._id;
-        customer = await Customer.findOne({_id: order.customer}).exec();
+        // Add new notification
+        // Get all users that are not admin matija
+        let users = await User.find({username: {$ne: "matija"}}).select('_id').exec();
+        let notification = new Notification();
+        notification.dateChanged = new Date();
+        notification.orderId = order._id;
+        notification.readBy = users;
+        await notification.save();
+    
+        await session.commitTransaction();
+        session.endSession();
+    
+        res.sendStatus(200);
     }
-    else {
-        console.log('New')
-        customer = new Customer();
+    catch(error) {
+        res.status(500).send(error.message);
     }
-    customer.name = reqData.customer.name;
-    customer.phone = reqData.customer.phone;
-    customer.email = reqData.customer.email;
-    customer.address = reqData.customer.address;
-    await customer.save();
-
-    order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
-    await order.save();
-
-    let users = await User.find({}).select('_id').exec();
-
-    let notification = new Notification();
-    notification.dateChanged = new Date();
-    notification.orderId = order._id;
-    notification.readBy = users;
-    await notification.save();
-
-    await session.commitTransaction();
-    session.endSession();
-
-    res.sendStatus(200);
 })
 
 router.post('/read-notification', async (req, res) => {
     let notification = await Notification.findOne({orderId: req.body.orderId}).exec();
 
+    console.log(notification)
+
     notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
     if(notification.readBy.length > 0) await notification.save();
     else await Notification.deleteOne({orderId: req.body.orderId}).exec();
+
+    console.log(notification);
 
     res.sendStatus(200);
 })
@@ -192,10 +206,7 @@ router.get('/search', async (req, res) => {
     if(req.query.filters.status !== '' && req.query.filters.status !== 'sve' ) {
         filters.state = req.query.filters.status;
     }
-    console.log('Filters: ')
-    console.log(filters)
-    console.log('Last order date: ')
-    console.log(req.query.lastOrderDate)
+
     if(!req.query.lastOrderDate) {
         orders = await Order.find({...filters})
                             .sort([['latestVersionDate', sort]])

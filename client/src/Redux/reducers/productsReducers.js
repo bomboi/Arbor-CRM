@@ -19,6 +19,9 @@ export const productSlice = createSlice({
         updateProduct: (state, action) => {
             let index = state.findIndex(item => item._id === action.payload._id);
             state[index] = action.payload;
+        },
+        removeProducts: (state, action) => {
+            return state.filter(item => !action.payload.includes(item._id));
         }
     },
     extraReducers: {

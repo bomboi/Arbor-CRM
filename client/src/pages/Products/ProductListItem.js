@@ -17,8 +17,6 @@ export const NCProductListHeader = (props) => {
             <Col xs><b>Naziv</b></Col>
             <Col xs><b>Cena</b></Col>
             <Col xs><b>Cena za gotovinsko</b></Col>
-            <Col xs><b>Kolicina stofa</b></Col>
-            <Col xs><b>Kategorija</b></Col>
             {props.isAdmin && <Col xs></Col>}
             {props.isAdmin && <Col xs></Col>}
         </Row>
@@ -34,8 +32,6 @@ const NCProductListItem = (props) => {
             <Col xs>{props.item.productName}</Col>
             <Col xs>{props.item.price}</Col>
             <Col xs>{props.item.discountedPrice?props.item.discountedPrice:'/'}</Col>
-            <Col xs>{props.item.materialLength?props.item.materialLength:'/'}</Col>
-            <Col xs>{props.item.category?props.item.category:'/'}</Col>
             {props.isAdmin && <Col xs><Checkbox checked={props.selected} onClick={()=>props.dispatch(selectProductSlice.actions.toggleSelectProduct(props.id))}/></Col>}
             {props.isAdmin && <Col xs><Button onClick={()=>{
                     props.dispatch(modalSlice.actions.toggleShow('UpdateProduct'))

@@ -91,8 +91,6 @@ class ComponentToPrint extends React.Component {
 }
 
 const ComponentToPrintM = (props) =>  {
-
-
         return (
             !props.show?
             <></>
@@ -191,9 +189,13 @@ class MultipleComponentsToPrint extends React.Component {
     componentDidUpdate(prevProps) {
         let orders = this.state.orders;
         if(!this.props.show && !cmpArrays(this.props.ids, prevProps.ids)) {
-            this.setState({loaded: true});
+            console.log("Different ids!")
+            let waitingQueueStarted = 0;
+            let waitingQueueFinished = 0;
             this.props.ids.map((id, index) => {
+                // Get new order if it is not already in the list
                 if(!orders.some(item => item._id === id)) {
+                    waitingQueueStarted++;
                     Axios.get('/api/order/get-versions', {params:{orderId:id}}).then(resVersions => {
                         Axios.get('/api/order/by-id/'+id).then(res => {
                             orders.push({
@@ -204,18 +206,33 @@ class MultipleComponentsToPrint extends React.Component {
                                 usingDelivery:resVersions.data.orderVersions[res.data.latestVersion].data.orderInfo.delivery,
                                 orderInfo:resVersions.data.orderVersions[res.data.latestVersion].data.orderInfo, 
                             })
+
+                            // If it is the last id, update state
                             if(index === this.props.ids.length - 1) {
-                                orders.map(item => this.props.ids.includes(item._id))
-                                this.setState({orders:orders});
-                                this.setState({loaded: true})
+                                // Remove unselected ids
+                                waitingQueueFinished++;
                             }
                         })
-                    }) 
+                    })
+                }
+
+                // If it is the last id, update state
+                if(index === this.props.ids.length - 1) {
+                    // Poll if fetching data is finished
+                    let interval = setInterval(() => {
+                        if(waitingQueueStarted === waitingQueueFinished) {
+                            clearInterval(interval);
+                            orders = orders.filter(item => this.props.ids.includes(item._id));
+                            console.log("ORDERS");
+                            console.log(orders)
+                            this.setState({orders:orders});
+                            this.setState({loaded: true});
+                        }
+                    }, 10)
                 }
             })
         }
     }
-
 
     state = {
         loaded: false, 
@@ -223,15 +240,17 @@ class MultipleComponentsToPrint extends React.Component {
     }
 
     render() {
-        console.log('render loaded: ' + this.state.loaded)
-        return !this.state.loaded ? <div></div> : <div >{this.state.orders.map(item =>
-            <ComponentToPrintM 
+        // console.log('render loaded: ' + this.state.loaded)
+        return !this.state.loaded ? <div></div> : <div >{this.state.orders.map(item =>{
+            return <ComponentToPrintM 
                 orderId={item.id}
                 customer={item.customer}
                 show={this.props.show}
                 usingDelivery={item.usingDelivery}
                 orderInfo={item.orderInfo}
-                articles={item.articles}/>)}</div>
+                articles={item.articles}/>
+        }
+            )}</div>
     }
 
 }

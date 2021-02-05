@@ -30,6 +30,17 @@ router.post('/add', async (req, res) => {
     })
 })
 
+router.post('/delete', async (req, res) => {
+    try {
+        let result = await Product.deleteMany({_id: {$in: req.body}}).exec();
+        if(result.deletedCount == 0) res.status(500).send("Ovaj proizvod je obrisan!");
+        res.sendStatus(200);
+    }
+    catch(error) {
+        res.status(500).send(error.message);
+    }
+})
+
 router.post('/update', async (req, res) => {
     Product.find({_id: req.body._id}, (err, products) => {
             console.log(err)

@@ -78,13 +78,6 @@ app.get('*', (req, res) => {
 // Choose the port and start the server
 const PORT = process.env.PORT || 5000
 
-// https.createServer({
-//   key: fs.readFileSync('server.key'),
-//   cert: fs.readFileSync('server.cert')
-// }, app)
-// .listen(3000, function () {
-//   console.log('Example app listening on port '+ PORT +'! Go to https://localhost:' + PORT+ '/')
-// })
 app.listen(PORT, () => {
   console.log(`Mixing it up on port ${PORT}`)
 })

@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
-import { PageHeader, Button, Row, Col, Card, List, Input } from 'antd';
+import { PageHeader, Button, Row, Col, Card, List, Input, message } from 'antd';
 import Axios from 'axios';
 import { ProductListItem, ProductListHeader } from './ProductListItem';
 import { connect } from 'react-redux'
 import AddProduct from './Modals/AddProduct';
 import ProductsPDF from './ProductsPDF';
 import UpdateProduct from './Modals/UpdateProduct';
-import { getProducts, areAllSelected } from '@selectors/productsSelectors';
+import { getProducts, areAllSelected, selectedProducts } from '@selectors/productsSelectors';
 import { modalSlice, selectProductSlice, productSlice } from '@reducers/productsReducers';
 import { isAdmin } from '@selectors/appSelectors';
 
@@ -40,6 +40,21 @@ const Products = (props) => {
         extraPageHeaderElements.push(<Button key='1' type="primary" onClick={()=>props.dispatch(modalSlice.actions.toggleShow('AddProduct'))}>Dodaj proizvod</Button>)
     }
 
+    const toggleSelect = () => props.dispatch(selectProductSlice.actions.toggleSelectAllProducts(props.products));
+
+    const deleteSelected = () => {
+        console.log("Products to remove");
+        console.log(props.selectedProducts);
+        Axios.post('/api/product/delete', props.selectedProducts)
+            .then(res => {
+                props.dispatch(productSlice.actions.removeProducts(props.selectedProducts));
+                message.success("Uspesno obrisani proizvodi!");
+            })
+            .catch(error => {
+                message.error(error.response.data);
+            });
+    }
+
     return (
         <div>
         <PageHeader
@@ -61,11 +76,8 @@ const Products = (props) => {
                         {props.isAdmin && 
                             <>
                             <Button>Izmeni selektovane</Button>
-                            <Button onClick={()=>props.dispatch(selectProductSlice.actions.toggleSelectAllProducts(props.products))}>
-                                {props.allSelected?'Odselektuj sve':'Selektuj sve'}
-                            </Button>
-                            <Button>Obrisi selektovane</Button>
-                            <Button>Obrisi sve</Button>
+                            <Button onClick={toggleSelect}>{props.allSelected?'Odselektuj sve':'Selektuj sve'}</Button>
+                            <Button onClick={deleteSelected}>Obrisi selektovane</Button>
                             </>
                         }
                 </Col>
@@ -88,7 +100,8 @@ const Products = (props) => {
 const mapStateToProps = (state) => ({
         products: getProducts(state),
         allSelected: areAllSelected(state),
-        isAdmin: isAdmin(state)
+        isAdmin: isAdmin(state),
+        selectedProducts: selectedProducts(state)
 })
 
 export default connect(mapStateToProps)(Products)
