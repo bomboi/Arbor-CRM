@@ -68,7 +68,7 @@ const OrderPreview = (props) => {
     };
 
     useEffect(()=> {
-        if(props.order != null && firstState === '') {
+        if(props.order != null) {
             setFirstState(props.order.state);
         }
     }, [props.order])
