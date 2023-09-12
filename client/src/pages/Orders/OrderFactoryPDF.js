@@ -47,6 +47,9 @@ class ComponentToPrint extends React.Component {
                         <Divider className="mt-0 mb-0"/>
                         {this.props.articles.map((article, index) => (
                             <div className="m-0">
+                            <Row className="m-0" gutter={20}>
+                                Kolicina: {article.quantity}
+                            </Row>
                             <Row className="mt-0" gutter={20}>
                                 <Col span={6} className="pb-2 pt-2" style={{whiteSpace:'pre-wrap'}}>{article.name}</Col>
                                 <Col span={18} className="pt-2 pb-2">
@@ -127,6 +130,9 @@ const ComponentToPrintM = (props) =>  {
                         <Divider className="mt-0 mb-0"/>
                         {props.articles.map((article, index) => (
                             <div className="m-0">
+                            <Row className="m-0" gutter={20}>
+                                Kolicina: {article.quantity}
+                            </Row>
                             <Row className="mt-0" gutter={20}>
                                 <Col span={6} className="pb-2 pt-2" style={{whiteSpace:'pre-wrap'}}>{article.name}</Col>
                                 <Col span={18} className="pt-2 pb-2">

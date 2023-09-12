@@ -94,6 +94,32 @@ const Statistics = () => {
                         </Card>
                     </Col>
                 </Row>
+                <Row className="mt-3" gutter={[20]}>
+                    <Col span={24}>
+                        <Card>
+                            <Title level={4}>Porudzbine po mesecima</Title>
+                            {data.ordersPerMonth && data.ordersPerMonth.reverse().map(orderData => 
+                            <>
+                                <div><b>{meseci[orderData._id.mesec]} {orderData._id.godina}</b></div>
+                                <Row>
+                                    <Col span={12}>
+                                        <Statistic
+                                        value={orderData.brPorudz}
+                                        valueStyle={{ color: '#999' }}
+                                        precision={0}/>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Statistic
+                                        value={orderData.promet}
+                                        precision={0}
+                                        valueStyle={{ color: '#999' }}
+                                        suffix="RSD"/>
+                                    </Col>
+                                </Row>
+                            </>)}
+                        </Card>
+                    </Col>
+                </Row>
             </BrowserView>
             <MobileView>
                 <Card>
@@ -140,7 +166,7 @@ const Statistics = () => {
                 </Card>
                 <Card>
                     <Title level={4}>Porudzbine po mesecima</Title>
-                    {data.ordersPerMonth && data.ordersPerMonth.map(orderData => 
+                    {data.ordersPerMonth && data.ordersPerMonth.reverse().map(orderData => 
                     <>
                         <div><b>{meseci[orderData._id.mesec]} {orderData._id.godina}</b></div>
                         <Row>

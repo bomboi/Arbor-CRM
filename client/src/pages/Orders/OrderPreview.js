@@ -152,7 +152,8 @@ const OrderPreview = (props) => {
                     <Collapse.Panel header={'Opcije'}>
                         <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
                         <Button onClick={deleteOrder} type={'primary'} className="mb-2" danger>Obrisi</Button>
-                        <Button className="mb-2">Štampaj</Button>
+                        {/* <Button onClick={} className="mb-2">Štampaj</Button> */}
+                        <OrderInvoicePDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                         {props.isAdmin && <OrderFactoryPDF className="mb-2 w-100" version={version}/>}
                         <Button className="mb-2">Prijavi reklamaciju</Button>
                         <Button className="mb-2" onClick={()=>{

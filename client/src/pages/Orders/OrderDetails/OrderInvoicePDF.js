@@ -4,7 +4,7 @@ import { Button, Row, Col, Divider, message } from 'antd';
 
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import { getAddedArticles } from '@selectors/ordersSelectors';
-import { getNewOrderCustomer, usingDelivery, getOrderInfo, getDeliveryPrice, getAvans, getGlobalDiscount } from '../../../Redux/selectors/ordersSelectors';
+import { getNewOrderCustomer, usingDelivery, getOrderInfo, getDeliveryPrice, getAvans, getGlobalDiscount, getOrderPreviewData, getOrderPreviewVersions } from '../../../Redux/selectors/ordersSelectors';
 import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 import moment from 'moment';
 import Axios from 'axios';
@@ -148,6 +148,68 @@ class ComponentToPrint extends React.Component {
         );
     }
 }
+
+const mapStateToPropsPreview = (state, props) => {
+    console.log(getOrderPreviewData(state))
+    console.log(props.version)
+    if(getOrderPreviewData(state) && getOrderPreviewVersions(state)[props.version] && props.version !== -1){
+        console.log(getOrderPreviewVersions(state)[props.version])
+        return {
+            orderId: getOrderPreviewData(state).orderId,
+            articles: getOrderPreviewVersions(state)[props.version].data.articles,
+            customer: getOrderPreviewData(state).customer,
+            usingDelivery: usingDelivery(state),
+            defaults: getOrderDefaults(state),
+            avans: getAvans(state),
+            globalDiscount: getGlobalDiscount(state),
+            orderInfo: getOrderPreviewVersions(state)[props.version].data.orderInfo,
+        }
+    }
+    else return {}
+}
+
+export const OrderInvoicePreviewPDF = connect(mapStateToPropsPreview)((props) => {
+
+    const componentRef = useRef();
+    let [show, setShow] = useState(false)
+
+    return (
+        <div className="d-inline">
+            <ReactToPrint
+                content={() => componentRef.current}
+                onBeforeGetContent={()=>setShow(true)}
+                onAfterPrint={()=>setShow(false)}>
+                <PrintContextConsumer>
+                    {({ handlePrint }) => (
+                        <Button onClick={() => {
+                            if(props.check()) {
+                                setShow(true);
+                                setTimeout(()=> handlePrint(), 5)
+                            }
+                            else {
+                                message.error('Niste uneli sve potrebne podatke!')
+                            }
+                        }}>Štampaj</Button>
+                    )}
+                </PrintContextConsumer>
+            </ReactToPrint>
+            <div style={{ display: "none" }}>
+                <ComponentToPrint  
+                    orderId={props.orderId}
+                    show={show}
+                    articles={props.articles} 
+                    customer={props.customer}
+                    usingDelivery={props.usingDelivery}
+                    defaults={props.defaults}
+                    orderInfo={props.orderInfo}
+                    deliveryPrice={props.deliveryPrice}
+                    avans={props.avans}
+                    globalDiscount={props.globalDiscount}
+                    ref={componentRef} />
+            </div>
+        </div>
+    )
+})
 
 const mapStateToProps = (state) => ({
     articles: getAddedArticles(state),
