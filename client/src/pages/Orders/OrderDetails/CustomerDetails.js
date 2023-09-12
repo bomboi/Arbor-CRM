@@ -56,12 +56,11 @@ const CustomerDetails = (props) => {
                     showIcon />}
             <Label text={'Ime kupca'} required/>
             <AutoComplete
-                value={props.customer.name}
                 className="w-100"
                 onChange={(value) => onChangeField(value, 'name')}
                 onSelect={onSelect}
                 placeholder="Unesite ime kupca">
-                    {props.customers.map(customer => (
+                    {props.customers.filter(customer => customer.name.includes(props.customer.name)).map(customer => (
                         <AutoComplete.Option key={customer._id} value={customer.name}>
                             <div>
                                 <b>{customer.name}</b>

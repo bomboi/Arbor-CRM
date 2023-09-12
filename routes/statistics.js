@@ -57,4 +57,30 @@ router.get('/get', async (req, res) => {
     });
 })
 
+// const orderCountLastMonth = await Order.aggregate([
+//     { 
+//         $match: {
+//             $expr: {
+//                 $and: [
+//                     { $gt: ['$latestVersionDate', prevMonthBeginning] },
+//                     { $lt: ['$latestVersionDate', today] }
+//                 ]
+//             }
+//         }
+//     },
+//     {
+//         $group: {
+//             _id: { mesec: { $month: '$latestVersionDate'}, godina: { $year: '$latestVersionDate' }},
+//             brPorudz: { $sum: 1 },
+//             promet: { $sum: '$totalAmount' }
+//         }
+//     },
+//     {
+//         $sort: { "_id.godina": 1, "_id.mesec": 1 }
+//     }
+// ]).exec();
+
+// console.log(orderCountLastMonth)
+
+
 module.exports = router;

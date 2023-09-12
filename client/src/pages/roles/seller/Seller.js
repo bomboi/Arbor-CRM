@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Menu, Spin } from 'antd';
+import { Layout, Menu, Spin, Button, Drawer } from 'antd';
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -26,6 +26,7 @@ const Seller = (props) => {
   let history = useHistory();
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(history.location.pathname.substring(1));
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   useEffect(() => {
     Axios.get('/api/user/get')
@@ -56,48 +57,113 @@ const Seller = (props) => {
         <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
       :
       // TODO: Make Sider independent of content
-      <Layout style={{ minHeight: '100vh' }} hasSider={isBrowser}>
-      <BrowserView>
-        <Sider theme="light" style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-        }}>
-          <div className="logo" />
-          <Menu selectedKeys={[selected]} mode="inline" onSelect={menuFunction}>
-            <Menu.Item key="porudzbine" icon={<ContainerOutlined />}>
-              Porudzbine
-            </Menu.Item>
-            <Menu.Item key="kupci" icon={<UserOutlined />}>
-              Kupci
-            </Menu.Item>
-            <Menu.Item key="proizvodi" icon={<AppstoreOutlined />}>
-              Proizvodi
-            </Menu.Item>
-            <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
-              Podesavanja
-            </Menu.Item>
-            {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
-              Statistika
-            </Menu.Item>}
-            {/* TODO: Put name and logout on the lower end of sider */}
-            <Menu.Item>
-              {props.loggedInUser.firstName}
-            </Menu.Item>
-            <Menu.Item key="logout" icon={<DesktopOutlined />}>
-              Izloguj se
-            </Menu.Item>
-          </Menu>
-        </Sider>
-      </BrowserView>
-      
-      <Layout style={{ marginLeft: isBrowser?200:0 }} className="site-layout">
-        <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
-              <MenuSwitch/>
-        </Content>
+      <>
+        <Layout style={{ minHeight: '100vh' }} hasSider={isBrowser}>
+        <BrowserView>
+          <Sider 
+            collapsible={true}
+            defaultCollapsed={true}
+            theme="light" 
+            style={{
+            height: '100vh',
+          }}>
+            <div className="logo" />
+            <Menu selectedKeys={[selected]} mode="inline" onSelect={menuFunction}>
+              <Menu.Item key="porudzbine" icon={<ContainerOutlined />}>
+                Porudzbine
+              </Menu.Item>
+              <Menu.Item key="kupci" icon={<UserOutlined />}>
+                Kupci
+              </Menu.Item>
+              <Menu.Item key="proizvodi" icon={<AppstoreOutlined />}>
+                Proizvodi
+              </Menu.Item>
+              <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
+                Podesavanja
+              </Menu.Item>
+              {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
+                Statistika
+              </Menu.Item>}
+              {/* TODO: Put name and logout on the lower end of sider */}
+              <Menu.Item>
+                {props.loggedInUser.firstName}
+              </Menu.Item>
+              <Menu.Item key="logout" icon={<DesktopOutlined />}>
+                Izloguj se
+              </Menu.Item>
+            </Menu>
+          </Sider>
+        </BrowserView>
+        
+        <Layout className="site-layout">
+          <MobileView>
+          <Button 
+            style={{
+              width: "100%"
+            }} 
+            size='large'
+            onClick={() => setOpenDrawer(!openDrawer)} 
+            type="primary">
+              Meni
+          </Button>
+            <Drawer
+              bodyStyle={{
+                padding: 0,
+                width: "100%"
+              }}
+              placement="left"
+              closable={false}
+              onClose={() => console.log("bruh")}
+              getContainer={false}
+              visible={openDrawer}>
+              <Button 
+                style={{
+                  width: "100%"
+                }} 
+                size='large'
+                onClick={() => setOpenDrawer(!openDrawer)} 
+                type="primary">
+                  Zatvori
+              </Button>
+              <Menu 
+                style={{
+                  width: "100%",
+                  height: "100%"
+                }} 
+                selectedKeys={[selected]} 
+                mode="inline" 
+                onSelect={menuFunction}>
+                    <Menu.Item key="porudzbine" icon={<ContainerOutlined />}>
+                      Porudzbine
+                    </Menu.Item>
+                    <Menu.Item key="kupci" icon={<UserOutlined />}>
+                      Kupci
+                    </Menu.Item>
+                    <Menu.Item key="proizvodi" icon={<AppstoreOutlined />}>
+                      Proizvodi
+                    </Menu.Item>
+                    <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
+                      Podesavanja
+                    </Menu.Item>
+                    {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
+                      Statistika
+                    </Menu.Item>}
+                    {/* TODO: Put name and logout on the lower end of sider */}
+                    <Menu.Item>
+                      {props.loggedInUser.firstName}
+                    </Menu.Item>
+                    <Menu.Item key="logout" icon={<DesktopOutlined />}>
+                      Izloguj se
+                    </Menu.Item>
+                  </Menu>
+            </Drawer>
+          </MobileView>
+          <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
+                <MenuSwitch/>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   )
 }
 

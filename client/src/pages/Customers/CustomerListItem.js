@@ -18,7 +18,7 @@ const NCCustomerListItem = (props) => {
         <Row className="p-3">
             <Col xs>{props.item.name}</Col>
             <Col xs>{props.item.phone}</Col>
-            <Col xs>{props.item.address.street}</Col>
+            <Col xs>{props.item.address && props.item.address.street}</Col>
         </Row>
     )
 }

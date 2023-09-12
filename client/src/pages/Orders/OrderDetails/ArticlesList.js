@@ -86,10 +86,10 @@ const ArticlesList = (props) => {
                         </Col>
                         <Col span={16}>
                             <Row>
-                                <Col span={12} style={{whiteSpace:'pre'}}>
+                                <Col span={12} className="text-wrap text-break" style={{whiteSpace:'pre'}}>
                                     {item.description}
                                 </Col>
-                                <Col span={12}>
+                                <Col span={12} className="text-break">
                                     {item.materials?
                                         item.materials.map(material=><div>
                                             <div>{material.description}</div>

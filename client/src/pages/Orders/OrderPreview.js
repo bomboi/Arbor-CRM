@@ -139,6 +139,15 @@ const OrderPreview = (props) => {
                 }}>Zatvori</Button>
             </Row></BrowserView>
             <MobileView>
+                <Button 
+                    style={{
+                        width: '100%', 
+                    }}
+                    size='large'
+                    onClick={()=>{
+                    props.dispatch(orderPreviewSlice.actions.toggleShow());
+                    props.dispatch(orderListSlice.actions.updateOrderState({index: props.orderIndex, state: firstState}))
+                }}>Zatvori</Button>
                 <Collapse ghost>
                     <Collapse.Panel header={'Opcije'}>
                         <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
@@ -153,10 +162,7 @@ const OrderPreview = (props) => {
                             props.dispatch(orderDetails.actions.initEditMode(true))
                             history.push('/porudzbine/izmeni/'+props.order.orderId);
                         }}>Izmeni</Button>
-                        <Button onClick={()=>{
-                            props.dispatch(orderPreviewSlice.actions.toggleShow());
-                            props.dispatch(orderListSlice.actions.updateOrderState({index: props.orderIndex, state: firstState}))
-                        }}>Zatvori</Button>
+                        
                         </div>
                     </Collapse.Panel>
                     <Collapse.Panel header={'Komentari'}>
