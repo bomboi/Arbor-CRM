@@ -146,14 +146,14 @@ const OrderList = (props) => {
             <div className="mb-2 d-flex justify-content-between">
                 <div>
                     <Button onClick={unselect} disabled={Object.keys(props.selectedIds).length === 0} className={isMobile?'mb-2 w-100':'mr-2'} >Odselektuj sve</Button>
-                    {props.isAdmin && <Button className={isMobile?'mb-2 w-100':'mr-2'}  onClick={()=>{
+                    <Button className={isMobile?'mb-2 w-100':'mr-2'}  onClick={()=>{
                         if(Object.keys(props.selectedIds).length === 0) {
                             message.error('Niste selektovali nijednu porudzbinu!');
                             return;
                         }
                         setMultipleOrderStateModalVisibility(true)
-                    }}>Promeni status selektovanih</Button>}
-                    {props.isAdmin && <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2'} />}
+                    }}>Promeni status selektovanih</Button>
+                    <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2'} />
                     <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>
                     {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
                         Selektovane porudžbine: {Object.keys(props.selectedIds).length}
