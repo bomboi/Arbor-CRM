@@ -13,7 +13,6 @@
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
     "antd": "^4.6.4",
-    "antd-mobile": "^2.3.4",
     "axios": "^0.20.0",
     "babel-eslint": "10.1.0",
     "babel-jest": "^24.9.0",
@@ -75,11 +74,9 @@
     "react-router-dom": "^5.2.0",
     "react-to-print": "^2.11.0",
     "redux": "^4.0.5",
-    "redux-toolkit": "^1.1.2",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
     "sass-loader": "8.0.2",
-    "semver": "6.3.0",
     "style-loader": "0.23.1",
     "terser-webpack-plugin": "2.3.8",
     "ts-pnp": "1.1.6",
@@ -90,7 +87,7 @@
     "workbox-webpack-plugin": "4.3.1"
   },
   "engines": {
-    "node": ">=14.16.1 <15.0.0" 
+    "node": ">=14.16.1 <15.0.0"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -100,7 +97,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:5001",
   "browserslist": {
     "production": [
       ">0.2%",

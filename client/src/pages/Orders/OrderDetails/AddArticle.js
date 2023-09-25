@@ -23,13 +23,8 @@ const AddArticle = (props) => {
     }
 
     const addToList = () => {
-        if(isArticleOk()) {
-            props.dispatch(newOrderArticlesSlice.actions.addArticle(props.currentArticle));
-            props.dispatch(newOrderNewArticleSlice.actions.clearArticle());
-        }
-        else {
-            message.error('Niste uneli sve podatke da biste dodali artikl!')
-        }
+        props.dispatch(newOrderArticlesSlice.actions.addArticle(props.currentArticle));
+        props.dispatch(newOrderNewArticleSlice.actions.clearArticle());
     }
 
     return (
@@ -38,13 +33,18 @@ const AddArticle = (props) => {
             width={1200}
             okText={props.edit?'Izmeni artikl':'Dodaj artikl'}
             onOk={()=>{
-                if(props.edit) {
-                    props.dispatch(newOrderArticlesSlice.actions.editArticle({article: props.currentArticle, index: props.index}))
+                if(isArticleOk()) {
+                    if(props.edit) {
+                        props.dispatch(newOrderArticlesSlice.actions.editArticle({article: props.currentArticle, index: props.index}))
+                    }
+                    else {
+                        addToList() 
+                    }
+                    props.onCancel();
                 }
                 else {
-                    addToList() 
+                    message.error('Niste uneli sve podatke da biste dodali artikl!')
                 }
-                props.onCancel();
             }}
             onCancel={props.onCancel}
             closable = {false}

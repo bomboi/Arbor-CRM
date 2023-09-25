@@ -133,19 +133,19 @@ const Seller = (props) => {
                 selectedKeys={[selected]} 
                 mode="inline" 
                 onSelect={menuFunction}>
-                    <Menu.Item key="porudzbine" icon={<ContainerOutlined />}>
+                    <Menu.Item key="porudzbine" onClick={() => setOpenDrawer(!openDrawer)} icon={<ContainerOutlined />}>
                       Porudzbine
                     </Menu.Item>
-                    <Menu.Item key="kupci" icon={<UserOutlined />}>
+                    <Menu.Item key="kupci" onClick={() => setOpenDrawer(!openDrawer)} icon={<UserOutlined />}>
                       Kupci
                     </Menu.Item>
-                    <Menu.Item key="proizvodi" icon={<AppstoreOutlined />}>
+                    <Menu.Item key="proizvodi" onClick={() => setOpenDrawer(!openDrawer)} icon={<AppstoreOutlined />}>
                       Proizvodi
                     </Menu.Item>
-                    <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
+                    <Menu.Item key="podesavanja" onClick={() => setOpenDrawer(!openDrawer)} icon={<SettingOutlined />}>
                       Podesavanja
                     </Menu.Item>
-                    {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
+                    {props.isAdmin && <Menu.Item key="statistika" onClick={() => setOpenDrawer(!openDrawer)} icon={<PieChartOutlined />}>
                       Statistika
                     </Menu.Item>}
                     {/* TODO: Put name and logout on the lower end of sider */}
