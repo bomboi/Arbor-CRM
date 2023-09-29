@@ -21,3 +21,11 @@ code {
 svg { 
   vertical-align: baseline !important;
 }
+
+.ant-popover-inner-content{
+  padding:0px
+}
+
+.notification-item:hover {
+  background-color: #eee;
+}

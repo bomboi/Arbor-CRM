@@ -31,6 +31,14 @@ const Seller = (props) => {
   useEffect(() => {
     Axios.get('/api/user/get')
       .then(result => {
+        if (!("Notification" in window)) {
+          console.log("Browser does not support desktop notification");
+        } else {
+          console.log("Notification supported");
+          Notification.requestPermission().then((permission) => {
+            console.log(permission)
+          });
+        }
         props.dispatch(userSlice.actions.initUser(result.data));
         setTimeout(() => {
           setLoading(false);
@@ -85,7 +93,7 @@ const Seller = (props) => {
                 Statistika
               </Menu.Item>}
               {/* TODO: Put name and logout on the lower end of sider */}
-              <Menu.Item>
+              <Menu.Item onClick={()=>{new Notification('Hello World')}}>
                 {props.loggedInUser.firstName}
               </Menu.Item>
               <Menu.Item key="logout" icon={<DesktopOutlined />}>
@@ -149,7 +157,7 @@ const Seller = (props) => {
                       Statistika
                     </Menu.Item>}
                     {/* TODO: Put name and logout on the lower end of sider */}
-                    <Menu.Item>
+                    <Menu.Item onClick={()=>{new Notification('Hello World')}}>
                       {props.loggedInUser.firstName}
                     </Menu.Item>
                     <Menu.Item key="logout" icon={<DesktopOutlined />}>

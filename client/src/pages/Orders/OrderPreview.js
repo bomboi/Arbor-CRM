@@ -113,6 +113,7 @@ const OrderPreview = (props) => {
         props.order === undefined ? <></> :
         <Modal 
             bodyStyle={{padding: 0}}
+            zIndex={5}
             width={1200}
             centered
             footer={null}

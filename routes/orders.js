@@ -8,6 +8,7 @@ const Setting = require('../models/Settings');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
+const session = require('express-session');
 
 router.use(isAuthenticated);
 
@@ -39,17 +40,52 @@ router.get('/all', async (req, res) => {
 })
 
 router.post('/post-comment', async (req, res) => {
-    console.log(req.body);
-    let order = await Order.findOne({_id: req.body.orderId}).exec();
-    let data = {
-        text: req.body.comment,
-        writtenBy: req.session.user,
-        datePosted: new Date()
+    try {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        console.log(req.body);
+        let order = await Order.findOne({_id: req.body.orderId}).exec();
+        let data = {
+            text: req.body.comment,
+            writtenBy: req.session.user,
+            datePosted: new Date()
+        }
+        order.comments.push(data)
+        await order.save();
+    
+    
+        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
+        let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
+
+        let notifications = []
+        for(user of otherUsers) {
+            let notification = new Notification();
+            notification.dateChanged = new Date();
+            notification.orderId = order._id;
+            notification.forUser = user._id;
+            notification.changedBy = currentUser._id;
+            notification.type = "orderCommented";
+            notification.text = "Korisnik " + currentUser.firstName + " je dodao novi komentar na porudzbinu " + order.orderId + ".";
+            notifications.push(notification);
+        }
+
+        
+        for(notification of notifications) {
+            await notification.save();
+        }
+        
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200);
+        res.send(data)
     }
-    order.comments.push(data)
-    await order.save();
-    res.status(200);
-    res.send(data)
+    catch(error) {
+        console.log(error);
+        res.status(500).send(error.message);
+    }
 });
 
 router.post('/update-state', async (req, res) => {
@@ -112,12 +148,25 @@ router.post('/add-version', async (req, res) => {
 
         // Add new notification
         // Get all users that are not admin matija
-        let users = await User.find({username: {$ne: "matija"}}).select('_id').exec();
-        let notification = new Notification();
-        notification.dateChanged = new Date();
-        notification.orderId = order._id;
-        notification.readBy = users;
-        await notification.save();
+        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
+        let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
+
+        let notifications = []
+        for(user of otherUsers) {
+            let notification = new Notification();
+            notification.dateChanged = new Date();
+            notification.orderId = order._id;
+            notification.forUser = user._id;
+            notification.changedBy = currentUser._id;
+            notification.type = "orderUpdated"
+            notification.text = `Korisnik ${currentUser.firstName} je izmenio porudzbinu ${orderData.orderId}.`;
+            notifications.push(notification);
+        }
+
+        for(notification of notifications) {
+            await notification.save();
+        }
     
         await session.commitTransaction();
         session.endSession();
@@ -130,59 +179,154 @@ router.post('/add-version', async (req, res) => {
 })
 
 router.post('/read-notification', async (req, res) => {
-    let notification = await Notification.findOne({orderId: req.body.orderId}).exec();
+    try {
+        let notification = await Notification.findOne({orderId: req.body.orderId}).populate('readBy').exec();
 
-    console.log(notification)
-
-    notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
-    if(notification.readBy.length > 0) await notification.save();
-    else await Notification.deleteOne({orderId: req.body.orderId}).exec();
-
-    console.log(notification);
-
-    res.sendStatus(200);
+        if(notification != null) {
+            console.log(notification);
+        
+            notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
+            let numberOfUsersThatReadNotification = notification.readBy.filter(user => user.active && user.role != "developer").length;
+            if(numberOfUsersThatReadNotification > 0) await notification.save();
+            else await Notification.deleteOne({orderId: req.body.orderId}).exec();
+        
+            console.log(notification);
+        }
+        
+        res.sendStatus(200);
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).send(error.message);
+    }
 })
 
 router.get('/get-versions', async (req, res) => {
-    let orderVersions = await OrderData.find({orderId: req.query.orderId})
-                                 .sort({version: 1})
-                                 .populate('changedBy')
-                                 .exec();
-    let order = await Order.findOne({_id: req.query.orderId}).populate('comments.writtenBy').exec();
-    res.status(200);
-    let data = {orderVersions: orderVersions, comments: order.comments};
-    console.log(data);
-    res.send(data);
+    try{
+        console.log(req.query.orderId);
+        let orderVersions = await OrderData.find({orderId: req.query.orderId})
+                                     .sort({version: 1})
+                                     .populate('changedBy')
+                                     .exec();
+        let order = await Order.findOne({_id: req.query.orderId}).populate('comments.writtenBy customer').exec();
+        console.log(orderVersions);
+        console.log(order);
+        let data = {orderVersions: orderVersions, comments: order.comments, order: order};
+        console.log(data);
+        res.status(200);
+        res.send(data);
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).send(error.message);
+    }
 })
 
 router.post('/delete', async (req, res) => {
-    let orders = await Order.find({_id: {$in: req.body.ids}}).exec();
-    let deletedOrderIds = orders.map(order => order._id);
-    for(order of orders) {
-        let customer = await Customer.findOne({_id: order.customer}).exec();
-        let index = customer.orders.findIndex(item => item === order._id);
-        customer.orders.splice(index, 1);
-        await customer.save();
+    try{
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        await OrderData.deleteMany({orderId: order._id}).exec();
+        console.log(req.body.ids);
 
-        await Order.deleteOne({_id: order._id}).exec();
+        let orders = await Order.find({_id: {$in: req.body.ids}}).exec();
+        console.log(orders);
+
+        if(orders.length > 0) {
+            let deletedOrders = orders.map(order => ({orderId: order.orderId, id: order._id}));
+            console.log(deletedOrders);
+
+            for(order of orders) {
+                let customer = await Customer.findOne({_id: order.customer}).exec();
+                let index = customer.orders.findIndex(item => item === order._id);
+                customer.orders.splice(index, 1);
+                await customer.save();
+        
+                await OrderData.deleteMany({orderId: order._id}).exec();
+        
+                await Order.deleteOne({_id: order._id}).exec();
+            }
+        
+            let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+            let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
+            let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
+            
+            let notificationText = "";
+            if(deletedOrders.length > 1) {
+                notificationText = `Korisnik ${currentUser.firstName} je obrisao porudzbine: `;
+                for(let deletedOrder of deletedOrders) notificationText += deletedOrder.orderId + ', ';
+                // TODO: Delete last coma
+            }
+            else {
+                notificationText = `Korisnik ${currentUser.firstName} je obrisao porudzbinu ${deletedOrders[0].orderId}.`;
+            }
+            
+            let notifications = []
+            for(user of otherUsers) {
+                for(deletedOrder of deletedOrders) {
+                    let notification = new Notification();
+                    notification.dateChanged = new Date();
+                    notification.changedBy = currentUser._id;
+                    notification.forUser = user._id;
+                    notification.type = "orderDeleted"
+                    notification.text = notificationText
+                    notifications.push(notification);
+                }
+            }
+        
+            for(notification of notifications) {
+                await notification.save();
+            }
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+    
+        res.sendStatus(200);
     }
-
-    let notification = new Notification();
-    if(deletedOrderIds.length > 1) {
-        notification.text = 'Obrisane su sledece porudzbine: \n';
-        for(let id of deletedOrderIds) notification.text += id + '\n';
+    catch(error) {
+        console.log(error);
+        res.status(500);
+        res.send(error.message);
     }
-    else {
-        notification.text = 'Obrisana je porudzbina broj ' + deletedOrderIds[0] + '.';
-    }
-    notification.dateChanged = new Date();
-    notification.readBy = [];
-    notification.changedBy = req.session.user;
-    await notification.save();
+})
 
-    res.sendStatus(200);
+router.get('/notifications', async (req, res) => {
+    try {
+        console.log(req.session.user);
+        let notifications = await Notification.find({forUser: req.session.user})
+                                                .sort([['dateChanged', -1]])
+                                                .populate('orderId')
+                                                .limit(10)
+                                                .exec();
+             
+        // TODO: read notifications
+        // for(notification of notifications) {
+        //     if(!notification.isRead) {
+        //         notification.isRead = true;
+        //         await notification.save();
+        //     }
+        // }
+        console.log(notifications);
+        res.status(200);
+        res.send(notifications);
+    }
+    catch(error) {
+        console.log(error)
+        res.status(500);
+        res.send(error.message);
+    }
+})
+
+router.post('/delete-notifications', async (req, res) => {
+    try {
+        // TODO
+    }
+    catch(error) {
+        console.log(error)
+        res.status(500);
+        res.send(error.message);
+    }
 })
 
 router.get('/search', async (req, res) => {
@@ -244,13 +388,15 @@ router.get('/search', async (req, res) => {
         let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
         let data = orders.map(order => ({ 
             ...order.toObject(), 
-            hasNotification: notifications.some(item => item.orderId.equals(order._id) && item.readBy.some(item => item.equals(req.session.user)))
+            hasNotification: false
+            // notifications.some(item => item.orderId.equals(order._id) && item.readBy.some(item => item.equals(req.session.user)))
         }))
     
         res.status(200);
         res.send(data);
     }
     catch(error) {
+        console.log(error);
         res.status(500);
         res.send(error.message);
     }

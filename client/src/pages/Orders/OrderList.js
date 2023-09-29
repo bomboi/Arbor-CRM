@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
-import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge, notification } from 'antd';
+import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge, Popover, notification } from 'antd';
 import OrderListItem from './OrderListItem';
 import Axios from 'axios';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import { orderListSlice } from '@reducers/ordersReducers';
+import { orderPreviewSlice } from '@reducers/ordersReducers';
 import { getOrderList, getLastOrderDate } from '@selectors/ordersSelectors';
 import OrderPreview from './OrderPreview';
 import { isAdmin } from '@selectors/appSelectors';
@@ -31,6 +33,14 @@ const OrderList = (props) => {
         sort: 'Najnovije'
     });
 
+    let [notifications, setNotifications] = useState([]);
+
+    let [notificationsPopover, setNotificationsPopover] = useState(false);
+
+    const handleOpenChange = (newOpen) => {
+        setNotificationsPopover(newOpen);
+      };
+
     let [multipleOrderStateModalVisible, setMultipleOrderStateModalVisibility] = useState(false);
 
     let history = useHistory();
@@ -50,13 +60,22 @@ const OrderList = (props) => {
         console.log(params);
         Axios.get('/api/order/search', { params }).then(res => {
             console.log('Call search')
-            console.log(res.data)
+            console.log(res.data)   
+            Axios.get('/api/order/notifications').then(res => {
+                console.log('Call notifications');
+                console.log(res.data);
+                setNotifications(res.data);
+            })
+            .catch(error => {
+                message.error(error.response.data);
+            })
             if(init) props.dispatch(orderListSlice.actions.init(res.data))
             else props.dispatch(orderListSlice.actions.update(res.data))
         })
         .catch(error => {
             message.error(error.response.data);
         })
+
     }
 
     const update = (value, key) => {
@@ -72,6 +91,34 @@ const OrderList = (props) => {
         props.dispatch(orderListSlice.actions.unselectAll())
     }
 
+    const open = (notification) => {
+        if(notification.type == "orderDeleted" || !notification.orderId) {
+            return;
+        }
+        const id = notification.orderId._id;
+        props.dispatch(orderPreviewSlice.actions.setLoading(true))
+        props.dispatch(orderPreviewSlice.actions.toggleShow());
+        setNotificationsPopover(false);
+        Axios.get('/api/order/get-versions', {
+            params: {
+                orderId: id
+            }
+        }).then(result => {
+            console.log('Versions');
+            console.log(result);
+            props.dispatch(orderPreviewSlice.actions.initVersions(result.data.orderVersions));
+            props.dispatch(orderPreviewSlice.actions.setData({...result.data.order, comments: result.data.comments}));
+            props.dispatch(orderPreviewSlice.actions.setIndex(props.index));
+            props.dispatch(orderPreviewSlice.actions.setLoading(false));
+            
+            Axios.post('/api/order/read-notification', {
+                orderId: result.data.order._id
+            }).then(res => {
+                // setHasNotification(false);
+            })
+        })
+    }
+
     const deleteSelected = () => {
         // TODO: Set spinner while deleting
         Axios.post('/api/order/delete', {
@@ -84,10 +131,51 @@ const OrderList = (props) => {
     }
 
     const extraList = [
-        <Button key='1' type="primary" onClick={()=>{
-            props.dispatch(clearNewOrder());
-            history.push('/porudzbine/dodaj');
-        }}>Nova porudžbina</Button>,
+        <div className='d-flex align-middle'>
+            <Popover
+                zIndex={3}
+                onOpenChange={handleOpenChange}
+                open={notificationsPopover}
+                placement="topLeft" 
+                className='notification-list'
+                trigger={"click"}
+                content={
+                    <>
+                        <List
+                            size="small"
+                            dataSource={notifications}
+                            renderItem={(notification) => 
+                                <List.Item className='notification-item' onClick={()=>{
+                                    console.log(notification.orderId)
+                                    setNotificationsPopover(false);
+                                    open(notification)
+                                }}>
+                                    <div>
+                                        <div>
+                                            {notification.text}
+                                        </div>
+                                        <div>
+                                            <small>{moment(notification.dateChanged).format('HH:mm, DD. MM. YYYY.').toString()}</small>
+                                        </div>
+                                    </div>
+
+                                </List.Item>
+                            }
+                        />
+                        {/* <Button>Obrisi sve</Button> */}
+                    </>
+                } 
+                >
+                <Button className='mr-2' key='1'>
+                    {/* {notifications.length > 0 && <Badge className='mr-2 mt-0' count={notifications.length}/> }  */}
+                    Obaveštenja
+                </Button>
+            </Popover>
+            {isBrowser && <Button key='1' type="primary" onClick={()=>{
+                props.dispatch(clearNewOrder());
+                history.push('/porudzbine/dodaj');
+            }}>Nova porudžbina</Button>}
+        </div>,
     ];
 
     return (
@@ -96,7 +184,7 @@ const OrderList = (props) => {
       ghost={false}
       title="Porudžbine"
       className="mb-3"
-      extra={isMobile?[]:extraList}
+      extra={extraList}
     ></PageHeader>
         <Card>
             <Row>

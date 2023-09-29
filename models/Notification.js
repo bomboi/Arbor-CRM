@@ -6,11 +6,22 @@ const notificationSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Order'
     },
+    type: String, // orderCommented | orderUpdated | orderDeleted
+    text: String,
     dateChanged: Date,
-    readBy: [{
+    isRead: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    changedBy: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    }]
+    },
+    forUser: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }
 })
 
 module.exports = mongoose.model('Notification', notificationSchema);
