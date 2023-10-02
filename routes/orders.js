@@ -9,6 +9,7 @@ const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const date_fns = require('date-fns');
 
 router.use(isAuthenticated);
 
@@ -160,7 +161,7 @@ router.post('/add-version', async (req, res) => {
             notification.forUser = user._id;
             notification.changedBy = currentUser._id;
             notification.type = "orderUpdated"
-            notification.text = `Korisnik ${currentUser.firstName} je izmenio porudzbinu ${orderData.orderId}.`;
+            notification.text = `Korisnik ${currentUser.firstName} je izmenio porudzbinu ${order.orderId}.`;
             notifications.push(notification);
         }
 
@@ -294,22 +295,30 @@ router.post('/delete', async (req, res) => {
 router.get('/notifications', async (req, res) => {
     try {
         console.log(req.session.user);
+        console.log(req.query.readNotifications);
+        const readNotifications = req.query.readNotifications === 'true';
+        let prevMonthBeginning = date_fns.subMonths(new Date(), 1);
+        await Notification.deleteMany({dateChanged: {$lte: prevMonthBeginning}});
         let notifications = await Notification.find({forUser: req.session.user})
                                                 .sort([['dateChanged', -1]])
                                                 .populate('orderId')
-                                                .limit(10)
                                                 .exec();
-             
-        // TODO: read notifications
-        // for(notification of notifications) {
-        //     if(!notification.isRead) {
-        //         notification.isRead = true;
-        //         await notification.save();
-        //     }
-        // }
-        console.log(notifications);
+        
+        const notificationToReturn = JSON.parse(JSON.stringify(notifications.slice(0,10)));
+
+        if(readNotifications) {
+            for(notification of notifications) {
+                if(!notification.isRead) {
+                    console.log('read notification')
+                    notification.isRead = true;
+                    await notification.save();
+                }
+            }
+        }
+        // console.log(notifications);
+        // console.log(notificationToReturn);
         res.status(200);
-        res.send(notifications);
+        res.send(notificationToReturn);
     }
     catch(error) {
         console.log(error)

@@ -26,6 +26,29 @@ svg {
   padding:0px
 }
 
+.ant-popover-inner-content{
+  padding: 0px !important;
+}
+
+.gray-text {
+  color: rgba(101, 101, 101, 0.85) !important;
+}
+
+.notification-item {
+  padding: 10px;
+}
+
 .notification-item:hover {
   background-color: #eee;
+}
+
+.notification-item-unread {
+  background-color: #e6f7ff;
+  color: #1890ff !important;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.notification-item-unread:hover {
+  background-color: #e1f1f9;
 }

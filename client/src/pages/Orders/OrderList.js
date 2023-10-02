@@ -34,12 +34,17 @@ const OrderList = (props) => {
     });
 
     let [notifications, setNotifications] = useState([]);
+    let [notificationBadge, setNotificationBadge] = useState(0);
 
     let [notificationsPopover, setNotificationsPopover] = useState(false);
 
     const handleOpenChange = (newOpen) => {
+        console.log("handleOpen")
+        if(!newOpen) {
+            setNotificationBadge(0);
+        }
         setNotificationsPopover(newOpen);
-      };
+    };
 
     let [multipleOrderStateModalVisible, setMultipleOrderStateModalVisibility] = useState(false);
 
@@ -49,6 +54,19 @@ const OrderList = (props) => {
         load(true);
     }, [filters])
  
+    const getNotifications = (readNotifications) => {
+        console.log('read', readNotifications)
+        Axios.get('/api/order/notifications', {params: {readNotifications: readNotifications}}).then(res => {
+            console.log('Call notifications');
+            console.log(res.data);
+            setNotifications(res.data);
+            setNotificationBadge(res.data.filter(notification => !notification.isRead).length);
+        })
+        .catch(error => {
+            message.error(error.response.data);
+        })
+    }
+
     const load = (init = false) => {
         console.log('Page change')
         let params = {
@@ -61,14 +79,8 @@ const OrderList = (props) => {
         Axios.get('/api/order/search', { params }).then(res => {
             console.log('Call search')
             console.log(res.data)   
-            Axios.get('/api/order/notifications').then(res => {
-                console.log('Call notifications');
-                console.log(res.data);
-                setNotifications(res.data);
-            })
-            .catch(error => {
-                message.error(error.response.data);
-            })
+            getNotifications(false);
+            setInterval(() => {getNotifications(false)}, 1800000); // 30min (1800000 ms)
             if(init) props.dispatch(orderListSlice.actions.init(res.data))
             else props.dispatch(orderListSlice.actions.update(res.data))
         })
@@ -130,22 +142,27 @@ const OrderList = (props) => {
         });
     }
 
+    const notificationsRead = notifications.filter(item => item.isRead);
+    const notificationsUnread = notifications.filter(item => !item.isRead)
+
     const extraList = [
         <div className='d-flex align-middle'>
             <Popover
                 zIndex={3}
-                onOpenChange={handleOpenChange}
+                onVisibleChange={handleOpenChange}
                 open={notificationsPopover}
                 placement="topLeft" 
-                className='notification-list'
                 trigger={"click"}
                 content={
                     <>
-                        <List
+                        {notificationsUnread.length > 0 && <List
+                            header={<div className="pl-3 gray-text">Nepročitane</div>}
                             size="small"
-                            dataSource={notifications}
+                            dataSource={notificationsUnread}
                             renderItem={(notification) => 
-                                <List.Item className='notification-item' onClick={()=>{
+                                <List.Item 
+                                    className='notification-item-unread'
+                                    onClick={()=>{
                                     console.log(notification.orderId)
                                     setNotificationsPopover(false);
                                     open(notification)
@@ -161,14 +178,42 @@ const OrderList = (props) => {
 
                                 </List.Item>
                             }
-                        />
+                        />}
+
+                        { notificationsRead.length > 0 && <List
+                            header={<div className="pl-3 gray-text">Pročitane</div>}
+                            size="small"
+                            dataSource={notificationsRead}
+                            renderItem={(notification) => 
+                                <List.Item 
+                                    className='notification-item gray-text'
+                                    onClick={()=>{
+                                    console.log(notification.orderId)
+                                    setNotificationsPopover(false);
+                                    open(notification)
+                                }}>
+                                    <div>
+                                        <div>
+                                            {notification.text}
+                                        </div>
+                                        <div>
+                                            <small>{moment(notification.dateChanged).format('HH:mm, DD. MM. YYYY.').toString()}</small>
+                                        </div>
+                                    </div>
+
+                                </List.Item>
+                            }
+                        /> }
                         {/* <Button>Obrisi sve</Button> */}
                     </>
                 } 
                 >
-                <Button className='mr-2' key='1'>
-                    {/* {notifications.length > 0 && <Badge className='mr-2 mt-0' count={notifications.length}/> }  */}
-                    Obaveštenja
+                <Button 
+                    disabled={notifications.length == 0} 
+                    className='mr-2' 
+                    key='1' 
+                    onClick={() => getNotifications(true)}>
+                    <Badge className='mr-2 mt-0' count={notificationBadge}/> Obaveštenja
                 </Button>
             </Popover>
             {isBrowser && <Button key='1' type="primary" onClick={()=>{
