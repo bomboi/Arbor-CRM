@@ -54,9 +54,9 @@ const OrderList = (props) => {
         load(true);
     }, [filters])
  
-    const getNotifications = (readNotifications) => {
-        console.log('read', readNotifications)
-        Axios.get('/api/order/notifications', {params: {readNotifications: readNotifications}}).then(res => {
+    const getNotifications = () => {
+
+        Axios.get('/api/order/notifications', {params: {readNotifications: false}}).then(res => {
             console.log('Call notifications');
             console.log(res.data);
             setNotifications(res.data);
@@ -124,7 +124,8 @@ const OrderList = (props) => {
             props.dispatch(orderPreviewSlice.actions.setLoading(false));
             
             Axios.post('/api/order/read-notification', {
-                orderId: result.data.order._id
+                orderId: result.data.order._id,
+                notificationId: notification._id
             }).then(res => {
                 // setHasNotification(false);
             })
@@ -212,7 +213,7 @@ const OrderList = (props) => {
                     disabled={notifications.length == 0} 
                     className='mr-2' 
                     key='1' 
-                    onClick={() => getNotifications(true)}>
+                    onClick={() => getNotifications(false)}>
                     <Badge className='mr-2 mt-0' count={notificationBadge}/> Obaveštenja
                 </Button>
             </Popover>

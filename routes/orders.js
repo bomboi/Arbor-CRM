@@ -181,20 +181,31 @@ router.post('/add-version', async (req, res) => {
 
 router.post('/read-notification', async (req, res) => {
     try {
-        let notification = await Notification.findOne({orderId: req.body.orderId}).populate('readBy').exec();
 
-        if(notification != null) {
-            console.log(notification);
+        let notification = await Notification.findOne({_id: req.body.notificationId}).exec();
         
-            notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
-            let numberOfUsersThatReadNotification = notification.readBy.filter(user => user.active && user.role != "developer").length;
-            if(numberOfUsersThatReadNotification > 0) await notification.save();
-            else await Notification.deleteOne({orderId: req.body.orderId}).exec();
-        
-            console.log(notification);
+        if (notification != null) {
+            notification.isRead = true;
+
+            await notification.save();
         }
-        
+
         res.sendStatus(200);
+
+        // let notification = await Notification.findOne({orderId: req.body.orderId}).populate('readBy').exec();
+
+        // if(notification != null) {
+        //     console.log(notification);
+        
+        //     notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
+        //     let numberOfUsersThatReadNotification = notification.readBy.filter(user => user.active && user.role != "developer").length;
+        //     if(numberOfUsersThatReadNotification > 0) await notification.save();
+        //     else await Notification.deleteOne({orderId: req.body.orderId}).exec();
+        
+        //     console.log(notification);
+        // }
+        
+        // res.sendStatus(200);
     }
     catch(error) {
         console.log(error);

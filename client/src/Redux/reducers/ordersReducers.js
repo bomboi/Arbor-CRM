@@ -248,6 +248,9 @@ export const orderPreviewSlice = createSlice({
         },
         postComment: (state, action) => {
             state.data.comments.push(action.payload);
+        },
+        setState: (state, action) => {
+            state.data.state = action.payload;
         }
     },
     extraReducers: {

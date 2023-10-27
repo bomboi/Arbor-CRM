@@ -85,6 +85,7 @@ const OrderPreview = (props) => {
             state: value
         }).then(() => {
             setFirstState(value)
+            props.dispatch(orderPreviewSlice.actions.setState(value))
         })
     }
 
@@ -94,6 +95,7 @@ const OrderPreview = (props) => {
             state: 'reklamacija'
         }).then(() => {
             setFirstState('reklamacija')
+            props.dispatch('reklamacija')
         })
     }
 

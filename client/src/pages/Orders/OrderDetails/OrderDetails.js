@@ -118,6 +118,10 @@ const OrderDetails = (props) => {
               if(typeof(callback) == "function") setTimeout(() => callback(), 80); 
               if(!print) history.push('/porudzbine');
             })
+            .catch(error => {
+              message.error('Doslo je do greske! Porudzbina nije sacuvana!');
+              console.log(error);
+            });
         }
         else {
           setSaveClicked(false);
@@ -128,13 +132,18 @@ const OrderDetails = (props) => {
       else {
         if(!saveClicked) {
           setSaveClicked(true);
-          Axios.post('/api/order/add', data).then(res => {
-            message.success('Dodata porudzbina!');
-            console.log('Callback:')
-            console.log(callback)
-            if(typeof(callback) == "function") setTimeout(()=> callback(res.data), 50)
-            if(!print) history.push('/porudzbine');
-          });
+          Axios.post('/api/order/add', data)
+            .then(res => {
+              message.success('Dodata porudzbina!');
+              console.log('Callback:')
+              console.log(callback)
+              if(typeof(callback) == "function") setTimeout(()=> callback(res.data), 50)
+              if(!print) history.push('/porudzbine');
+            })
+            .catch(error => {
+              message.error('Doslo je do greske! Porudzbina nije sacuvana!');
+              console.log(error);
+            });
         }
       }
       console.log('save order')
