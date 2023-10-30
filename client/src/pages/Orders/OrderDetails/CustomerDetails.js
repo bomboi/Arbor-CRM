@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input, InputNumber, Card, AutoComplete, Divider, Switch, Typography, Select, Checkbox, Alert } from 'antd';
 import { connect } from 'react-redux';
 import Axios from 'axios';
@@ -24,6 +24,8 @@ const createKeyValue = (key, value) => {
 const { Title } = Typography;
 
 const CustomerDetails = (props) => {
+
+    const [customerName, setCustomerName] = useState(props.customer.name);
 
     useEffect((_props) => {
         if(!props.areCustomersInitialized) {
@@ -57,7 +59,11 @@ const CustomerDetails = (props) => {
             <Label text={'Ime kupca'} required/>
             <AutoComplete
                 className="w-100"
-                onChange={(value) => onChangeField(value, 'name')}
+                onChange={(value) => {
+                    onChangeField(value, 'name')
+                    setCustomerName(value)
+                }}
+                value={customerName}
                 onSelect={onSelect}
                 placeholder="Unesite ime kupca">
                     {props.customers.filter(customer => customer.name.includes(props.customer.name)).map(customer => (
