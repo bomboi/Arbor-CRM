@@ -340,7 +340,22 @@ router.get('/notifications', async (req, res) => {
 
 router.post('/delete-notifications', async (req, res) => {
     try {
-        // TODO
+        await Notification.deleteMany({forUser: req.session.user}).exec();
+
+        res.send(200);
+    }
+    catch(error) {
+        console.log(error)
+        res.status(500);
+        res.send(error.message);
+    }
+})
+
+router.post('/delete-notification', async (req, res) => {
+    try {
+        await Notification.deleteOne({_id: req.body.notificationId}).exec();
+
+        res.send(200);
     }
     catch(error) {
         console.log(error)
@@ -378,7 +393,10 @@ router.get('/search', async (req, res) => {
         
         let orderIds = [];
         if(req.query.filters.customerName !== '') {
-            var regexp = new RegExp("^"+ req.query.filters.customerName);
+            var regexp = new RegExp(".*"+ req.query.filters.customerName + ".*");
+            // let customerNameFilters = req.query.filters.customerName.split(' ').map(name => new RegExp("^"+ name));
+            // console.log(customerNameFilters)
+            // orderIds = await Customer.find({name: {$in: customerNameFilters}}).select('orders -_id').exec();
             orderIds = await Customer.find({name: regexp}).select('orders -_id').exec();
             orderIds = orderIds.reduce((acc, val) => {return acc.concat(val.orders)}, []);
             filters._id = {$in: orderIds};
@@ -463,6 +481,8 @@ router.post('/add', async (req, res) => {
     order.customer = customer._id;
     await order.save();
 
+
+    console.log("order note", req.body.orderInfo.note)
     let orderData = new OrderData();
     orderData.orderId = order._id;
     orderData.version = 0;

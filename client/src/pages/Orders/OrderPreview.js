@@ -27,6 +27,7 @@ import Axios from 'axios';
 import { isBrowser, isMobile, BrowserView, MobileView } from 'react-device-detect';
 import OrderFactoryPDF from './OrderFactoryPDF';
 import { OrderInvoicePDF } from './OrderDetails/OrderInvoicePDF';
+import moment from 'moment';
 
 const SelectVersion = (props) => {
     const genOptions = (number) => {
@@ -186,7 +187,7 @@ const OrderPreview = (props) => {
                                     izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName} 
                                 </div>
                                 <div>
-                                    trenutna verzija: {props.versions[version].changedBy.firstName} {props.versions[version].changedBy.lastName}
+                                    trenutna verzija: {props.versions[version].changedBy.firstName} {props.versions[version].changedBy.lastName} ({moment(props.versions[version].dateCreated).format('DD. MM. YYYY.').toString()})
                                 </div>
                             </small>
                             <div>
@@ -277,6 +278,8 @@ const OrderPreview = (props) => {
                                             <div>Popust: {props.versions[version].data.orderInfo.discount}%</div>
                                             <div>Rok isporuke: {props.versions[version].data.orderInfo.deadlineFrom} - {props.versions[version].data.orderInfo.deadlineTo} dana.</div>
                                             <div>Nacin placanja: {props.versions[version].data.orderInfo.paymentType}</div>
+                                            <div>Datum: {moment(props.versions[version].data.orderInfo.date).format('DD. MM. YYYY.').toString()}</div>
+                                            {props.versions[version].data.orderInfo.note && <div>Napomena: {props.versions[version].data.orderInfo.note}</div>}
                                         </Col>
                                         </Row>}
                                 </BrowserView>
@@ -298,6 +301,8 @@ const OrderPreview = (props) => {
                                             <div>Popust: {props.versions[version].data.orderInfo.discount}%</div>
                                             <div>Rok isporuke: {props.versions[version].data.orderInfo.deadlineFrom} - {props.versions[version].data.orderInfo.deadlineTo} dana.</div>
                                             <div>Nacin placanja: Gotovina</div>
+                                            <div>Datum: {moment(props.versions[version].data.orderInfo.date).format('DD. MM. YYYY.').toString()}</div>
+                                            {props.versions[version].data.orderInfo.note && <div>Napomena: {props.versions[version].data.orderInfo.note}</div>}
                                         </Row>
                                         </>}
                                 </MobileView>

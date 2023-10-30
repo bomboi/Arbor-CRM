@@ -218,6 +218,20 @@ export const orderListSlice = createSlice({
     }
 });
 
+// const notificationsSliceInitialState = {
+//     notifications: [],
+//     // badge: 0,
+//     // popover: false
+// }
+
+// export const notificationsSlice = createSlice({
+//     name: 'notificationsSlice',
+//     initialState: notificationsSliceInitialState,
+//     reducers: {
+
+//     }
+// })
+
 const orderPreviewSliceInitialState = {
     visible: false,
     loading: true,

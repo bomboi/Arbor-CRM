@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from "react-router-dom";
-import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge, Popover, notification } from 'antd';
+import { Button, Row, Col, List, Select, DatePicker, Input, PageHeader, Card, Divider, message, Badge, Popover } from 'antd';
 import OrderListItem from './OrderListItem';
 import Axios from 'axios';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { orderListSlice } from '@reducers/ordersReducers';
-import { orderPreviewSlice } from '@reducers/ordersReducers';
-import { getOrderList, getLastOrderDate } from '@selectors/ordersSelectors';
+import { orderListSlice, orderPreviewSlice, clearNewOrder } from '@reducers/ordersReducers';
+import { getOrderList, getLastOrderDate, getSelectedIds } from '@selectors/ordersSelectors';
 import OrderPreview from './OrderPreview';
 import { isAdmin } from '@selectors/appSelectors';
 import MultipleOrderStateModal from './MultipleOrderStateModal';
-import { getSelectedIds } from '../../Redux/selectors/ordersSelectors';
 import { DeleteOutlined } from '@ant-design/icons';
-import { clearNewOrder } from '../../Redux/reducers/ordersReducers';
 import { isMobile, isBrowser } from 'react-device-detect';
 import { OrderFactoryPDFMultiple } from './OrderFactoryPDF';
+import Notifications from './Notifications';
 
 const { RangePicker } = DatePicker;
 const { Search } = Input;
@@ -33,19 +31,6 @@ const OrderList = (props) => {
         sort: 'Najnovije'
     });
 
-    let [notifications, setNotifications] = useState([]);
-    let [notificationBadge, setNotificationBadge] = useState(0);
-
-    let [notificationsPopover, setNotificationsPopover] = useState(false);
-
-    const handleOpenChange = (newOpen) => {
-        console.log("handleOpen")
-        if(!newOpen) {
-            setNotificationBadge(0);
-        }
-        setNotificationsPopover(newOpen);
-    };
-
     let [multipleOrderStateModalVisible, setMultipleOrderStateModalVisibility] = useState(false);
 
     let history = useHistory();
@@ -53,19 +38,6 @@ const OrderList = (props) => {
     useEffect(() => {
         load(true);
     }, [filters])
- 
-    const getNotifications = () => {
-
-        Axios.get('/api/order/notifications', {params: {readNotifications: false}}).then(res => {
-            console.log('Call notifications');
-            console.log(res.data);
-            setNotifications(res.data);
-            setNotificationBadge(res.data.filter(notification => !notification.isRead).length);
-        })
-        .catch(error => {
-            message.error(error.response.data);
-        })
-    }
 
     const load = (init = false) => {
         console.log('Page change')
@@ -78,9 +50,7 @@ const OrderList = (props) => {
         console.log(params);
         Axios.get('/api/order/search', { params }).then(res => {
             console.log('Call search')
-            console.log(res.data)   
-            getNotifications(false);
-            setInterval(() => {getNotifications(false)}, 1800000); // 30min (1800000 ms)
+            console.log(res.data);
             if(init) props.dispatch(orderListSlice.actions.init(res.data))
             else props.dispatch(orderListSlice.actions.update(res.data))
         })
@@ -103,35 +73,6 @@ const OrderList = (props) => {
         props.dispatch(orderListSlice.actions.unselectAll())
     }
 
-    const open = (notification) => {
-        if(notification.type == "orderDeleted" || !notification.orderId) {
-            return;
-        }
-        const id = notification.orderId._id;
-        props.dispatch(orderPreviewSlice.actions.setLoading(true))
-        props.dispatch(orderPreviewSlice.actions.toggleShow());
-        setNotificationsPopover(false);
-        Axios.get('/api/order/get-versions', {
-            params: {
-                orderId: id
-            }
-        }).then(result => {
-            console.log('Versions');
-            console.log(result);
-            props.dispatch(orderPreviewSlice.actions.initVersions(result.data.orderVersions));
-            props.dispatch(orderPreviewSlice.actions.setData({...result.data.order, comments: result.data.comments}));
-            props.dispatch(orderPreviewSlice.actions.setIndex(props.index));
-            props.dispatch(orderPreviewSlice.actions.setLoading(false));
-            
-            Axios.post('/api/order/read-notification', {
-                orderId: result.data.order._id,
-                notificationId: notification._id
-            }).then(res => {
-                // setHasNotification(false);
-            })
-        })
-    }
-
     const deleteSelected = () => {
         // TODO: Set spinner while deleting
         Axios.post('/api/order/delete', {
@@ -143,80 +84,9 @@ const OrderList = (props) => {
         });
     }
 
-    const notificationsRead = notifications.filter(item => item.isRead);
-    const notificationsUnread = notifications.filter(item => !item.isRead)
-
     const extraList = [
         <div className='d-flex align-middle'>
-            <Popover
-                zIndex={3}
-                onVisibleChange={handleOpenChange}
-                open={notificationsPopover}
-                placement="topLeft" 
-                trigger={"click"}
-                content={
-                    <>
-                        {notificationsUnread.length > 0 && <List
-                            header={<div className="pl-3 gray-text">Nepročitane</div>}
-                            size="small"
-                            dataSource={notificationsUnread}
-                            renderItem={(notification) => 
-                                <List.Item 
-                                    className='notification-item-unread'
-                                    onClick={()=>{
-                                    console.log(notification.orderId)
-                                    setNotificationsPopover(false);
-                                    open(notification)
-                                }}>
-                                    <div>
-                                        <div>
-                                            {notification.text}
-                                        </div>
-                                        <div>
-                                            <small>{moment(notification.dateChanged).format('HH:mm, DD. MM. YYYY.').toString()}</small>
-                                        </div>
-                                    </div>
-
-                                </List.Item>
-                            }
-                        />}
-
-                        { notificationsRead.length > 0 && <List
-                            header={<div className="pl-3 gray-text">Pročitane</div>}
-                            size="small"
-                            dataSource={notificationsRead}
-                            renderItem={(notification) => 
-                                <List.Item 
-                                    className='notification-item gray-text'
-                                    onClick={()=>{
-                                    console.log(notification.orderId)
-                                    setNotificationsPopover(false);
-                                    open(notification)
-                                }}>
-                                    <div>
-                                        <div>
-                                            {notification.text}
-                                        </div>
-                                        <div>
-                                            <small>{moment(notification.dateChanged).format('HH:mm, DD. MM. YYYY.').toString()}</small>
-                                        </div>
-                                    </div>
-
-                                </List.Item>
-                            }
-                        /> }
-                        {/* <Button>Obrisi sve</Button> */}
-                    </>
-                } 
-                >
-                <Button 
-                    disabled={notifications.length == 0} 
-                    className='mr-2' 
-                    key='1' 
-                    onClick={() => getNotifications(false)}>
-                    <Badge className='mr-2 mt-0' count={notificationBadge}/> Obaveštenja
-                </Button>
-            </Popover>
+            <Notifications/>
             {isBrowser && <Button key='1' type="primary" onClick={()=>{
                 props.dispatch(clearNewOrder());
                 history.push('/porudzbine/dodaj');

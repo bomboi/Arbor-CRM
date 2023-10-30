@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux';
 import { PageHeader, Row, Card, Col, Statistic } from 'antd';
 import Title from 'antd/lib/typography/Title';
-import { Bar } from 'react-chartjs-2';
+import { Bar, HorizontalBar } from 'react-chartjs-2';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import Axios from 'axios';
 import { useState } from 'react';
@@ -94,6 +94,27 @@ const Statistics = () => {
                         </Card>
                     </Col>
                 </Row>
+                {/* <Card>
+                    {data.ordersPerMonth && console.log(data.ordersPerMonth.filter(input => input._id.godina == 2022).map(input => input.promet))}
+                {data.ordersPerMonth && <Bar
+                        height={100}
+                        data = {{
+                            labels: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'],
+                            datasets: [
+                                {
+                                    label: '2022',
+                                    data: data.ordersPerMonth.filter(input => input._id.godina == 2022).map(input => input.promet),
+                                    backgroundColor: 'gray'
+                                },
+                                {
+                                    label: '2023',
+                                    data: data.ordersPerMonth.filter(input => input._id.godina == 2023).map(input => input.promet),
+                                    backgroundColor: 'green'
+                                },
+                            ]
+                        }}
+                    />} 
+                </Card> */}
                 <Row className="mt-3" gutter={[20]}>
                     <Col span={24}>
                         <Card>
@@ -164,6 +185,32 @@ const Statistics = () => {
                         </Col>
                     </Row>
                 </Card>
+                {/* <Card>
+                    {data.ordersPerMonth && console.log(data.ordersPerMonth.filter(input => input._id.godina == 2022).map(input => input.promet))}
+                {data.ordersPerMonth && <HorizontalBar
+                        height={400}
+                        data = {{
+                            labels: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'],
+                            datasets: [
+                                {
+                                    label: '2022',
+                                    data: data.ordersPerMonth.filter(input => input._id.godina == 2022).map(input => input.promet),
+                                    backgroundColor: 'blue'
+                                },
+                                {
+                                    label: '2023',
+                                    data: data.ordersPerMonth.filter(input => input._id.godina == 2023).map(input => input.promet),
+                                    backgroundColor: 'green'
+                                },
+                                // {
+                                //     label: '2021',
+                                //     data: data.ordersPerMonth.filter(input => input._id.godina == 2021).map(input => input.promet),
+                                //     backgroundColor: 'red'
+                                // }
+                            ]
+                        }}
+                    />} 
+                </Card> */}
                 <Card>
                     <Title level={4}>Porudzbine po mesecima</Title>
                     {data.ordersPerMonth && data.ordersPerMonth.reverse().map(orderData => 

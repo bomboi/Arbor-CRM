@@ -29,7 +29,8 @@ const orderDataSchema = new mongoose.Schema({
             deadlineFrom: Number,
             deadlineTo: Number,
             delivery: Boolean,
-            deliveryPrice: Number
+            deliveryPrice: Number,
+            note: String
         }
     },
     dateCreated: Date,
