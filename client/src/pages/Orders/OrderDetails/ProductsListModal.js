@@ -40,14 +40,24 @@ const ProductsListModal = (props) => {
                         <Card className="mt-2" bodyStyle={{padding: 10}}>
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex justify-content-between w-100 mr-3">
-                                    <div>{item.productName}</div>
-                                    <div>{item.price} RSD</div>
+                                    <div>
+                                        <div>{item.productName}</div>
+                                        <div><b>{item.category}</b></div>
+                                    </div>  
                                 </div>
                                 <div>
-                                    <Button onClick={()=>{
+                                    <Button block onClick={()=>{
                                         props.dispatch(newOrderNewArticleSlice.actions.selectProduct({productName: item.productName, price: item.price}))
                                         props.onCancel();
-                                    }}>Izaberi</Button>
+                                    }}>{item.price} RSD</Button>
+                                    <Button block onClick={()=>{
+                                        props.dispatch(newOrderNewArticleSlice.actions.selectProduct({productName: item.productName, price: item.discountedPrice}))
+                                        props.onCancel();
+                                    }}>{item.discountedPrice} RSD (10%)</Button>
+                                    <Button block onClick={()=>{
+                                        props.dispatch(newOrderNewArticleSlice.actions.selectProduct({productName: item.productName, price: item.secondDiscountedPrice}))
+                                        props.onCancel();
+                                    }}>{item.secondDiscountedPrice} RSD (20%)</Button>
                                 </div>
                             </div>
                         </Card>)}/>
