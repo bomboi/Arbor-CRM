@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
-import { PageHeader, Button, Row, Col, Card, List, Input, message } from 'antd';
+import { PageHeader, Button, Row, Col, Card, List, Input, message, Spin } from 'antd';
 import Axios from 'axios';
 import { ProductListItem, ProductListHeader } from './ProductListItem';
 import { connect } from 'react-redux'
@@ -15,12 +15,52 @@ const Products = (props) => {
     
     const [searchString, setSearchString] = useState('')
 
+    const [isUploadingPrices, setIsUploadingPrices] = useState(false);
+
     useEffect(() => {
         if(props.products.length === 0) {
             Axios.get('/api/product/all').then(result => {
                 props.dispatch(productSlice.actions.initProducts(result.data))
             })
         }
+
+        const fileSelect = document.getElementById("fileSelect");
+        const fileElem = document.getElementById("fileElem");
+
+        fileSelect.addEventListener("click", (e) => {
+            if (fileElem) {
+                fileElem.click();
+            }
+        }, false);
+
+        fileElem.addEventListener("change", handleFiles, false);
+        
+        function handleFiles() {
+            if(this.files.length == 0) return;
+            const file = this.files[0]; /* now you can work with the file list */
+            var formData = new FormData();
+            formData.append('prices', file)
+
+            setIsUploadingPrices(true);
+            props.dispatch(productSlice.actions.initProducts([]))
+            Axios.post('/api/product/upload-prices', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(res => {
+                Axios.get('/api/product/all').then(result => {
+                    props.dispatch(productSlice.actions.initProducts(result.data))
+                })
+                this.files = []
+                setIsUploadingPrices(false);
+            })
+            .catch(e => {
+                console.log(e)
+                setIsUploadingPrices(false);
+            })
+        }
+
     }, [])
 
     const onSearch = (e) => {
@@ -37,7 +77,13 @@ const Products = (props) => {
     console.log('isAdmin: ' + props.isAdmin)
 
     if(props.isAdmin) {
+        extraPageHeaderElements.push(<Button id='fileSelect' key='1'>{isUploadingPrices && <Spin />} &nbsp;Importuj cenovnik</Button>)
         extraPageHeaderElements.push(<Button key='1' type="primary" onClick={()=>props.dispatch(modalSlice.actions.toggleShow('AddProduct'))}>Dodaj proizvod</Button>)
+        extraPageHeaderElements.push(<input
+            type="file"
+            id="fileElem"
+            accept=".csv"
+            style={{display: 'none'}} />)
     }
 
     const toggleSelect = () => props.dispatch(selectProductSlice.actions.toggleSelectAllProducts(props.products));

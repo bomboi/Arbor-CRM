@@ -13,11 +13,15 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
+    secondDiscountedPrice: {
+        type: Number,
+        required: false
+    },
     materialLength: {
         type: Number,
         required: false
     },
-    Category: {
+    category: {
         type: String,
         required: false
     }

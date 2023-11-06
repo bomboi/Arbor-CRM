@@ -70,7 +70,6 @@ const Notifications = (props) => {
 
     const deleteAllNotifications = () => {
         Axios.post('/api/order/delete-notifications').then(res => {
-            // setHasNotification(false);
             setNotifications([])
         })
     }
@@ -80,7 +79,6 @@ const Notifications = (props) => {
         Axios.post('/api/order/delete-notification', {
             notificationId: notification._id
         }).then(res => {
-            // setHasNotification(false);
             setNotifications(notifications.filter(item => item._id != notification._id))
         })
     }
@@ -88,10 +86,11 @@ const Notifications = (props) => {
     const openNotification = (notification) => {
         if(notification.type == "orderDeleted" || !notification.orderId) {
             Axios.post('/api/order/read-notification', {
+                orderId: notification.orderId,
                 notificationId: notification._id
             }).then(res => {
-                // setHasNotification(false);
-                setNotificationBadge(notificationBadge - 1);
+                console.log(res);
+                setNotificationBadge(notificationBadge - res > 0 ? notificationBadge - res : 0);
             })
             return;
         }
@@ -112,9 +111,11 @@ const Notifications = (props) => {
             props.dispatch(orderPreviewSlice.actions.setLoading(false));
             
             Axios.post('/api/order/read-notification', {
+                orderId: notification.orderId,
                 notificationId: notification._id
             }).then(res => {
-                setNotificationBadge(notificationBadge - 1 > 0 ? notificationBadge - 1 : 0);
+                console.log("read", res);
+                setNotificationBadge(notificationBadge - res > 0 ? notificationBadge - res : 0);
             })
         })
     }
@@ -165,7 +166,6 @@ const Notifications = (props) => {
                                 />
                             }
                         /> }
-                        {/* <Button >Obrisi sve</Button> */}
                     </div>
                     <Button 
                         type='link' 

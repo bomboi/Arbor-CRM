@@ -181,31 +181,26 @@ router.post('/add-version', async (req, res) => {
 
 router.post('/read-notification', async (req, res) => {
     try {
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        let notification = await Notification.findOne({_id: req.body.notificationId}).exec();
-        
-        if (notification != null) {
+        console.log(req.session.user);
+        console.log(req.body.orderId);
+
+        let notifications = await Notification.find({orderId: req.body.orderId, forUser: req.session.user, isRead: false}).exec();
+        const length = notifications.length
+        console.log("read", length)
+        for(notification of notifications) {
             notification.isRead = true;
-
+    
             await notification.save();
         }
 
-        res.sendStatus(200);
+        await session.commitTransaction();
+        session.endSession();
 
-        // let notification = await Notification.findOne({orderId: req.body.orderId}).populate('readBy').exec();
-
-        // if(notification != null) {
-        //     console.log(notification);
-        
-        //     notification.readBy.splice(notification.readBy.findIndex(item => item.equals(req.session.user)), 1);
-        //     let numberOfUsersThatReadNotification = notification.readBy.filter(user => user.active && user.role != "developer").length;
-        //     if(numberOfUsersThatReadNotification > 0) await notification.save();
-        //     else await Notification.deleteOne({orderId: req.body.orderId}).exec();
-        
-        //     console.log(notification);
-        // }
-        
-        // res.sendStatus(200);
+        res.status(200);
+        res.send({length: length});
     }
     catch(error) {
         console.log(error);
@@ -215,16 +210,16 @@ router.post('/read-notification', async (req, res) => {
 
 router.get('/get-versions', async (req, res) => {
     try{
-        console.log(req.query.orderId);
+        // console.log(req.query.orderId);
         let orderVersions = await OrderData.find({orderId: req.query.orderId})
                                      .sort({version: 1})
                                      .populate('changedBy')
                                      .exec();
         let order = await Order.findOne({_id: req.query.orderId}).populate('comments.writtenBy customer').exec();
-        console.log(orderVersions);
-        console.log(order);
+        // console.log(orderVersions);
+        // console.log(order);
         let data = {orderVersions: orderVersions, comments: order.comments, order: order};
-        console.log(data);
+        // console.log(data);
         res.status(200);
         res.send(data);
     }
