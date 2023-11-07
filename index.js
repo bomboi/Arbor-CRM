@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 
   // Middlewares
 app.use(express.json())
+app.use(cors())
 app.use(session({
   name: 'sessionId',
   secret: 'matija',

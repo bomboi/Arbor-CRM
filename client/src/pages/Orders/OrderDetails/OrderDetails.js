@@ -9,10 +9,8 @@ import { OrderInvoicePDF, OrderInvoiceSavePDF } from './OrderInvoicePDF';
 import Axios from 'axios';
 import { connect } from 'react-redux';
 import { getAddedArticles, getOrderInfo, getNewOrderCustomer, usingDelivery } from '@selectors/ordersSelectors';
-import { getOrderPreviewVersions, getOrderPreviewData, isEditModeInitialized } from '@selectors/ordersSelectors';
-import lo from 'lodash';
+import { isEditModeInitialized } from '@selectors/ordersSelectors';
 import { orderDetails, newOrderArticlesSlice, newOrderInfoSlice, newOrderCustomerSlice, clearNewOrder } from '../../../Redux/reducers/ordersReducers';
-import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 
 
@@ -29,6 +27,7 @@ const compareObjectsRecursive = (obj1, obj2) => {
     else return false;
 }
 
+// TODO: try JSON stringify compare
 const compareObjects = (obj1, obj2) => {
   if(obj1 === null || obj2 === null) return null;
   return compareObjectsRecursive(obj1, obj2);
