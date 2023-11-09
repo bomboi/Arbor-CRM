@@ -1,11 +1,9 @@
 const express = require('express')
-const cowsay = require('cowsay')
 const cors = require('cors')
 const path = require('path')
 const dotenv = require('dotenv')
 const mongoose = require('mongoose');
 var https = require('https')
-var fs = require('fs')
 const User = require('./models/User');
 const bodyParser = require('body-parser');
 const session = require('express-session')
@@ -18,31 +16,40 @@ const app = express()
 dotenv.config();
 
 // Connect to database
-mongoose.connect(process.env.DB_CONNECT, 
+mongoose.connect(
+  process.env.DB_CONNECT, 
   { useNewUrlParser: true, useUnifiedTopology: true },
-  () => console.log('Connected to DB'))
+  () => console.log('Connected to DB')
+);
   
-  
-  var store = new MongoDBStore({
-    uri: process.env.DB_CONNECT,
-    collection: 'sessions'
-  });
+var store = new MongoDBStore({
+  uri: process.env.DB_CONNECT,
+  collection: 'sessions'
+});
   
 app.use((req, res, next) => {
   console.log(req.method + ' ' + req.url);
   next();
-})
-
+});
 
   // Middlewares
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  credentials: true,
+  // // exposedHeaders: ["Set-Cookie"]
+  // credentials: true,
+  // origin: 'http://127.0.0.1:3001',
+  // exposedHeaders: ['Set-Cookie'],
+  // // preflightContinue: true,
+  // // optionsSuccessStatus: 200,
+  // // allowedHeaders: ['Accept','Accept-Language','Content-Language','Content-Type','Authorization','Cookie','X-Requested-With','Origin','Host']
+}))
+
 app.use(session({
   name: 'sessionId',
   secret: 'matija',
   resave: false,
   saveUninitialized: false,
-  cookie:{},
   store: store,
 }))
 
