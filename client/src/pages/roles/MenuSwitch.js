@@ -10,6 +10,7 @@ import Products from '../Products/Products';
 import ProtectedRoute from '../../routing/ProtectedRoute';
 import Settings from '../Settings/Settings';
 import Statistics from '../Statistics/Statistics';
+import { Redirect } from 'react-router-dom/cjs/react-router-dom';
 
 export default function MenuSwitch() {
     let match = useRouteMatch();
@@ -29,8 +30,11 @@ export default function MenuSwitch() {
                 <ProtectedRoute path="/podesavanja">
                     <Settings />
                 </ProtectedRoute>
-                <ProtectedRoute path="/statistika">
+                <ProtectedRoute designatedRole="admin" path="/statistika">
                     <Statistics />
+                </ProtectedRoute>
+                <ProtectedRoute path="/">
+                    <Redirect to="/porudzbine" />
                 </ProtectedRoute>
             </Switch>
         // </Router>

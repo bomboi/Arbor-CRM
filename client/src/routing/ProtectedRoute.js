@@ -26,8 +26,7 @@ function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest })
                 if(allowed) {
                     return children;
                 }
-                else return children;
-                // else redirect to not allowed
+                else return <Redirect to='/porudzbine'/>;
             }
             else if(!login) return <Redirect to='/login' />;
             else return children;
