@@ -26,7 +26,7 @@ import { getTagColor } from '../../utils';
 import Axios from 'axios';
 import { isBrowser, isMobile, BrowserView, MobileView } from 'react-device-detect';
 import OrderFactoryPDF from './OrderFactoryPDF';
-import { OrderInvoicePDF } from './OrderDetails/OrderInvoicePDF';
+import { OrderInvoicePDF, OrderInvoicePreviewPDF } from './OrderDetails/OrderInvoicePDF';
 import moment from 'moment';
 
 const SelectVersion = (props) => {
@@ -126,7 +126,7 @@ const OrderPreview = (props) => {
             <BrowserView><Row justify={'space-between'} className="pl-4 pr-4 pt-3 pb-3">
                 <div>
                     <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>
-                    <OrderInvoicePDF check={() => true} orderId={props.order?props.order.orderId:0}/>
+                    <OrderInvoicePreviewPDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                     {props.isAdmin && <OrderFactoryPDF version={version}/>}
                     <Button onClick={complaint} className="mr-2">Prijavi reklamaciju</Button>
                     <Button onClick={()=>{
@@ -157,7 +157,7 @@ const OrderPreview = (props) => {
                         <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
                         <Button onClick={deleteOrder} type={'primary'} className="mb-2" danger>Obrisi</Button>
                         {/* <Button onClick={} className="mb-2">Štampaj</Button> */}
-                        <OrderInvoicePDF check={() => true} orderId={props.order?props.order.orderId:0}/>
+                        <OrderInvoicePreviewPDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                         {props.isAdmin && <OrderFactoryPDF className="mb-2 w-100" version={version}/>}
                         <Button className="mb-2">Prijavi reklamaciju</Button>
                         <Button className="mb-2" onClick={()=>{

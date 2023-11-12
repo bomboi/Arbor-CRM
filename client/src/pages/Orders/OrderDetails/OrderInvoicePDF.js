@@ -49,11 +49,11 @@ class ComponentToPrint extends React.Component {
                                 <div>
                                     {this.props.customer.email && <>Email: {this.props.customer.email}</>}
                                 </div>
-                                {this.props.usingDelivery &&<div>
+                                {this.props.usingDelivery &&
                                     <div>
-                                    Adresa: {this.props.customer.address.street} ({this.props.customer.address.homeType}) / {this.props.customer.address.floor}. sprat ({this.props.customer.address.elevator?"ima lift":"nema lift"})
+                                    Adresa: {this.props.customer.address?.street} ({this.props.customer.address?.homeType}) / {this.props.customer.address?.floor}. sprat ({this.props.customer.address?.elevator?"ima lift":"nema lift"})
                                     </div>
-                                </div>}
+                                }
                             </div>
                             <div>
                                 {this.props.orderId && <div className="customer-name text-right">
@@ -150,19 +150,19 @@ class ComponentToPrint extends React.Component {
 }
 
 const mapStateToPropsPreview = (state, props) => {
-    console.log(getOrderPreviewData(state))
-    console.log(props.version)
-    if(getOrderPreviewData(state) && getOrderPreviewVersions(state)[props.version] && props.version !== -1){
-        console.log(getOrderPreviewVersions(state)[props.version])
+    console.log(getOrderPreviewData(state));
+    let listOfVersions = getOrderPreviewVersions(state);
+    if(getOrderPreviewData(state)){
+        console.log(listOfVersions[listOfVersions.length-1])
         return {
             orderId: getOrderPreviewData(state).orderId,
-            articles: getOrderPreviewVersions(state)[props.version].data.articles,
+            articles: listOfVersions[listOfVersions.length-1].data.articles,
             customer: getOrderPreviewData(state).customer,
             usingDelivery: usingDelivery(state),
             defaults: getOrderDefaults(state),
             avans: getAvans(state),
             globalDiscount: getGlobalDiscount(state),
-            orderInfo: getOrderPreviewVersions(state)[props.version].data.orderInfo,
+            orderInfo: listOfVersions[listOfVersions.length-1].data.orderInfo,
         }
     }
     else return {}

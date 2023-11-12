@@ -388,7 +388,7 @@ router.get('/search', async (req, res) => {
         
         let orderIds = [];
         if(req.query.filters.customerName !== '') {
-            var regexp = new RegExp(".*"+ req.query.filters.customerName + ".*");
+            var regexp = new RegExp(".*"+ req.query.filters.customerName + ".*", "i");
             orderIds = await Customer.find({name: regexp}).select('orders -_id').exec();
             orderIds = orderIds.reduce((acc, val) => {return acc.concat(val.orders)}, []);
             filters._id = {$in: orderIds};
