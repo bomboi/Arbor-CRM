@@ -44,7 +44,6 @@ const OrderListItem = (props) => {
 
     const open = () => {
         props.dispatch(orderPreviewSlice.actions.setLoading(true))
-        props.dispatch(orderPreviewSlice.actions.toggleShow());
         Axios.get('/api/order/get-versions', {
             params: {
                 orderId: props.item._id
@@ -61,7 +60,8 @@ const OrderListItem = (props) => {
             }).then(res => {
                 setHasNotification(false);
             })
-        })
+        }).then(()=>{
+            props.dispatch(orderPreviewSlice.actions.toggleShow());})
     }
 
     return (
