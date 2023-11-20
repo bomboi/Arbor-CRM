@@ -300,7 +300,7 @@ const OrderPreview = (props) => {
                                         <Row>
                                             <div>Popust: {props.versions[version].data.orderInfo.discount}%</div>
                                             <div>Rok isporuke: {props.versions[version].data.orderInfo.deadlineFrom} - {props.versions[version].data.orderInfo.deadlineTo} dana.</div>
-                                            <div>Nacin placanja: Gotovina</div>
+                                            <div>Nacin placanja: {props.versions[version].data.orderInfo.paymentType}</div>
                                             <div>Datum: {moment(props.versions[version].data.orderInfo.date).format('DD. MM. YYYY.').toString()}</div>
                                             {props.versions[version].data.orderInfo.note && <div>Napomena: {props.versions[version].data.orderInfo.note}</div>}
                                         </Row>
