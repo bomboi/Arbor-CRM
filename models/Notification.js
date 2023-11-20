@@ -21,6 +21,10 @@ const notificationSchema = new mongoose.Schema({
     forUser: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
     }
 })
 

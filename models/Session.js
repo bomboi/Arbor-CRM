@@ -6,6 +6,10 @@ const sessionSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
     }
 })
 

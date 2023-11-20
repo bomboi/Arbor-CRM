@@ -19,12 +19,16 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        required: true
-        // roles: admin, seller
+        required: true,
+        enum: ['superadmin', 'admin', 'seller', 'factory']
     },
     active: {
         type: Boolean,
         required: false
+    },
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
     }
 })
 

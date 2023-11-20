@@ -6,7 +6,11 @@ const settingSchema = new mongoose.Schema({
         ref: 'User'
     },
     name: String,
-    value: String
+    value: String,
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
+    }
 })
 
 module.exports = mongoose.model('Setting', settingSchema);

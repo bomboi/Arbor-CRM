@@ -14,6 +14,7 @@ router.get('/authenticated', async (req, res) => {
     else res.sendStatus(401);
 })
 
+// TODO: generic adding
 router.post('/register', async (req, res) => {
     const user = new User({
         username: 'matija',
@@ -47,6 +48,7 @@ router.post('/login', async (req, res) => {
                 }
                 else if(result) {
                     req.session.user = user._id;
+                    req.session.clientId = user.clientId;
                     res.sendStatus(200);
                 }
                 else {

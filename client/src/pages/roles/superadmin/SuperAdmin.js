@@ -18,10 +18,10 @@ import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
 import { isBrowser, MobileView, BrowserView } from 'react-device-detect';
 import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
+import SuperAdminMenuSwitch from './SuperAdminMenuSwitch';
 
 const { Content, Sider } = Layout;
 
-// TODO: Create Browser and Mobile components
 const Seller = (props) => {
 
   let history = useHistory();
@@ -32,14 +32,6 @@ const Seller = (props) => {
   useEffect(() => {
     Axios.get('/api/user/get')
       .then(result => {
-        if (!("Notification" in window)) {
-          console.log("Browser does not support desktop notification");
-        } else {
-          console.log("Notification supported");
-          Notification.requestPermission().then((permission) => {
-            console.log(permission)
-          });
-        }
         props.dispatch(userSlice.actions.initUser(result.data));
         setTimeout(() => {
           setLoading(false);
@@ -105,70 +97,8 @@ const Seller = (props) => {
         </BrowserView>
         
         <Layout className="site-layout">
-          <MobileView>
-          <Button 
-            style={{
-              width: "100%"
-            }} 
-            size='large'
-            onClick={() => setOpenDrawer(!openDrawer)} 
-            type="primary">
-              Meni
-          </Button>
-            <Drawer
-              bodyStyle={{
-                padding: 0,
-                width: "100%"
-              }}
-              placement="left"
-              closable={false}
-              onClose={() => console.log("bruh")}
-              getContainer={false}
-              visible={openDrawer}>
-              <Button 
-                style={{
-                  width: "100%"
-                }} 
-                size='large'
-                onClick={() => setOpenDrawer(!openDrawer)} 
-                type="primary">
-                  Zatvori
-              </Button>
-              <Menu 
-                style={{
-                  width: "100%",
-                  height: "100%"
-                }} 
-                selectedKeys={[selected]} 
-                mode="inline" 
-                onSelect={menuFunction}>
-                    <Menu.Item key="porudzbine" onClick={() => setOpenDrawer(!openDrawer)} icon={<ContainerOutlined />}>
-                      Porudzbine
-                    </Menu.Item>
-                    <Menu.Item key="kupci" onClick={() => setOpenDrawer(!openDrawer)} icon={<UserOutlined />}>
-                      Kupci
-                    </Menu.Item>
-                    <Menu.Item key="proizvodi" onClick={() => setOpenDrawer(!openDrawer)} icon={<AppstoreOutlined />}>
-                      Proizvodi
-                    </Menu.Item>
-                    <Menu.Item key="podesavanja" onClick={() => setOpenDrawer(!openDrawer)} icon={<SettingOutlined />}>
-                      Podesavanja
-                    </Menu.Item>
-                    {props.isAdmin && <Menu.Item key="statistika" onClick={() => setOpenDrawer(!openDrawer)} icon={<PieChartOutlined />}>
-                      Statistika
-                    </Menu.Item>}
-                    {/* TODO: Put name and logout on the lower end of sider */}
-                    <Menu.Item onClick={()=>{new Notification('Hello World')}}>
-                      {props.loggedInUser.firstName}
-                    </Menu.Item>
-                    <Menu.Item key="logout" icon={<DesktopOutlined />}>
-                      Izloguj se
-                    </Menu.Item>
-                  </Menu>
-            </Drawer>
-          </MobileView>
           <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
-                <MenuSwitch/>
+                <SuperAdminMenuSwitch/>
           </Content>
         </Layout>
       </Layout>

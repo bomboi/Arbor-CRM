@@ -37,6 +37,10 @@ const orderDataSchema = new mongoose.Schema({
     changedBy: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
+    },
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
     }
 })
 

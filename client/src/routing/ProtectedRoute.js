@@ -16,12 +16,13 @@ function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest })
         Auth.isAuthenticated().then(res => {
             setAuthenticated(res);
         });
-    });
+    }, []);
 
     return (
         <Route {...rest} render={() => {
             if(authenticated) {
                 if(login) return <Redirect to='/porudzbine'/>
+                // TODO: Add support for multiple roles
                 let allowed = designatedRole === undefined || userRole === designatedRole;
                 if(allowed) {
                     return children;

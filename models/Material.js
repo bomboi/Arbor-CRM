@@ -9,7 +9,11 @@ const materialSchema = new mongoose.Schema({
     names: [{
         type: String,
         required: false
-    }]
+    }],
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
+    }
 })
 
 module.exports = mongoose.model('Material', materialSchema);
