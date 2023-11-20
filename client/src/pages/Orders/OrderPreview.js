@@ -125,7 +125,7 @@ const OrderPreview = (props) => {
             <Spin spinning={props.loading}>
             <BrowserView><Row justify={'space-between'} className="pl-4 pr-4 pt-3 pb-3">
                 <div>
-                    <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>
+                    {props.isAdmin && <Button onClick={deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>}
                     <OrderInvoicePreviewPDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                     {props.isAdmin && <OrderFactoryPDF version={version}/>}
                     <Button onClick={complaint} className="mr-2">Prijavi reklamaciju</Button>
