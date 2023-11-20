@@ -25,7 +25,7 @@ const shuffle = (string) => {
 }
 
 const calculateTotalPrice = (acc, value) => {
-    let articlePrice = parseInt(value.price) * parseInt(value.quantity) * (100 - parseInt(value.discount)) / 100;
+    let articlePrice = parseInt(value.price) * parseFloat(value.quantity) * (100 - parseInt(value.discount)) / 100;
     return parseInt(acc) + parseInt(articlePrice);
 }
 

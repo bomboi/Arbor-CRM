@@ -158,7 +158,7 @@ const OrderList = (props) => {
                         setMultipleOrderStateModalVisibility(true)
                     }}>Promeni status selektovanih</Button>
                     <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2'} />
-                    <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>
+                    {props.isAdmin && <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>}
                     {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
                         Selektovane porudžbine: {Object.keys(props.selectedIds).length}
                     </div>}
