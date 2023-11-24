@@ -1,13 +1,16 @@
 login:
 	popravi login sesije
 	centriraj login formu
+	dodaj logo
 
 dodaj/izmeni porudzbinu:
-	dodaj napomenu na pdf
+	dodaj napomenu na pdf DONE
 
 backend:
-	dodaj provere u svim rutama
+	dodaj provere u svim rutama + try/catch
 	dodaj komentare u kodu
+	dodaj url na sve logove
+	promeni logove
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
@@ -15,14 +18,17 @@ proizvodi:
 
 pregled porudzbine:
 	stampaj ne radi kad se promeni porudzbina
-	ne radi
 
 lista poruzdbina:
 	kad se obrise porudzbina, ostaju 'nove izmene'
 	problem sa nebrisanjem novih izmena
-	stampaj naloge ne radi kako treba - admin
+	stampaj naloge ne radi kako treba - admin DONE
+	najstarije sortiranje ne radi
 
 podesavanja:
 	menjanje sifre
+
+generalno:
+	dodaj testove
 	
 	

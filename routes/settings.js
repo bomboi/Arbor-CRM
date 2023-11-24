@@ -3,6 +3,7 @@ const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Setting = require('../models/Settings');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const { logId } = require('../utils');
 
 router.use(isAuthenticated);
 
@@ -12,7 +13,7 @@ function compareAsync(param1, param2) {
             if (err) {
                  reject(err);
             } else {
-                console.log(res);
+                console.log(logId(req), res);
                  resolve(res);
             }
         });
@@ -23,7 +24,7 @@ router.get('/order-defaults', async (req, res) => {
     const defaults = await Setting.find({name: {$in: ['DefaultDeadlineTo', 'DefaultDeadlineFrom', 'DefaultCompanyInfo', 'DefaultOrderNote']}}).exec();
     const reducer = (acc, value) => { acc[value.name] = value.value; return acc};
     const data = defaults.reduce(reducer, {})
-    console.log(data)
+    console.log(logId(req), data)
     res.status(200).send(data);
 
 })
@@ -60,9 +61,9 @@ router.post('/company-info', async (req, res) => {
 router.post('/change-password', async (req, res) => {
     try {
         let user = await User.findOne({_id: req.session.user}).exec();
-        console.log(user);
+        console.log(logId(req), user);
         const result = await bcrypt.compare(req.body.old, user.password);
-        console.log(result);
+        console.log(logId(req), result);
         if(result) {
             let salt = await bcrypt.genSalt(12);
             let hash = await bcrypt.hash(req.body.new, salt);
@@ -76,7 +77,7 @@ router.post('/change-password', async (req, res) => {
         }
     }
     catch(error) {
-        console.log(error)
+        console.log(logId(req), error)
         res.status(500);
         res.send(error.message);
     }

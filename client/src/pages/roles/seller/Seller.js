@@ -29,24 +29,24 @@ const Seller = (props) => {
   const [selected, setSelected] = useState(history.location.pathname.substring(1));
   const [openDrawer, setOpenDrawer] = useState(false);
 
-  useEffect(() => {
-    Axios.get('/api/user/get')
-      .then(result => {
-        if (!("Notification" in window)) {
-          console.log("Browser does not support desktop notification");
-        } else {
-          console.log("Notification supported");
-          Notification.requestPermission().then((permission) => {
-            console.log(permission)
-          });
-        }
-        props.dispatch(userSlice.actions.initUser(result.data));
-        setTimeout(() => {
-          setLoading(false);
-        }, 10);
-      })
-    Axios.get('/api/setting/order-defaults').then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)));
-  }, []);
+  // useEffect(() => {
+  //   Axios.get('/api/user/get')
+  //     .then(result => {
+  //       if (!("Notification" in window)) {
+  //         console.log("Browser does not support desktop notification");
+  //       } else {
+  //         console.log("Notification supported");
+  //         Notification.requestPermission().then((permission) => {
+  //           console.log(permission)
+  //         });
+  //       }
+  //       props.dispatch(userSlice.actions.initUser(result.data));
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //       }, 10);
+  //     })
+  //   Axios.get('/api/setting/order-defaults').then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)));
+  // }, []);
 
   const menuFunction = ({ item, key, keyPath, domEvent }) => {
     setSelected(key);
@@ -62,9 +62,9 @@ const Seller = (props) => {
   };
 
   return (
-      loading?
-        <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
-      :
+      // loading?
+      //   <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
+      // :
       // TODO: Make Sider independent of content
       <>
         <Layout style={{ minHeight: '100vh' }} hasSider={isBrowser}>

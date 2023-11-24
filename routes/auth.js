@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/User');
 const Session = require('../models/Session')
 const bcrypt = require('bcrypt');
+const { logId } = require('../utils');
 
 const isAuthenticated = async (req, res, next) => {
     if(req.session.user != undefined) next();
@@ -9,7 +10,7 @@ const isAuthenticated = async (req, res, next) => {
 }
 
 router.get('/authenticated', async (req, res) => {
-    console.log('authenticate')
+    console.log(logId(req), 'authenticate')
     if(req.session.user != undefined) res.sendStatus(200)
     else res.sendStatus(401);
 })
@@ -33,17 +34,17 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-    console.log(req.session.id)
+    console.log(logId(req), req.session.id)
     const user = User.findOne({'username': req.body.username}, (err, user) => {
         if(err) {
-            console.log(err);
+            console.log(logId(req), err);
             res.send(401);
         }
-        console.log(user)
+        console.log(logId(req), user)
         if(user) {
             bcrypt.compare(req.body.password, user.password, function(err, result) {
                 if(err) {
-                    console.log(err);
+                    console.log(logId(req), err);
                     res.sendStatus(500);
                 }
                 else if(result) {
@@ -61,7 +62,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.get('/logout', async (req, res) => {
-    console.log(req.session.id)
+    console.log(logId(req), req.session.id)
     try{
         req.session.destroy();
         res.sendStatus(200)

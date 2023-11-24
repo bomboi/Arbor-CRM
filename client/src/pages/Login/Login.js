@@ -42,7 +42,7 @@ const Login = (props) => {
                                 props.dispatch(userSlice.actions.initUser(result.data));
                                 setTimeout(() => {
                                 }, 10);
-                                history.push('porudzbine');
+                                history.push('/');
                             })
                   }
                 }).catch(error => {

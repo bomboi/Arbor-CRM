@@ -3,7 +3,8 @@ import { logout } from '../actions';
 
 export const userSlice = createSlice({
     name: 'userSlice',
-    initialState: {},
+    initialState: {
+    },
     reducers: {
         initUser: (state, action) => {
             return action.payload;

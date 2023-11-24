@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Product = require('../models/Product')
 const multer  = require('multer');
 const upload = multer();
+const { logId } = require('../utils');
 
 const mongoose = require('mongoose');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
@@ -17,7 +18,7 @@ router.get('/all', async (req, res) => {
         res.send(products);
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500);
         res.send(error.message);
     }
@@ -30,7 +31,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
 
         let result = await Product.deleteMany({}).exec();
         if(result.deletedCount == 0) res.status(500).send("Ovaj proizvod je obrisan!");
-        console.log("Svi proizvodi su obrisani!");
+        console.log(logId(req), "Svi proizvodi su obrisani!");
 
         const rows = req.file.buffer.toString('utf-8').split('\n');
         for(let row of rows) {
@@ -44,7 +45,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
             await product.save();
         }
 
-        console.log("Svi proizvodi su dodati!")
+        console.log(logId(req), "Svi proizvodi su dodati!")
 
         await session.commitTransaction();
         session.endSession();
@@ -53,7 +54,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
         res.send("Upload complete!");
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500);
         res.send(error.message);
     }
@@ -61,14 +62,14 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
 
 router.post('/add', async (req, res) => {
     Product.find({productName: { "$regex": req.body.name, "$options": "i" }}, (err, products) => {
-            console.log(err)
-            console.log(products)
+            console.log(logId(req), err)
+            console.log(logId(req), products)
             if(err == null && products.length == 0) {
                 let product = new Product();
                 product.productName = req.body.name;
                 product.price = req.body.price;
                 product.discountedPrice = req.body.discountedPrice;
-                product.save(err=>console.log(err));
+                product.save(err=>console.log(logId(req), err));
                 res.status(200).send(product)
             }
             else {
@@ -90,8 +91,8 @@ router.post('/delete', async (req, res) => {
 
 router.post('/update', async (req, res) => {
     Product.find({_id: req.body._id}, (err, products) => {
-            console.log(err)
-            console.log(products)
+            console.log(logId(req), err)
+            console.log(logId(req), products)
             if(err == null && products.length == 0) {
                 res.sendStatus(400)
             }

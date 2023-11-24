@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Customer = require('./../models/Customer');
+const { logId } = require('../utils');
 
 router.get('/all', (req, res) => {
     Customer.find({}, (err, customers) => {
