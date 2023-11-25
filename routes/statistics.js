@@ -6,6 +6,7 @@ const { logId } = require('../utils');
 
 router.use(isAuthenticated);
 
+// TODO: Figure out where to put clientId
 router.get('/get', async (req, res) => {
     let today = new Date();
     let beginning = new Date(today.getFullYear(), today.getMonth(), 1);

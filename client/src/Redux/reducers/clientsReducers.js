@@ -18,6 +18,10 @@ export const clientsSlice = createSlice({
                 clients: action.payload,
                 initialized: true
             };
+        },
+        toggleActive: (state, action) => {
+            console.log(action.payload);
+            state.clients[action.payload.index].active = action.payload.active
         }
     },
     extraReducers: {
@@ -25,8 +29,28 @@ export const clientsSlice = createSlice({
     }
 })
 
+const modalSliceInitialState = {
+    show: {
+        AddClient: false,
+    }
+}
+
+export const modalSlice = createSlice({
+    name: 'modalSlice',
+    initialState: modalSliceInitialState,
+    reducers: {
+        toggleShow: (state, action) => {
+            state.show[action.payload] = !state.show[action.payload]
+        }
+    },
+    extraReducers: {
+        [logout]: state => ({...modalSliceInitialState})
+    }
+});
+
 const clientsReducer = combineReducers({
-    clientsSlice: clientsSlice.reducer
+    clientsSlice: clientsSlice.reducer,
+    modalSlice: modalSlice.reducer
 });
 
 export default clientsReducer;

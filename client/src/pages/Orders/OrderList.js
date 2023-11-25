@@ -57,7 +57,6 @@ const OrderList = (props) => {
         .catch(error => {
             message.error(error.response.data);
         })
-
     }
 
     const update = (value, key) => {

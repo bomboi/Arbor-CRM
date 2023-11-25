@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react';
-import { PageHeader } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { PageHeader, Button } from 'antd';
 import Axios from 'axios';
-import { clientsSlice } from '@reducers/clientsReducers';
+import { clientsSlice, modalSlice } from '@reducers/clientsReducers';
 import { getClients, areClientsInitialized } from '@selectors/clientsSelectors';
 import { connect } from 'react-redux';
 import ClientItem from './ClientItem';
+import AddClient from './Modals/AddClient';
 
 const Clients = (props) => {
 
-    let extraPageHeaderElements = []
+    const addClient = () => {
+        props.dispatch(modalSlice.actions.toggleShow('AddClient'));
+    }
+
+    let extraPageHeaderElements = [
+        <Button onClick={addClient} type='primary'>Dodaj</Button>
+    ]
 
     useEffect(() => {
         if(!props.areClientsInitialized) {
@@ -26,8 +33,9 @@ const Clients = (props) => {
             title="Klijenti"
             className="mb-3"
             extra={extraPageHeaderElements}/>
+            <AddClient/>
 
-            {props.clients.map(client => (<ClientItem client = {client}/>))}
+            {props.clients.map((client, index) => (<ClientItem client = {client} index={index}/>))}
         </div>
     )
 }

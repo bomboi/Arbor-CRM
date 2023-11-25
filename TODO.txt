@@ -11,13 +11,21 @@ backend:
 	dodaj komentare u kodu
 	dodaj url na sve logove
 	promeni logove
+	kreacija notifikacija u jedan method
+
+kupci:
+	podrska za vise adresa
+
+klijenti:
+	kada se zabrani pristup, preusmeri na login
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
 	obrisi selektovane
 
 pregled porudzbine:
-	stampaj ne radi kad se promeni porudzbina
+	stampaj ne radi kad se promeni porudzbina (?)
+	pregled prevremene uplate
 
 lista poruzdbina:
 	kad se obrise porudzbina, ostaju 'nove izmene'

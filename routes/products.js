@@ -12,7 +12,7 @@ router.use(isAuthenticated);
 
 router.get('/all', async (req, res) => {
     try {
-        let products = await Product.find({}).sort({category: -1}).exec();
+        let products = await Product.find({clientId: req.session.clientId}).sort({category: -1}).exec();
 
         res.status(200);
         res.send(products);
@@ -29,7 +29,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
         const session = await mongoose.startSession();
         session.startTransaction();
 
-        let result = await Product.deleteMany({}).exec();
+        let result = await Product.deleteMany({clientId: req.session.clientId}).exec();
         if(result.deletedCount == 0) res.status(500).send("Ovaj proizvod je obrisan!");
         console.log(logId(req), "Svi proizvodi su obrisani!");
 
@@ -42,6 +42,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
             product.discountedPrice = parseFloat(items[2]);
             product.secondDiscountedPrice = parseFloat(items[3]);
             product.category = items[4];
+            product.clientId = req.session.clientId;
             await product.save();
         }
 
@@ -61,7 +62,7 @@ router.post("/upload-prices", upload.single('prices'), async (req, res) => {
 });
 
 router.post('/add', async (req, res) => {
-    Product.find({productName: { "$regex": req.body.name, "$options": "i" }}, (err, products) => {
+    Product.find({clientId: req.session.clientId, productName: { "$regex": req.body.name, "$options": "i" }}, (err, products) => {
             console.log(logId(req), err)
             console.log(logId(req), products)
             if(err == null && products.length == 0) {
@@ -69,6 +70,7 @@ router.post('/add', async (req, res) => {
                 product.productName = req.body.name;
                 product.price = req.body.price;
                 product.discountedPrice = req.body.discountedPrice;
+                product.clientId = req.session.clientId;
                 product.save(err=>console.log(logId(req), err));
                 res.status(200).send(product)
             }

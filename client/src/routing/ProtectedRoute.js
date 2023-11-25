@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
     Route,
     Redirect,
-    useHistory
+    useLocation
   } from "react-router-dom";
 import Auth from './Auth';
 import { getUserRole } from '@selectors/appSelectors';
@@ -12,6 +12,7 @@ import { Spin } from 'antd';
 function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest }) {
 
     const [authenticated, setAuthenticated] = useState(undefined);
+    const location = useLocation();
 
     useEffect(() => {
         console.log('ProtectedRoute: useEffects')

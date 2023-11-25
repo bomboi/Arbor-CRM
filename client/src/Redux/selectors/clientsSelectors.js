@@ -5,3 +5,5 @@ export const getClients = state => {
 export const areClientsInitialized = state => {
     return state.clientsReducers.clientsSlice.initialized;
 }
+
+export const isModalVisible = (state, modal) => state.clientsReducers.modalSlice.show[modal];

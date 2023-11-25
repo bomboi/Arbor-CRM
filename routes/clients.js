@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { logId } = require('../utils');
 const Client = require('./../models/Client');
+const Session = require('./../models/Session');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 
 router.use(isAuthenticated);
@@ -38,11 +39,19 @@ router.post('/add', async (req, res) => {
 
 router.post('/set-active', async (req, res) => {
     try {
-        let client = await Client.findOne({name: {'$regex': req.body.username, '$options': 'i'}}).exec();
+        let client = await Client.findOne({username: req.body.username}).exec();
+        console.log(req.body.username)
         if (client) {
             client.active = req.body.active
             await client.save();
-            res.status(200).send(client);
+            if (!req.body.active){
+                let sessions = await Session.deleteMany({'session.clientId': client._id}).exec();
+                // for(session of sessions) {
+                //     req.session.destroy(session._id);
+                // }
+                // console.log('ss')
+            }
+            res.sendStatus(200);
         }
         else res.sendStatus(400);
     }

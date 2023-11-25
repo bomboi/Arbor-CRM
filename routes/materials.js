@@ -9,7 +9,7 @@ router.use(isAuthenticated);
 router.get('/producers', async (req, res) => {
     console.log(logId(req), req.query)
     // const regex = req.query+'/i';
-    Material.find({producer: { "$regex": req.query.value, "$options": "i" }},
+    Material.find({clientId: req.session.clientId, producer: { "$regex": req.query.value, "$options": "i" }},
         (err, materials) => {
             console.log(logId(req), err)
             console.log(logId(req), materials)
@@ -27,6 +27,7 @@ router.post('/producers/save', async (req, res) => {
             if(err == null && materials.length == 0) {
                 let material = new Material();
                 material.producer = req.query.value;
+                material.clientId = req.session.clientId;
                 material.names = [];
                 material.save();
                 res.sendStatus(200)
@@ -38,7 +39,7 @@ router.post('/producers/save', async (req, res) => {
 })
 
 router.get('/names', async (req, res) => {
-    const regex = { names: { $regex: req.query.name, $options: "i" } };
+    const regex = { clientId: req.session.clientId, names: { $regex: req.query.name, $options: "i" } };
     if(req.query.producer != undefined) {
         regex['producer'] = { "$regex": req.query.producer, "$options": "i" }
     }
@@ -57,10 +58,10 @@ router.get('/names', async (req, res) => {
 router.post('/name/save', async (req, res) => {
     if(req.query.producer === '') res.sendStatus(400)
     const regex = { producer: { "$regex": req.query.producer, "$options": "i" } };
-    Material.find({ producer: { $regex: req.body.producer, $options: "i" } }, (err, materials) => {
+    Material.find({ clientId: req.session.clientId, producer: { $regex: req.body.producer, $options: "i" } }, (err, materials) => {
         console.log(logId(req), 'error: ' + err)
-        // console.log(logId(req), materials)
         if(err == null && materials.length != 0) {
+            // TODO: Explain in comments
             let material = materials[0];
             if(material.names == undefined) material.names = [];
             material.names.push(req.body.name);

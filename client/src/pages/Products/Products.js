@@ -74,8 +74,6 @@ const Products = (props) => {
 
     let extraPageHeaderElements = [<ProductsPDF/>]
 
-    console.log('isAdmin: ' + props.isAdmin)
-
     if(props.isAdmin) {
         extraPageHeaderElements.push(<Button id='fileSelect' key='1'>{isUploadingPrices && <Spin />} &nbsp;Importuj cenovnik</Button>)
         extraPageHeaderElements.push(<Button key='1' type="primary" onClick={()=>props.dispatch(modalSlice.actions.toggleShow('AddProduct'))}>Dodaj proizvod</Button>)

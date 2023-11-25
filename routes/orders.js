@@ -14,6 +14,8 @@ const { logId } = require('../utils');
 
 router.use(isAuthenticated);
 
+// UTIL METHODS
+
 const shuffle = (string) => {
     var parts = string.split('');
     for (var i = parts.length; i > 0;) {
@@ -30,8 +32,10 @@ const calculateTotalPrice = (acc, value) => {
     return parseInt(acc) + parseInt(articlePrice);
 }
 
+// ROUTES
+
 router.get('/all', async (req, res) => {
-    let orders = await Order.find({})
+    let orders = await Order.find({clientId: req.session.clientId})
                             .populate('customer', '-_id -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
@@ -57,7 +61,7 @@ router.post('/post-comment', async (req, res) => {
         await order.save();
     
     
-        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
         let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
         let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
 
@@ -68,12 +72,12 @@ router.post('/post-comment', async (req, res) => {
             notification.orderId = order._id;
             notification.forUser = user._id;
             notification.changedBy = currentUser._id;
+            notification.clientId = req.session.clientId
             notification.type = "orderCommented";
             notification.text = "Korisnik " + currentUser.firstName + " je dodao novi komentar na porudzbinu " + order.orderId + ".";
             notifications.push(notification);
         }
 
-        
         for(notification of notifications) {
             await notification.save();
         }
@@ -117,6 +121,7 @@ router.post('/add-version', async (req, res) => {
         orderData.changedBy = req.session.user;
         orderData.data.articles = reqData.articles;
         orderData.data.orderInfo = reqData.orderInfo;
+        orderData.clientId = req.session.clientId
         await orderData.save();
     
         // Copying new data to Order
@@ -139,6 +144,7 @@ router.post('/add-version', async (req, res) => {
         customer.phone = reqData.customer.phone;
         customer.email = reqData.customer.email;
         customer.address = reqData.customer.address;
+        customer.clientId = req.session.clientId;
         await customer.save();
     
         // Calculate new Order amount
@@ -150,7 +156,7 @@ router.post('/add-version', async (req, res) => {
 
         // Add new notification
         // Get all users that are not admin matija
-        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
         let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
         let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
 
@@ -162,6 +168,7 @@ router.post('/add-version', async (req, res) => {
             notification.forUser = user._id;
             notification.changedBy = currentUser._id;
             notification.type = "orderUpdated"
+            notification.clientId = req.session.clientId;
             notification.text = `Korisnik ${currentUser.firstName} je izmenio porudzbinu ${order.orderId}.`;
             notifications.push(notification);
         }
@@ -211,16 +218,12 @@ router.post('/read-notification', async (req, res) => {
 
 router.get('/get-versions', async (req, res) => {
     try{
-        // console.log(logId(req), req.query.orderId);
         let orderVersions = await OrderData.find({orderId: req.query.orderId})
                                      .sort({version: 1})
                                      .populate('changedBy')
                                      .exec();
         let order = await Order.findOne({_id: req.query.orderId}).populate('comments.writtenBy customer').exec();
-        // console.log(logId(req), orderVersions);
-        // console.log(logId(req), order);
         let data = {orderVersions: orderVersions, comments: order.comments, order: order};
-        // console.log(logId(req), data);
         res.status(200);
         res.send(data);
     }
@@ -255,7 +258,7 @@ router.post('/delete', async (req, res) => {
                 await Order.deleteOne({_id: order._id}).exec();
             }
         
-            let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+            let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
             let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
             let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
             
@@ -305,6 +308,7 @@ router.get('/notifications', async (req, res) => {
         console.log(logId(req), req.query.readNotifications);
         const readNotifications = req.query.readNotifications === 'true';
         let prevMonthBeginning = date_fns.subMonths(new Date(), 1);
+        // TODO: Check if it needs clientId added
         await Notification.deleteMany({dateChanged: {$lte: prevMonthBeginning}});
         let notifications = await Notification.find({forUser: req.session.user})
                                                 .sort([['dateChanged', -1]])
@@ -322,8 +326,6 @@ router.get('/notifications', async (req, res) => {
                 }
             }
         }
-        // console.log(logId(req), notifications);
-        // console.log(logId(req), notificationToReturn);
         res.status(200);
         res.send(notificationToReturn);
     }
@@ -374,6 +376,8 @@ router.get('/search', async (req, res) => {
             }
             filters.orderId = req.query.filters.orderId; 
         }
+
+        filters.clientId = req.session.clientId;
     
         // Sort orders according to filter
         let sort = req.query.filters.sort === 'Najnovije' ? -1 : 1;
@@ -405,7 +409,7 @@ router.get('/search', async (req, res) => {
                                 .exec();
         }
         else {
-            let latestVersionDate = {$lt: req.query.lastOrderDate};
+            let latestVersionDate = sort == -1 ? {$lt: req.query.lastOrderDate} : {$gt: req.query.lastOrderDate};
             if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
             orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
                                 .sort([['latestVersionDate', sort]])
@@ -416,6 +420,7 @@ router.get('/search', async (req, res) => {
                                 .exec();
         }
         
+        // TODO: Delete if not needed
         let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
         let data = orders.map(order => ({ 
             ...order.toObject(), 
@@ -441,7 +446,7 @@ router.post('/add', async (req, res) => {
     console.log(logId(req), (new Date(req.body.orderInfo.date)).getFullYear())
     const date = new Date(req.body.orderInfo.date);
 
-    let setting = await Setting.findOne({name: 'MonthlyNumberOfOrders', owner: 'app'}).exec();
+    let setting = await Setting.findOne({clientId: req.session.clientId, name: 'MonthlyNumberOfOrders', owner: 'app'}).exec();
     setting.value = '' + ((parseInt(setting.value) + 1)%100);
     console.log(logId(req), setting)
     await setting.save();
@@ -454,6 +459,7 @@ router.post('/add', async (req, res) => {
     order.state = 'poruceno';
     order.latestVersion = 0;
     order.orderId = orderId;
+    order.clientId = req.session.clientId;
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
     if(reqData.orderInfo.delivery) order.totalAmount += reqData.orderInfo.deliveryPrice;
 
@@ -467,6 +473,7 @@ router.post('/add', async (req, res) => {
         customer.phone = reqData.customer.phone;
         customer.email = reqData.customer.email;
         customer.address = reqData.customer.address;
+        customer.clientId = req.session.clientId
         customer.orders = [];
         await customer.save();
     }
@@ -483,6 +490,7 @@ router.post('/add', async (req, res) => {
     orderData.changedBy = req.session.user;
     orderData.data.articles = reqData.articles;
     orderData.data.orderInfo = reqData.orderInfo;
+    orderData.clientId = req.session.clientId;
     await orderData.save();
 
     order.latestVersionData = orderData._id;
