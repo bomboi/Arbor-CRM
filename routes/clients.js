@@ -20,7 +20,7 @@ router.get('/all', async (req, res) => {
 
 router.post('/add', async (req, res) => {
     try {
-        let clients = await Client.find({name: {'$regex': req.body.username, '$options': 'i'}}).exec();
+        let clients = await Client.find({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
         if (clients.length == 0) {
             let client = new Client();
             client.username = req.body.username;
@@ -30,6 +30,17 @@ router.post('/add', async (req, res) => {
             res.status(200).send(client);
         }
         else res.sendStatus(400);
+    }
+    catch (err) {
+        console.log(logId(req), err);
+        res.sendStatus(400);
+    }
+})
+
+router.post('/delete', async (req, res) => {
+    try {
+        await Client.deleteOne({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
+        res.sendStatus(200);
     }
     catch (err) {
         console.log(logId(req), err);

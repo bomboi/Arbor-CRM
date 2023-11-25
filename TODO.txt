@@ -9,7 +9,7 @@ dodaj/izmeni porudzbinu:
 backend:
 	dodaj provere u svim rutama + try/catch
 	dodaj komentare u kodu
-	dodaj url na sve logove
+	dodaj url na sve logove DONE
 	promeni logove
 	kreacija notifikacija u jedan method
 
@@ -18,6 +18,8 @@ kupci:
 
 klijenti:
 	kada se zabrani pristup, preusmeri na login
+	dodaj admina pri kreiranju klijenta
+	uvedi planove
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
@@ -35,6 +37,8 @@ lista poruzdbina:
 
 podesavanja:
 	menjanje sifre
+	uvid u naloge i kreiranje naloga za admina
+	menjanje imena - admin
 
 generalno:
 	dodaj testove

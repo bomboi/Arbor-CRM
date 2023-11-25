@@ -13,6 +13,9 @@ export const clientsSlice = createSlice({
         addClient: (state, action) => {
             state.clients.push(action.payload);
         },
+        removeClient: (state, action) => {
+            state.clients.splice(action.payload, 1);
+        },
         initClients: (state, action) => {
             return {
                 clients: action.payload,

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Card, Switch } from 'antd';
+import { Card, Switch} from 'antd';
+import { DeleteOutlined } from '@ant-design/icons'
 import Axios from 'axios';
 import { clientsSlice } from '@reducers/clientsReducers';
 import { getClients, areClientsInitialized } from '@selectors/clientsSelectors';
@@ -17,11 +18,25 @@ const ClientItem = (props) => {
             })
     }
 
+    const deleteClient = () => {
+        Axios.post('/api/client/delete', {username: props.client.username})
+            .then(res => {
+                props.dispatch(clientsSlice.actions.removeClient(props.index))
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
     return (
         <Card>
             <div className='d-flex justify-content-between align-items-center'>
                 <div><b>{props.client.name}</b> @{props.client.username} </div>
-                <Switch checked = {props.client.active} onChange={toggleActive}/>
+                <div>
+
+                    <Switch checked = {props.client.active} onChange={toggleActive}/>
+                    <DeleteOutlined onClick={deleteClient} className='p-2' style={{color:'red'}} />
+                </div>
             </div>
         </Card>
     );

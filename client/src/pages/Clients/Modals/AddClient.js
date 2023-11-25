@@ -5,28 +5,29 @@ import { clientsSlice, modalSlice } from '@reducers/clientsReducers';
 import { getClients, areClientsInitialized } from '@selectors/clientsSelectors';
 import { connect } from 'react-redux';
 import { isModalVisible } from '../../../Redux/selectors/clientsSelectors';
+import { Row, Col, Input, InputNumber } from 'antd';
 
 
 const AddClient = (props) => {
 
     const [isAddModalOpen, setAddModalOpen] = useState(false);
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
 
     const onCancel = () => {
         props.dispatch(modalSlice.actions.toggleShow('AddClient'));
     }
 
-    // let extraPageHeaderElements = [
-    //     <Button onClick={addClient} type='primary'>Dodaj</Button>
-    // ]
-
-    // useEffect(() => {
-    //     if(!props.areClientsInitialized) {
-    //         Axios.get('/api/client/all')
-    //             .then(res => {
-    //                 props.dispatch(clientsSlice.actions.initClients(res.data))
-    //             });
-    //     }
-    // }, []);
+    const addClient = () => {
+        Axios.post('/api/client/add', {
+            name: name,
+            username: username
+        })
+        .then(res => {
+            props.dispatch(clientsSlice.actions.addClient(res.data))
+            props.dispatch(modalSlice.actions.toggleShow('AddClient'))
+        });
+    }
 
     return (
         <Modal
@@ -36,11 +37,16 @@ const AddClient = (props) => {
         closable = {false}
         maskClosable = {false}
         okText = "Dodaj"
-        // onOk = {addProduct}
+        onOk = {addClient}
         cancelText = "Zatvori"
         onCancel = {onCancel}
         >
-            <div>asda</div>
+            <Row gutter={[20,10]}><Col flex={'auto'}>
+                <Input onChange={e=>{setUsername(e.target.value);}} placeholder="Username klijenta"/>
+            </Col></Row>
+            <Row gutter={[20,10]}><Col flex={'auto'}>
+                <Input onChange={e=>{setName(e.target.value);}} placeholder="Ime klijenta"/>
+            </Col></Row>
         </Modal>
     )
 }
