@@ -1,8 +1,11 @@
 const router = require('express').Router();
 const { logId } = require('../utils');
 const Client = require('./../models/Client');
+const User = require('./../models/User');
 const Session = require('./../models/Session');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
+const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 router.use(isAuthenticated);
 
@@ -22,12 +25,33 @@ router.post('/add', async (req, res) => {
     try {
         let clients = await Client.find({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
         if (clients.length == 0) {
+            const session = await mongoose.startSession();
+            session.startTransaction();
+
             let client = new Client();
             client.username = req.body.username;
             client.name = req.body.name;
             client.active = false;
             await client.save();
+
+            // Creating new admin user for the client.
+            let user = new User();
+            user.username = req.body.username + '_admin';
+            user.firstName = 'Admin';
+            user.lastName = 'Account';
+            user.role = 'admin';
+            user.active = true;
+            user.clientId = client._id;
+            let salt = await bcrypt.genSalt(12);
+            let hash = await bcrypt.hash('password', salt);
+            user.password = hash;
+            await user.save();
+
+            await session.commitTransaction();
+            session.endSession();
+
             res.status(200).send(client);
+
         }
         else res.sendStatus(400);
     }
@@ -39,7 +63,16 @@ router.post('/add', async (req, res) => {
 
 router.post('/delete', async (req, res) => {
     try {
-        await Client.deleteOne({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        let client = await Client.findOne({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
+        await User.deleteMany({clientId: client._id}).exec();
+        await Client.deleteOne({_id: client._id}).exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
         res.sendStatus(200);
     }
     catch (err) {

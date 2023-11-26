@@ -12,7 +12,13 @@ const clientSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         required: true
-    }
+    },
+    plan: {
+        type: String,
+        required: true,
+        default: 'basic',
+        enum: ['basic', 'classic', 'professional']
+    },
 })
 
 module.exports = mongoose.model('Client', clientSchema);

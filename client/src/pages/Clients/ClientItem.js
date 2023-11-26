@@ -31,9 +31,12 @@ const ClientItem = (props) => {
     return (
         <Card>
             <div className='d-flex justify-content-between align-items-center'>
-                <div><b>{props.client.name}</b> @{props.client.username} </div>
                 <div>
-
+                    <div><b>{props.client.name}</b></div> 
+                    <div>@{props.client.username}</div> 
+                </div>
+                <div>
+                    <div>{props.client.plan}</div>
                     <Switch checked = {props.client.active} onChange={toggleActive}/>
                     <DeleteOutlined onClick={deleteClient} className='p-2' style={{color:'red'}} />
                 </div>

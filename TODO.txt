@@ -20,6 +20,7 @@ klijenti:
 	kada se zabrani pristup, preusmeri na login
 	dodaj admina pri kreiranju klijenta
 	uvedi planove
+	obrisi sve porudzbine sa brisanjem klijenta
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
