@@ -8,6 +8,7 @@ import {
   AppstoreOutlined,
   ContainerOutlined,
   SettingOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
 import MenuSwitch from '../MenuSwitch';
@@ -90,6 +91,9 @@ const Seller = (props) => {
               <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
                 Podesavanja
               </Menu.Item>
+              {props.isAdmin && <Menu.Item key="korisnici" icon={<TeamOutlined />}>
+                Korisnici
+              </Menu.Item>}
               {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
                 Statistika
               </Menu.Item>}
