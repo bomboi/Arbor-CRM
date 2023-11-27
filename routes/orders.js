@@ -4,7 +4,7 @@ const Customer = require('../models/Customer');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const OrderData = require('../models/OrderData');   
-const Setting = require('../models/Settings');
+const Settings = require('../models/Settings');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
@@ -446,15 +446,16 @@ router.post('/add', async (req, res) => {
     console.log(logId(req), (new Date(req.body.orderInfo.date)).getFullYear())
     const date = new Date(req.body.orderInfo.date);
 
-    let setting = await Setting.findOne({clientId: req.session.clientId, name: 'MonthlyNumberOfOrders', owner: 'app'}).exec();
-    setting.value = '' + ((parseInt(setting.value) + 1)%100);
-    console.log(logId(req), setting)
-    await setting.save();
+    let defaults = await Settings.findOne({clientId: req.session.clientId}).exec();
+
+    defaults.currentNumberOfMonthlyOrders = '' + ((parseInt(defaults.currentNumberOfMonthlyOrders) + 1)%100);
+    console.log(logId(req), defaults)
+    await defaults.save();
     
     const reqData = req.body;
     let order = new Order();
 
-    let orderId = shuffle('' + date.getFullYear() + date.getDate() + ('0000' + (setting.value)).slice(-2)); 
+    let orderId = shuffle('' + date.getFullYear() + date.getDate() + ('0000' + (defaults.currentNumberOfMonthlyOrders)).slice(-2)); 
 
     order.state = 'poruceno';
     order.latestVersion = 0;

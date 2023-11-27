@@ -98,7 +98,7 @@ const Seller = (props) => {
                 Statistika
               </Menu.Item>}
               {/* TODO: Put name and logout on the lower end of sider */}
-              <Menu.Item onClick={()=>{new Notification('Hello World')}}>
+              <Menu.Item>
                 {props.loggedInUser.firstName}
               </Menu.Item>
               <Menu.Item key="logout" icon={<DesktopOutlined />}>

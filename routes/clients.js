@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { logId } = require('../utils');
 const Client = require('./../models/Client');
 const User = require('./../models/User');
+const Settings = require('./../models/Settings');
 const Session = require('./../models/Session');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const bcrypt = require('bcrypt');
@@ -28,13 +29,25 @@ router.post('/add', async (req, res) => {
             const session = await mongoose.startSession();
             session.startTransaction();
 
+            // Creating the new client.
             let client = new Client();
             client.username = req.body.username;
             client.name = req.body.name;
             client.active = false;
             await client.save();
 
-            // Creating new admin user for the client.
+            // Creating default settings for the new client.
+            let settings = new Settings();
+            settings.defaultDeadlineStart = 10;
+            settings.defaultDeadlineEnd = 20;
+            settings.defaultOrderNote = '';
+            settings.defaultCompanyInfo = '';
+            settings.defaultProductDiscount = 10;
+            settings.currentNumberOfMonthlyOrders = 0;
+            settings.clientId = client._id;
+            await settings.save();
+
+            // Creating new admin user for the new client.
             let user = new User();
             user.username = req.body.username + '_admin';
             user.firstName = 'Admin';
@@ -68,6 +81,7 @@ router.post('/delete', async (req, res) => {
 
         let client = await Client.findOne({username: {'$regex': req.body.username, '$options': 'i'}}).exec();
         await User.deleteMany({clientId: client._id}).exec();
+        await Settings.deleteMany({clientId: client._id}).exec();
         await Client.deleteOne({_id: client._id}).exec();
 
         await session.commitTransaction();
@@ -90,10 +104,6 @@ router.post('/set-active', async (req, res) => {
             await client.save();
             if (!req.body.active){
                 let sessions = await Session.deleteMany({'session.clientId': client._id}).exec();
-                // for(session of sessions) {
-                //     req.session.destroy(session._id);
-                // }
-                // console.log('ss')
             }
             res.sendStatus(200);
         }
