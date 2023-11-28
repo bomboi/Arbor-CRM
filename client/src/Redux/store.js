@@ -4,6 +4,7 @@ import appReducers from './reducers/appReducers';
 import customersReducers from './reducers/customersReducers';
 import ordersReducers from './reducers/ordersReducers';
 import clientsReducers from './reducers/clientsReducers';
+import usersReducers from './reducers/usersReducers';
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     appReducers,
     customersReducers,
     ordersReducers,
-    clientsReducers
+    clientsReducers,
+    usersReducers,
   }
 })
 

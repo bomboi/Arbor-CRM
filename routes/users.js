@@ -14,4 +14,13 @@ router.get('/get', (req, res) => {
     else res.sendStatus(403);
 })
 
+router.get('/all', async (req, res) => {
+    if(req.session.user !== undefined) {
+        let users = await User.find({clientId: req.session.clientId}).exec();
+
+        res.status(200).send(users);
+    }
+    else res.sendStatus(403);
+})
+
 module.exports = router;
