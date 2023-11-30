@@ -81,7 +81,7 @@ router.post('/set-active', async (req, res) => {
     try {
         let user =  await User.findOne({clientId: req.session.clientId, _id: req.body._id}).exec();
         if(user) {
-            user.active = req.body.active == 'true';
+            user.active = req.body.active;
     
             await user.save();
             res.status(200).send(user);
