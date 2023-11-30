@@ -5,9 +5,14 @@ import { connect } from 'react-redux'
 import { UserListItem, UserListHeader } from './UserListItem';
 import { getUsers } from '@selectors/usersSelectors';
 import Axios from 'axios'; 
-import { usersSlice } from '@reducers/usersReducers';
+import { usersSlice, modalSlice } from '@reducers/usersReducers';
+import AddUser from './AddUser';
+import UpdateUser from './UpdateUser';
 
 const Users = (props) => {
+    const extraPageHeaderElements = [
+        <Button key='1' type="primary" onClick={()=>props.dispatch(modalSlice.actions.toggleShow('AddUser'))}>Dodaj korisnika</Button>
+    ]
 
     useEffect(() => {
         if(props.users.length === 0) {
@@ -22,7 +27,10 @@ const Users = (props) => {
         <PageHeader
         ghost={false}
         title="Korisnici"
-        className="mb-3"/>
+        className="mb-3"
+        extra={extraPageHeaderElements}/>
+            <AddUser/>
+            <UpdateUser/>
             <Card>
                 <List 
                     header={<UserListHeader />}

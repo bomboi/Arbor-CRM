@@ -10,8 +10,6 @@ const UpdateProduct = (props) => {
         
     let [product, setProduct] = useState({});
     let [errorMsg, setErrorMsg] = useState('');
-    console.log('render component')
-    console.log(product)
 
     useEffect(() => {
         setProduct({...props.product})

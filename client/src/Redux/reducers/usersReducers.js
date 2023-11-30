@@ -13,8 +13,13 @@ export const usersSlice = createSlice({
         addUser: (state, action) => {
             state.users.push(action.payload);
         },
+        updateUser: (state, action) => {
+            let index = state.users.findIndex(item => item._id === action.payload._id);
+            state.users[index] = action.payload;
+        },
         removeUser: (state, action) => {
-            state.users.splice(action.payload, 1);
+            let index = state.users.findIndex(item => item._id === action.payload);
+            state.users.splice(index, 1);
         },
         initUsers: (state, action) => {
             return {
@@ -23,8 +28,8 @@ export const usersSlice = createSlice({
             };
         },
         toggleActive: (state, action) => {
-            console.log(action.payload);
-            state.users[action.payload.index].active = action.payload.active
+            let index = state.users.findIndex(item => item._id === action.payload._id);
+            state.users[index].active = action.payload.active;
         }
     },
     extraReducers: {
@@ -35,7 +40,9 @@ export const usersSlice = createSlice({
 const modalSliceInitialState = {
     show: {
         AddUser: false,
-    }
+        UpdateUser: false
+    },
+    currentUser: {}
 }
 
 export const modalSlice = createSlice({
@@ -44,6 +51,9 @@ export const modalSlice = createSlice({
     reducers: {
         toggleShow: (state, action) => {
             state.show[action.payload] = !state.show[action.payload]
+        },
+        setCurrentUser: (state, action) => {
+            state.currentUser = action.payload
         }
     },
     extraReducers: {
