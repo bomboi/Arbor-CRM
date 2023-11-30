@@ -26,7 +26,7 @@ export default function MenuSwitch() {
                 <ProtectedRoute designatedRole="superadmin" path="/statistika">
                     <SuperAdminStatistics />
                 </ProtectedRoute>
-                <ProtectedRoute path="/">
+                <ProtectedRoute defaultRoute path="/">
                     <Redirect to="/klijenti" />
                 </ProtectedRoute>
             </Switch>

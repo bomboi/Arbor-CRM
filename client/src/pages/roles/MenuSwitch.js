@@ -37,7 +37,7 @@ export default function MenuSwitch() {
                 <ProtectedRoute designatedRole="admin" path="/korisnici">
                     <Users />
                 </ProtectedRoute>
-                <ProtectedRoute path="/">
+                <ProtectedRoute defaultRoute path="/">
                     <Redirect to="/porudzbine" />
                 </ProtectedRoute>
             </Switch>

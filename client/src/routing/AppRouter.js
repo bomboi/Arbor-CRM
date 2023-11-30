@@ -36,8 +36,8 @@ const AppRouter = (props) => {
           })
           .catch(error => {
             console.log(error)
-            if(error.response.status == 403 || error.response.status == 401) {
-            }
+            // if(error.response.status == 403 || error.response.status == 401) {
+            // }
           })
         Axios.get('/api/setting/order-defaults')
             .then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)))
@@ -50,7 +50,9 @@ const AppRouter = (props) => {
             <ProtectedRoute login path='/login'>
               <Login />
             </ProtectedRoute>
-            <RoleSwitch path='/' />
+            <ProtectedRoute>
+              <RoleSwitch path='/' />
+            </ProtectedRoute>
           </Switch>
         </Router>
     )

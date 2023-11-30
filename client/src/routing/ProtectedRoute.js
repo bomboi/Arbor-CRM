@@ -9,7 +9,7 @@ import { getUserRole } from '@selectors/appSelectors';
 import { connect } from 'react-redux';
 import { Spin } from 'antd';
 
-function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest }) {
+function ProtectedRoute ({ children, designatedRole, userRole, login, defaultRoute, ...rest }) {
 
     const [authenticated, setAuthenticated] = useState(undefined);
     const location = useLocation();
@@ -19,7 +19,7 @@ function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest })
         Auth.isAuthenticated().then(res => {
             setAuthenticated(res);
         });
-    }, []);
+    }, [userRole]);
 
     return (
         <Route {...rest} render={() => {
@@ -27,7 +27,10 @@ function ProtectedRoute ({ children, designatedRole, userRole, login, ...rest })
                 if(authenticated == undefined){
                     return <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
                 }
-                if(authenticated) return <Redirect to='/'/>
+                if(authenticated) {
+                    if(defaultRoute || login) return <Redirect to='/'/>
+                    return children;
+                } 
                 if(login) return children;
                 return <Redirect to='/login'/>;
             }

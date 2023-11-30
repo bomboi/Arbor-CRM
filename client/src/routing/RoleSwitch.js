@@ -13,7 +13,7 @@ import { orderDefaultsSlice } from '@reducers/appReducers';
 import { Spin } from 'antd';
 import { userSlice } from '@reducers/appReducers';
 
-function RoleSwitch ({ userRole, dispatch, ...rest }) {
+function RoleSwitch ({ children, userRole, dispatch, ...rest }) {
     
     return (
         <Route {...rest} render={() => {
@@ -24,7 +24,7 @@ function RoleSwitch ({ userRole, dispatch, ...rest }) {
                 case 'seller':
                     return <Seller/>;
                 default:
-                    return <Redirect to='/login' />;
+                    return children;
             }
         }} />
     )

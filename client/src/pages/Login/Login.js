@@ -41,8 +41,8 @@ const Login = (props) => {
                                 console.log('INIT_USER')
                                 props.dispatch(userSlice.actions.initUser(result.data));
                                 setTimeout(() => {
+                                    history.push('/');
                                 }, 10);
-                                history.push('/');
                             })
                   }
                 }).catch(error => {
