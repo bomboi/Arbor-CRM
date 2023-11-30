@@ -2,10 +2,16 @@ const mongoose = require('mongoose')
 const User = require('./User')
 
 const sessionSchema = new mongoose.Schema({
-    sessionId: String,
-    user: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User'
+    expires: Date,
+    session: {
+        user: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        },
+        clientId: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Client'
+        }
     }
 })
 

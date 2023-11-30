@@ -1,12 +1,16 @@
 const mongoose = require('mongoose')
 
 const settingSchema = new mongoose.Schema({
-    owner: String | {
+    monthlyNumberOfOrders: Number,
+    defaultDeadlineStart: Number,
+    defaultDeadlineEnd: Number,
+    defaultCompanyInfo: String,
+    defaultOrderNote: String,
+    defaultProductDiscount: Number,
+    clientId: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
-    },
-    name: String,
-    value: String
+        ref: 'Client'
+    }
 })
 
 module.exports = mongoose.model('Setting', settingSchema);

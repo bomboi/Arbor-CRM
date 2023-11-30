@@ -10,6 +10,7 @@ import Products from '../Products/Products';
 import ProtectedRoute from '../../routing/ProtectedRoute';
 import Settings from '../Settings/Settings';
 import Statistics from '../Statistics/Statistics';
+import Users from '../Users/Users';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom';
 
 export default function MenuSwitch() {
@@ -33,7 +34,10 @@ export default function MenuSwitch() {
                 <ProtectedRoute designatedRole="admin" path="/statistika">
                     <Statistics />
                 </ProtectedRoute>
-                <ProtectedRoute path="/">
+                <ProtectedRoute designatedRole="admin" path="/korisnici">
+                    <Users />
+                </ProtectedRoute>
+                <ProtectedRoute defaultRoute path="/">
                     <Redirect to="/porudzbine" />
                 </ProtectedRoute>
             </Switch>

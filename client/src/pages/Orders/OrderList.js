@@ -57,7 +57,6 @@ const OrderList = (props) => {
         .catch(error => {
             message.error(error.response.data);
         })
-
     }
 
     const update = (value, key) => {
@@ -95,7 +94,7 @@ const OrderList = (props) => {
     ];
 
     return (
-    <div>
+    <div style={{height: '100%'}} className='mb-2'>
         <PageHeader
       ghost={false}
       title="Porudžbine"
@@ -169,9 +168,9 @@ const OrderList = (props) => {
                     </div>}
                 </div>
             </div>
-            <Row className="mt-2">
+            <Row className="mt-2" style={{height:'calc(75vh - 40px)', overflow: 'scroll'}}>
                 <Col span={24}>
-                    <List 
+                    <List
                         dataSource={props.orders} 
                         renderItem={(item, index) => <OrderListItem item={item} index={index}/>}/>
                 </Col>

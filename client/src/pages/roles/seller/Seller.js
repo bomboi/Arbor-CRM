@@ -8,6 +8,7 @@ import {
   AppstoreOutlined,
   ContainerOutlined,
   SettingOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
 import MenuSwitch from '../MenuSwitch';
@@ -21,6 +22,7 @@ import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 
 const { Content, Sider } = Layout;
 
+// TODO: Create Browser and Mobile components
 const Seller = (props) => {
 
   let history = useHistory();
@@ -28,24 +30,24 @@ const Seller = (props) => {
   const [selected, setSelected] = useState(history.location.pathname.substring(1));
   const [openDrawer, setOpenDrawer] = useState(false);
 
-  useEffect(() => {
-    Axios.get('/api/user/get')
-      .then(result => {
-        if (!("Notification" in window)) {
-          console.log("Browser does not support desktop notification");
-        } else {
-          console.log("Notification supported");
-          Notification.requestPermission().then((permission) => {
-            console.log(permission)
-          });
-        }
-        props.dispatch(userSlice.actions.initUser(result.data));
-        setTimeout(() => {
-          setLoading(false);
-        }, 10);
-      })
-    Axios.get('/api/setting/order-defaults').then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)));
-  }, []);
+  // useEffect(() => {
+  //   Axios.get('/api/user/get')
+  //     .then(result => {
+  //       if (!("Notification" in window)) {
+  //         console.log("Browser does not support desktop notification");
+  //       } else {
+  //         console.log("Notification supported");
+  //         Notification.requestPermission().then((permission) => {
+  //           console.log(permission)
+  //         });
+  //       }
+  //       props.dispatch(userSlice.actions.initUser(result.data));
+  //       setTimeout(() => {
+  //         setLoading(false);
+  //       }, 10);
+  //     })
+  //   Axios.get('/api/setting/order-defaults').then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)));
+  // }, []);
 
   const menuFunction = ({ item, key, keyPath, domEvent }) => {
     setSelected(key);
@@ -61,9 +63,9 @@ const Seller = (props) => {
   };
 
   return (
-      loading?
-        <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
-      :
+      // loading?
+      //   <div className="h-100 d-flex justify-content-center align-items-center"><Spin tip="Ucitavanje..."/></div>
+      // :
       // TODO: Make Sider independent of content
       <>
         <Layout style={{ minHeight: '100vh' }} hasSider={isBrowser}>
@@ -89,11 +91,14 @@ const Seller = (props) => {
               <Menu.Item key="podesavanja" icon={<SettingOutlined />}>
                 Podesavanja
               </Menu.Item>
+              {props.isAdmin && <Menu.Item key="korisnici" icon={<TeamOutlined />}>
+                Korisnici
+              </Menu.Item>}
               {props.isAdmin && <Menu.Item key="statistika" icon={<PieChartOutlined />}>
                 Statistika
               </Menu.Item>}
               {/* TODO: Put name and logout on the lower end of sider */}
-              <Menu.Item onClick={()=>{new Notification('Hello World')}}>
+              <Menu.Item>
                 {props.loggedInUser.firstName}
               </Menu.Item>
               <Menu.Item key="logout" icon={<DesktopOutlined />}>

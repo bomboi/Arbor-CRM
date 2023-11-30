@@ -32,6 +32,10 @@ const customerSchema = new mongoose.Schema({
     tag: {
         type: String,
         required: false
+    },
+    clientId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Client'
     }
 })
 

@@ -1,0 +1,5 @@
+db.createCollection("clients")
+db.clients.insertOne({username: 'arbor', name:'Arbor Namestaj', active: true})
+db.settings.update({}, {$set: {clientId: ObjectId("6558859240df475c0010e2ed")}}, {upsert: false, multi: true})
+
+db.users.update({}, {$set: {deleted: false}}, {upsert: false, multi: true})

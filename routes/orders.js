@@ -4,14 +4,17 @@ const Customer = require('../models/Customer');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const OrderData = require('../models/OrderData');   
-const Setting = require('../models/Settings');
+const Settings = require('../models/Settings');
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const date_fns = require('date-fns');
+const { logId } = require('../utils');
 
 router.use(isAuthenticated);
+
+// UTIL METHODS
 
 const shuffle = (string) => {
     var parts = string.split('');
@@ -29,8 +32,10 @@ const calculateTotalPrice = (acc, value) => {
     return parseInt(acc) + parseInt(articlePrice);
 }
 
+// ROUTES
+
 router.get('/all', async (req, res) => {
-    let orders = await Order.find({})
+    let orders = await Order.find({clientId: req.session.clientId})
                             .populate('customer', '-_id -__v -orders')
                             .populate('latestVersionData', 'data.orderInfo.date')
                             .select('-__v -comments')
@@ -45,7 +50,7 @@ router.post('/post-comment', async (req, res) => {
         const session = await mongoose.startSession();
         session.startTransaction();
 
-        console.log(req.body);
+        console.log(logId(req), req.body);
         let order = await Order.findOne({_id: req.body.orderId}).exec();
         let data = {
             text: req.body.comment,
@@ -56,7 +61,7 @@ router.post('/post-comment', async (req, res) => {
         await order.save();
     
     
-        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
         let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
         let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
 
@@ -67,12 +72,12 @@ router.post('/post-comment', async (req, res) => {
             notification.orderId = order._id;
             notification.forUser = user._id;
             notification.changedBy = currentUser._id;
+            notification.clientId = req.session.clientId
             notification.type = "orderCommented";
             notification.text = "Korisnik " + currentUser.firstName + " je dodao novi komentar na porudzbinu " + order.orderId + ".";
             notifications.push(notification);
         }
 
-        
         for(notification of notifications) {
             await notification.save();
         }
@@ -84,14 +89,14 @@ router.post('/post-comment', async (req, res) => {
         res.send(data)
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500).send(error.message);
     }
 });
 
 router.post('/update-state', async (req, res) => {
     let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
-    console.log(req.body.selectedIds)
+    console.log(logId(req), req.body.selectedIds)
     for(let order of orders) {
         order.state = req.body.state;
         await order.save();
@@ -116,6 +121,7 @@ router.post('/add-version', async (req, res) => {
         orderData.changedBy = req.session.user;
         orderData.data.articles = reqData.articles;
         orderData.data.orderInfo = reqData.orderInfo;
+        orderData.clientId = req.session.clientId
         await orderData.save();
     
         // Copying new data to Order
@@ -138,6 +144,7 @@ router.post('/add-version', async (req, res) => {
         customer.phone = reqData.customer.phone;
         customer.email = reqData.customer.email;
         customer.address = reqData.customer.address;
+        customer.clientId = req.session.clientId;
         await customer.save();
     
         // Calculate new Order amount
@@ -149,7 +156,7 @@ router.post('/add-version', async (req, res) => {
 
         // Add new notification
         // Get all users that are not admin matija
-        let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+        let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
         let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
         let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
 
@@ -161,6 +168,7 @@ router.post('/add-version', async (req, res) => {
             notification.forUser = user._id;
             notification.changedBy = currentUser._id;
             notification.type = "orderUpdated"
+            notification.clientId = req.session.clientId;
             notification.text = `Korisnik ${currentUser.firstName} je izmenio porudzbinu ${order.orderId}.`;
             notifications.push(notification);
         }
@@ -184,12 +192,12 @@ router.post('/read-notification', async (req, res) => {
         const session = await mongoose.startSession();
         session.startTransaction();
 
-        console.log(req.session.user);
-        console.log(req.body.orderId);
+        console.log(logId(req), req.session.user);
+        console.log(logId(req), req.body.orderId);
 
         let notifications = await Notification.find({orderId: req.body.orderId, forUser: req.session.user, isRead: false}).exec();
         const length = notifications.length
-        console.log("read", length)
+        console.log(logId(req), "read", length)
         for(notification of notifications) {
             notification.isRead = true;
     
@@ -203,28 +211,24 @@ router.post('/read-notification', async (req, res) => {
         res.send({length: length});
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500).send(error.message);
     }
 })
 
 router.get('/get-versions', async (req, res) => {
     try{
-        // console.log(req.query.orderId);
         let orderVersions = await OrderData.find({orderId: req.query.orderId})
                                      .sort({version: 1})
                                      .populate('changedBy')
                                      .exec();
         let order = await Order.findOne({_id: req.query.orderId}).populate('comments.writtenBy customer').exec();
-        // console.log(orderVersions);
-        // console.log(order);
         let data = {orderVersions: orderVersions, comments: order.comments, order: order};
-        // console.log(data);
         res.status(200);
         res.send(data);
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500).send(error.message);
     }
 })
@@ -234,14 +238,14 @@ router.post('/delete', async (req, res) => {
         const session = await mongoose.startSession();
         session.startTransaction();
 
-        console.log(req.body.ids);
+        console.log(logId(req), req.body.ids);
 
         let orders = await Order.find({_id: {$in: req.body.ids}}).exec();
-        console.log(orders);
+        console.log(logId(req), orders);
 
         if(orders.length > 0) {
             let deletedOrders = orders.map(order => ({orderId: order.orderId, id: order._id}));
-            console.log(deletedOrders);
+            console.log(logId(req), deletedOrders);
 
             for(order of orders) {
                 let customer = await Customer.findOne({_id: order.customer}).exec();
@@ -254,7 +258,7 @@ router.post('/delete', async (req, res) => {
                 await Order.deleteOne({_id: order._id}).exec();
             }
         
-            let users = await User.find({username: {$ne: "matija"}}).select('_id firstName active').exec();
+            let users = await User.find({username: {$ne: "matija"}, clientId: req.session.clientId}).select('_id firstName active').exec();
             let currentUser = users.filter(user => user._id.toString() == req.session.user)[0];
             let otherUsers = users.filter(user => user._id.toString() != req.session.user && user.active);
             
@@ -292,7 +296,7 @@ router.post('/delete', async (req, res) => {
         res.sendStatus(200);
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500);
         res.send(error.message);
     }
@@ -300,10 +304,11 @@ router.post('/delete', async (req, res) => {
 
 router.get('/notifications', async (req, res) => {
     try {
-        console.log(req.session.user);
-        console.log(req.query.readNotifications);
+        console.log(logId(req), req.session.user);
+        console.log(logId(req), req.query.readNotifications);
         const readNotifications = req.query.readNotifications === 'true';
         let prevMonthBeginning = date_fns.subMonths(new Date(), 1);
+        // TODO: Check if it needs clientId added
         await Notification.deleteMany({dateChanged: {$lte: prevMonthBeginning}});
         let notifications = await Notification.find({forUser: req.session.user})
                                                 .sort([['dateChanged', -1]])
@@ -315,19 +320,17 @@ router.get('/notifications', async (req, res) => {
         if(readNotifications) {
             for(notification of notifications) {
                 if(!notification.isRead) {
-                    console.log('read notification')
+                    console.log(logId(req), 'read notification')
                     notification.isRead = true;
                     await notification.save();
                 }
             }
         }
-        // console.log(notifications);
-        // console.log(notificationToReturn);
         res.status(200);
         res.send(notificationToReturn);
     }
     catch(error) {
-        console.log(error)
+        console.log(logId(req), error)
         res.status(500);
         res.send(error.message);
     }
@@ -340,7 +343,7 @@ router.post('/delete-notifications', async (req, res) => {
         res.send(200);
     }
     catch(error) {
-        console.log(error)
+        console.log(logId(req), error)
         res.status(500);
         res.send(error.message);
     }
@@ -353,7 +356,7 @@ router.post('/delete-notification', async (req, res) => {
         res.send(200);
     }
     catch(error) {
-        console.log(error)
+        console.log(logId(req), error)
         res.status(500);
         res.send(error.message);
     }
@@ -373,6 +376,8 @@ router.get('/search', async (req, res) => {
             }
             filters.orderId = req.query.filters.orderId; 
         }
+
+        filters.clientId = req.session.clientId;
     
         // Sort orders according to filter
         let sort = req.query.filters.sort === 'Najnovije' ? -1 : 1;
@@ -404,7 +409,7 @@ router.get('/search', async (req, res) => {
                                 .exec();
         }
         else {
-            let latestVersionDate = {$lt: req.query.lastOrderDate};
+            let latestVersionDate = sort == -1 ? {$lt: req.query.lastOrderDate} : {$gt: req.query.lastOrderDate};
             if(hasRange) latestVersionDate.$lte = filters.latestVersionDate.$lte;
             orders = await Order.find({...filters, latestVersionDate: latestVersionDate})
                                 .sort([['latestVersionDate', sort]])
@@ -415,6 +420,7 @@ router.get('/search', async (req, res) => {
                                 .exec();
         }
         
+        // TODO: Delete if not needed
         let notifications = await Notification.find({orderId: {$in: orders.map(order => order._id)}}).exec();
         let data = orders.map(order => ({ 
             ...order.toObject(), 
@@ -426,7 +432,7 @@ router.get('/search', async (req, res) => {
         res.send(data);
     }
     catch(error) {
-        console.log(error);
+        console.log(logId(req), error);
         res.status(500);
         res.send(error.message);
     }
@@ -437,26 +443,28 @@ router.post('/add', async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    console.log((new Date(req.body.orderInfo.date)).getFullYear())
+    console.log(logId(req), (new Date(req.body.orderInfo.date)).getFullYear())
     const date = new Date(req.body.orderInfo.date);
 
-    let setting = await Setting.findOne({name: 'MonthlyNumberOfOrders', owner: 'app'}).exec();
-    setting.value = '' + ((parseInt(setting.value) + 1)%100);
-    console.log(setting)
-    await setting.save();
+    let defaults = await Settings.findOne({clientId: req.session.clientId}).exec();
+
+    defaults.currentNumberOfMonthlyOrders = '' + ((parseInt(defaults.currentNumberOfMonthlyOrders) + 1)%100);
+    console.log(logId(req), defaults)
+    await defaults.save();
     
     const reqData = req.body;
     let order = new Order();
 
-    let orderId = shuffle('' + date.getFullYear() + date.getDate() + ('0000' + (setting.value)).slice(-2)); 
+    let orderId = shuffle('' + date.getFullYear() + date.getDate() + ('0000' + (defaults.currentNumberOfMonthlyOrders)).slice(-2)); 
 
     order.state = 'poruceno';
     order.latestVersion = 0;
     order.orderId = orderId;
+    order.clientId = req.session.clientId;
     order.totalAmount = reqData.articles.reduce(calculateTotalPrice, [0]) * (100 - reqData.orderInfo.discount) / 100;
     if(reqData.orderInfo.delivery) order.totalAmount += reqData.orderInfo.deliveryPrice;
 
-    console.log('Total amount:' +  order.totalAmount);
+    console.log(logId(req), 'Total amount:' +  order.totalAmount);
 
     let customer = reqData.customer;
     if(customer._id === undefined) {
@@ -466,6 +474,7 @@ router.post('/add', async (req, res) => {
         customer.phone = reqData.customer.phone;
         customer.email = reqData.customer.email;
         customer.address = reqData.customer.address;
+        customer.clientId = req.session.clientId
         customer.orders = [];
         await customer.save();
     }
@@ -474,7 +483,7 @@ router.post('/add', async (req, res) => {
     await order.save();
 
 
-    console.log("order note", req.body.orderInfo.note)
+    console.log(logId(req), "order note", req.body.orderInfo.note)
     let orderData = new OrderData();
     orderData.orderId = order._id;
     orderData.version = 0;
@@ -482,6 +491,7 @@ router.post('/add', async (req, res) => {
     orderData.changedBy = req.session.user;
     orderData.data.articles = reqData.articles;
     orderData.data.orderInfo = reqData.orderInfo;
+    orderData.clientId = req.session.clientId;
     await orderData.save();
 
     order.latestVersionData = orderData._id;
@@ -500,23 +510,23 @@ router.post('/add', async (req, res) => {
 })
 
 router.get('/by-id/:id', async (req, res) => {
-    console.log(req.params.id);
+    console.log(logId(req), req.params.id);
     let order = await Order.findOne({_id: req.params.id})
                             .select('-comments')
                             .populate('customer')
                             .populate('latestVersionData').exec();
-    console.log(order)
+    console.log(logId(req), order)
     res.status(200)
     res.send(order);
 })
 
 router.get('/:id', async (req, res) => {
-    console.log(req.params.id);
+    console.log(logId(req), req.params.id);
     let order = await Order.findOne({orderId: req.params.id}    )
                             .select('-comments')
                             .populate('customer')
                             .populate('latestVersionData').exec();
-    console.log(order)
+    console.log(logId(req), order)
     res.status(200)
     res.send(order);
 })

@@ -1,28 +1,47 @@
 login:
 	popravi login sesije
 	centriraj login formu
+	dodaj logo
 
 dodaj/izmeni porudzbinu:
-	dodaj napomenu na pdf
+	dodaj napomenu na pdf DONE
 
 backend:
-	dodaj provere u svim rutama
+	dodaj provere u svim rutama + try/catch
 	dodaj komentare u kodu
+	dodaj url na sve logove DONE
+	promeni logove
+	kreacija notifikacija u jedan method
+
+kupci:
+	podrska za vise adresa
+
+klijenti:
+	kada se zabrani pristup, preusmeri na login
+	dodaj admina pri kreiranju klijenta
+	uvedi planove
+	obrisi sve porudzbine sa brisanjem klijenta
 
 proizvodi:
 	promeni cenu selektovanih proizvoda - admin
 	obrisi selektovane
 
 pregled porudzbine:
-	stampaj ne radi kad se promeni porudzbina
-	ne radi
+	stampaj ne radi kad se promeni porudzbina (?)
+	pregled prevremene uplate
 
 lista poruzdbina:
 	kad se obrise porudzbina, ostaju 'nove izmene'
 	problem sa nebrisanjem novih izmena
-	stampaj naloge ne radi kako treba - admin
+	stampaj naloge ne radi kako treba - admin DONE
+	najstarije sortiranje ne radi
 
 podesavanja:
 	menjanje sifre
+	uvid u naloge i kreiranje naloga za admina
+	menjanje imena - admin
+
+generalno:
+	dodaj testove
 	
 	

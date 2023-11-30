@@ -24,41 +24,44 @@ const Products = (props) => {
             })
         }
 
-        const fileSelect = document.getElementById("fileSelect");
-        const fileElem = document.getElementById("fileElem");
+        if(props.isAdmin){
 
-        fileSelect.addEventListener("click", (e) => {
-            if (fileElem) {
-                fileElem.click();
-            }
-        }, false);
-
-        fileElem.addEventListener("change", handleFiles, false);
-        
-        function handleFiles() {
-            if(this.files.length == 0) return;
-            const file = this.files[0]; /* now you can work with the file list */
-            var formData = new FormData();
-            formData.append('prices', file)
-
-            setIsUploadingPrices(true);
-            props.dispatch(productSlice.actions.initProducts([]))
-            Axios.post('/api/product/upload-prices', formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
+            const fileSelect = document.getElementById("fileSelect");
+            const fileElem = document.getElementById("fileElem");
+    
+            fileSelect.addEventListener("click", (e) => {
+                if (fileElem) {
+                    fileElem.click();
                 }
-            })
-            .then(res => {
-                Axios.get('/api/product/all').then(result => {
-                    props.dispatch(productSlice.actions.initProducts(result.data))
+            }, false);
+    
+            fileElem.addEventListener("change", handleFiles, false);
+            
+            function handleFiles() {
+                if(this.files.length == 0) return;
+                const file = this.files[0]; /* now you can work with the file list */
+                var formData = new FormData();
+                formData.append('prices', file)
+    
+                setIsUploadingPrices(true);
+                props.dispatch(productSlice.actions.initProducts([]))
+                Axios.post('/api/product/upload-prices', formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data'
+                    }
                 })
-                this.files = []
-                setIsUploadingPrices(false);
-            })
-            .catch(e => {
-                console.log(e)
-                setIsUploadingPrices(false);
-            })
+                .then(res => {
+                    Axios.get('/api/product/all').then(result => {
+                        props.dispatch(productSlice.actions.initProducts(result.data))
+                    })
+                    this.files = []
+                    setIsUploadingPrices(false);
+                })
+                .catch(e => {
+                    console.log(e)
+                    setIsUploadingPrices(false);
+                })
+            }
         }
 
     }, [])
@@ -73,8 +76,6 @@ const Products = (props) => {
     }
 
     let extraPageHeaderElements = [<ProductsPDF/>]
-
-    console.log('isAdmin: ' + props.isAdmin)
 
     if(props.isAdmin) {
         extraPageHeaderElements.push(<Button id='fileSelect' key='1'>{isUploadingPrices && <Spin />} &nbsp;Importuj cenovnik</Button>)

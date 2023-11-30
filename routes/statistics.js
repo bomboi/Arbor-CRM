@@ -2,9 +2,11 @@ const router = require('express').Router();
 const isAuthenticated = require('../routes/auth').isAuthenticated;
 const Order = require('../models/Order');
 const date_fns = require('date-fns');
+const { logId } = require('../utils');
 
 router.use(isAuthenticated);
 
+// TODO: Figure out where to put clientId
 router.get('/get', async (req, res) => {
     let today = new Date();
     let beginning = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -74,7 +76,7 @@ router.get('/get', async (req, res) => {
         }
     ]).exec();
     
-    console.log(orderCountLastMonth)
+    console.log(logId(req), orderCountLastMonth)
     res.status(200).send({
         orderCount: orderCount.length == 0 ? 0 : orderCount[0].total,
         orderPrice: orderCount.length == 0 ? 0 : orderCount[0].price,
