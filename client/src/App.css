@@ -105,3 +105,7 @@
 .adm-tabs-content {
   height: 100%;
 }
+
+.flex-even {
+  flex: 1;
+}
