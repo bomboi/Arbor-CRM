@@ -95,13 +95,19 @@ router.post('/post-comment', async (req, res) => {
 });
 
 router.post('/update-state', async (req, res) => {
-    let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
-    console.log(logId(req), req.body.selectedIds)
-    for(let order of orders) {
-        order.state = req.body.state;
-        await order.save();
+    try {
+        let orders = await Order.find({_id: {$in: req.body.selectedIds}}).exec();
+        console.log(logId(req), req.body.selectedIds)
+        for(let order of orders) {
+            order.state = req.body.state;
+            await order.save();
+        }
+        res.sendStatus(200);
     }
-    res.sendStatus(200);
+    catch(error) {
+        console.log(logId(req), error);
+        res.sendStatus(500);
+    }
 })
 
 router.post('/add-version', async (req, res) => {

@@ -1,15 +1,62 @@
 import React, {useState} from 'react'
 import { Modal, Row, Col, Button, Tag, Select, Spin, Skeleton } from 'antd';
-import { Popup, Tabs, Card, ProgressBar, List, Divider, NoticeBar } from 'antd-mobile'
+import { Popup, Tabs, Button as MobileButton, Card, ProgressBar, List, Divider, ActionSheet, Picker } from 'antd-mobile'
 import Title from 'antd/lib/typography/Title';
 import OrderPreviewComments from './OrderPreviewComments';
 import { Collapse } from 'antd';
-import { getTagColor } from '../../utils';
+import { getPrimaryTagHEXColor, getSecondaryTagHEXColor } from '../../utils';
 import OrderFactoryPDF from './OrderFactoryPDF';
 import { OrderInvoicePDF, OrderInvoicePreviewPDF } from './OrderDetails/OrderInvoicePDF';
 import moment from 'moment';
 
+const SelectVersion = (props) => {
+    const genOptions = (number) => {
+        let i = number;
+        let options = []
+        while(i > 0) {
+            options.push(<Select.Option className="text-secondary" value={i}>Verzija {i}</Select.Option>)
+            i--;
+        }
+        return options
+    }
+
+    return (
+        <Select 
+            className="text-secondary" 
+            bordered={false} 
+            defaultValue={props.number}
+            onSelect={props.onSelect}>
+            {genOptions(props.number)}
+        </Select>
+    )
+}
+
 const OrderPreviewMobile = (props) => {
+
+    const [showActionSheet, toggleActionSheet] = useState(false);
+    const [visible, setVisible] = useState(false)
+
+    const actions = [
+        {
+            text: 'Obrisi porudzbinu',
+            onClick: props.deleteOrder
+        },
+        {
+            text: 'Izmeni porudzbinu',
+            onClick: props.editOrder
+        }
+    ]
+
+    const orderStates = [
+        [
+          { label: 'Poruceno', value: 'poruceno' },
+          { label: 'U izradi', value: 'u izradi' },
+          { label: 'Za isporuku', value: 'za isporuku' },
+          { label: 'Isporuceno', value: 'isporuceno' },
+          { label: 'Reklamacija', value: 'reklamacija' },
+          { label: 'Arhivirano', value: 'arhivirano' },
+        ]
+      ]
 
     return (
         props.order === undefined ? <></> :
@@ -24,6 +71,7 @@ const OrderPreviewMobile = (props) => {
                         <Tabs.Tab title='Pregled' key='fruits' >
                             <div style={{height: '100%', overflowY: 'scroll' , margin:-12}} >
                             <Spin spinning={props.loading}>
+                            
                             {/* <Collapse ghost>
                                 <Collapse.Panel header={'Opcije'}>
                                     <div className="pl-4 pr-4 pt-3 pb-3 d-flex flex-column">
@@ -39,6 +87,12 @@ const OrderPreviewMobile = (props) => {
                 <Row>
                     <Col className="pb-4 pt-2" span={24}>
                         {props.loading? <Skeleton active paragraph={{rows:0}}/> :<>
+                            <div className="d-flex justify-content-between m-3">
+                                <div className="d-flex align-items-end">
+                                    <Title level={4} className="mb-0">#{props.order.orderId}</Title>
+                                </div>
+                                
+                            </div>
                             <div className={"d-flex justify-content-between m-3"}>
                                 <div className="text-secondary mt-0">
                                     <div>
@@ -48,37 +102,60 @@ const OrderPreviewMobile = (props) => {
                                         trenutna verzija: {props.versions[props.version].changedBy.firstName} {props.versions[props.version].changedBy.lastName} ({moment(props.versions[props.version].dateCreated).format('DD. MM. YYYY.').toString()})
                                     </div>
                                 </div>
-                                <div>
+                            </div>
+                            <div className='d-flex flex-row justify-content-between mr-2 ml-2'>
+                                <div className="align-self-center flex-even">
+                                        {!props.isAdmin ? 
+                                        <Tag color={'blue'} style={{fontSize:14}} className="mr-0">
+                                            {props.order.state.toUpperCase()}
+                                        </Tag>
+                                        :
+                                        <>
+                                            <MobileButton
+                                                block 
+                                                size='small'
+                                                style={{
+                                                    '--background-color': getSecondaryTagHEXColor(props.firstState),
+                                                    '--text-color': getPrimaryTagHEXColor(props.firstState),
+                                                    '--border-color': getPrimaryTagHEXColor(props.firstState)}}
+                                                fill='solid'
+                                                onClick={() => {setVisible(true)}}>
+                                                {props.firstState.toUpperCase()}
+                                            </MobileButton>
+                                            <Picker
+                                            columns={orderStates}
+                                            visible={visible}
+                                            onClose={() => {setVisible(false)}}
+                                            confirmText='Sacuvaj'
+                                            cancelText='Zatvori'
+                                            value={[props.firstState]}
+                                            onConfirm={(value) => props.onSelectOrderState(value[0])}
+                                            />
+                                        </>
+                                        }
+                                </div>
+                                <Divider direction='vertical' style={{height:'inherit'}}/>
+                                <div className='flex-even'>
+                                        {/* <MobileButton
+                                                block 
+                                                size='small'>
+                                                    Verzija 1
+                                                </MobileButton> */}
                                     <props.SelectVersion 
                                         onSelect={props.selectVersion}
                                         number={props.versions.length}/>
                                 </div>
-                            </div>
-                            <div className="d-flex justify-content-between m-3">
-                                <div className="d-flex align-items-end">
-                                    <Title level={4} className="mb-0">#{props.order.orderId}</Title>
-                                </div>
-                                <div className="align-self-center">
-                                    {!props.isAdmin ? 
-                                    <Tag color={'blue'} style={{fontSize:14}} className="mr-0">
-                                        {props.order.state.toUpperCase()}
-                                    </Tag>
-                                    :
-                                    <Select 
-                                        bordered={false} 
-                                        value={props.firstState.toUpperCase()} 
-                                        className={"ant-tag ant-tag-" + getTagColor(props.firstState)}
-                                        onSelect={props.onSelectOrderState}>
-                                        <Select.Option value="poruceno">Poruceno</Select.Option>
-                                        <Select.Option value="u izradi">U izradi</Select.Option>
-                                        <Select.Option value="za isporuku">Za isporuku</Select.Option>
-                                        <Select.Option value="isporuceno">Isporuceno</Select.Option>
-                                        <Select.Option value="reklamacija">Reklamacija</Select.Option>
-                                        <Select.Option value="arhivirano">Arhivirano</Select.Option>
-                                    </Select>
-                                    }
+                                <Divider direction='vertical' style={{height:'inherit'}}/>
+                                <div className='flex-even'>
+                                    <MobileButton block size='small' onClick={()=>toggleActionSheet(true)}>Opcije</MobileButton>
+                                    <ActionSheet
+                                        visible={showActionSheet}
+                                        actions={actions}
+                                        onClose={() => toggleActionSheet(false)}
+                                    />
                                 </div>
                             </div>
+
                         </>}
                         {!props.loading && <>
                             <List header='Kupac' mode='card'>
@@ -116,7 +193,7 @@ const OrderPreviewMobile = (props) => {
                             <List mode='card'>
                                 <List.Item>
                                     <div><b>#{index + 1} {item.name}</b></div>
-                                    <div>{item.quantity} x {item.price} RSD  {item.discount?("(-" + item.discount + "%)"):""} = {item.quantity * item.price * (item.discount?(100-item.discount)/100:0)} RSD</div>
+                                    <div>{item.quantity} x {item.price} RSD  {item.discount?("(-" + item.discount + "%)"):""} = {item.quantity * item.price * (item.discount?(100-item.discount)/100:1)} RSD</div>
                                     </List.Item>
                                     <List.Item>
                                     <div style={{whiteSpace:'pre'}}>{item.description}</div>
