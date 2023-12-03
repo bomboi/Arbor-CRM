@@ -33,15 +33,16 @@ const AppRouter = (props) => {
 
 
             props.dispatch(userSlice.actions.initUser(result.data));
+            Axios.get('/api/setting/order-defaults')
+              .then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)))
+              .catch(error => console.log(error));
           })
           .catch(error => {
             console.log(error)
             // if(error.response.status == 403 || error.response.status == 401) {
             // }
           })
-        Axios.get('/api/setting/order-defaults')
-            .then(res => props.dispatch(orderDefaultsSlice.actions.init(res.data)))
-            .catch(error => console.log(error));
+        
       }, []);
 
     return (
