@@ -33,7 +33,7 @@ class ComponentToPrint extends React.Component {
                             <img className="order-logo" alt="arbor_logo" src={window.location.origin + '/logo.png'}/>
                             <div className="d-flex flex-column justify-content-start">
                                 <div className="invoice-title text-secondary" style={{textAlign: 'right'}}>PREDRAČUN</div>
-                                <div className="text-secondary" style={{whiteSpace:'pre', textAlign: 'right'}}>{this.props.defaults.DefaultCompanyInfo}</div>
+                                <div className="text-secondary" style={{whiteSpace:'pre', textAlign: 'right'}}>{this.props.defaults.defaultCompanyInfo}</div>
                             </div>
                         </div>
                     </div>
@@ -141,7 +141,7 @@ class ComponentToPrint extends React.Component {
                 <div className="bg-light">
                     <Row className="footer-margin" justify={'center'}>
                         <p className="text-secondary mt-2 mb-0" level={2}>Rok isporuke je od {this.props.orderInfo.deadlineFrom} do {this.props.orderInfo.deadlineTo} dana.</p>
-                        <p className="text-secondary mt-0 mb-3" level={2}>{this.props.defaults.DefaultOrderNote}</p>
+                        <p className="text-secondary mt-0 mb-3" level={2}>{this.props.defaults.defaultOrderNote}</p>
                     </Row>
                 </div>
             </div>
