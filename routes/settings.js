@@ -23,8 +23,8 @@ function compareAsync(param1, param2) {
 router.get('/order-defaults', async (req, res) => {
     try {
         const defaults = await Settings.find({clientId: req.session.clientId}).exec();
-        console.log(logId(req), data)
-        res.status(200).send(data);
+        console.log(logId(req), defaults)
+        res.status(200).send(defaults);
     }
     catch(error) {
         console.log(logId(req), error)
