@@ -35,10 +35,10 @@ const OrderPreviewBrowser = (props) => {
                     {props.isAdmin && <Button onClick={props.deleteOrder} type={'primary'} className="mr-2" danger>Obrisi</Button>}
                     <OrderInvoicePreviewPDF check={() => true} orderId={props.order?props.order.orderId:0}/>
                     {props.isAdmin && <OrderFactoryPDF version={props.version}/>}
-                    <Button onClick={props.complaint} className="mr-2">Prijavi reklamaciju</Button>
-                    <Button onClick={props.editOrder}>Izmeni</Button>
+                    <Button type='text' onClick={props.complaint} className="mr-2">Prijavi reklamaciju</Button>
+                    <Button type='text' onClick={props.editOrder}>Izmeni</Button>
                 </div>
-                <Button onClick={props.closePreview}>
+                <Button type='text' onClick={props.closePreview}>
                     Zatvori</Button>
             </Row>
             <Divider className="m-0"/>
@@ -71,7 +71,7 @@ const OrderPreviewBrowser = (props) => {
                                 <Select 
                                     bordered={false} 
                                     value={props.firstState.toUpperCase()} 
-                                    className={"ant-tag ant-tag-" + getTagColor(props.firstState)}
+                                    className={"tag-borderless ant-tag ant-tag-" + getTagColor(props.firstState)}
                                     onSelect={props.onSelectOrderState}>
                                     <Select.Option value="poruceno">Poruceno</Select.Option>
                                     <Select.Option value="u izradi">U izradi</Select.Option>
@@ -116,7 +116,7 @@ const OrderPreviewBrowser = (props) => {
                 </Card>
                 </>}
             </props.SkeletonRow>
-            <Card bodyStyle={{overflowY:'scroll', height:320}}>
+            <Card bordered={false} bodyStyle={{overflowY:'scroll', height:320}}>
                 <List
                     header={<Row className="w-100">
                             <Col span={4}>

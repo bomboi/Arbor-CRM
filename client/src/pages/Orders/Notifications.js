@@ -178,6 +178,7 @@ const Notifications = (props) => {
             >
             <Button 
                 disabled={notifications.length == 0} 
+                type='text'
                 className='mr-2' 
                 key='1' 
                 onClick={() => getNotifications(false)}>
