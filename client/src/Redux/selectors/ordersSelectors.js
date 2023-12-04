@@ -36,3 +36,7 @@ export const getOrderPreviewVersions = state => state.ordersReducers.orderManage
 export const isOrderPreviewLoading = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.loading;
 export const getOrderPreviewId = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.data._id;
 export const getOrderPreviewIndex = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.index;
+
+export const getPreviewAvans = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.avans;
+export const getPreviewGlobalDiscount = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.discount;
+export const getPreviewDeliveryPrice = state => state.ordersReducers.orderManagementReducer.orderPreviewSlice.deliveryPrice;

@@ -4,7 +4,7 @@ import { Button, Row, Col, Divider, message } from 'antd';
 
 import ReactToPrint, { PrintContextConsumer } from 'react-to-print';
 import { getAddedArticles } from '@selectors/ordersSelectors';
-import { getNewOrderCustomer, usingDelivery, getOrderInfo, getDeliveryPrice, getAvans, getGlobalDiscount, getOrderPreviewData, getOrderPreviewVersions } from '../../../Redux/selectors/ordersSelectors';
+import { getNewOrderCustomer, usingDelivery, getOrderInfo, getDeliveryPrice, getAvans, getGlobalDiscount, getOrderPreviewData, getOrderPreviewVersions, getPreviewAvans, getPreviewGlobalDiscount, getPreviewDeliveryPrice} from '../../../Redux/selectors/ordersSelectors';
 import { getOrderDefaults } from '../../../Redux/selectors/appSelectors';
 import moment from 'moment';
 import Axios from 'axios';
@@ -154,15 +154,17 @@ const mapStateToPropsPreview = (state, props) => {
     let listOfVersions = getOrderPreviewVersions(state);
     if(getOrderPreviewData(state)){
         console.log(listOfVersions[listOfVersions.length-1])
+        const orderInfo = listOfVersions[listOfVersions.length-1].data.orderInfo
         return {
             orderId: getOrderPreviewData(state).orderId,
             articles: listOfVersions[listOfVersions.length-1].data.articles,
             customer: getOrderPreviewData(state).customer,
             usingDelivery: usingDelivery(state),
             defaults: getOrderDefaults(state),
-            avans: getAvans(state),
-            globalDiscount: getGlobalDiscount(state),
-            orderInfo: listOfVersions[listOfVersions.length-1].data.orderInfo,
+            avans: orderInfo.avans,
+            globalDiscount: orderInfo.globalDiscount,
+            deliveryPrice: orderInfo.deliveryPrice,
+            orderInfo: orderInfo,
         }
     }
     else return {}
