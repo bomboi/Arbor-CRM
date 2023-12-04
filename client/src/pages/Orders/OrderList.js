@@ -101,83 +101,92 @@ const OrderList = (props) => {
       className="mb-3"
       extra={extraList}
     ></PageHeader>
-        <Card>
-            <Row>
-                <Col flex={'auto'} className='mb-3'>
-                        <Search
-                            className={isMobile?'mb-2 w-100':'mr-3'}
-                            value={filters.orderId}
-                            placeholder="Unesite broj porudžbine"
-                            onChange={e => update(e.target.value, 'orderId')}
-                            style={{ width: 300 }} />
-                        <Search
-                            className={isMobile?'mb-2 w-100':'mr-3'}
-                            value={filters.customerName}
-                            placeholder="Unesite ime kupca"
-                            onChange={e => update(e.target.value, 'customerName')}
-                            style={{ width: 300 }} />
-                        <RangePicker
-                            className={isMobile?'mb-2 w-100':'mr-3'}
-                            value={filters.range}
-                            onChange={value => updateRange(value)}
-                            placeholder={['Pocetni datum', 'Krajnji datum']}
-                            format={'DD/MM/YYYY'}/>
-                        <Select 
-                            value={filters.status} 
-                            onSelect={value => update(value, 'status')} 
-                            className={isMobile?'mb-2 w-100':'mr-3'} 
-                            style={{ width: 120 }}>
-                            <Select.Option value="sve">Sve</Select.Option>
-                            <Select.Option value="poruceno">Poručeno</Select.Option>
-                            <Select.Option value="u izradi">U izradi</Select.Option>
-                            <Select.Option value="za isporuku">Za isporuku</Select.Option>
-                            <Select.Option value="isporuceno">Isporučeno</Select.Option>
-                            <Select.Option value="reklamacija">Reklamacija</Select.Option>
-                            <Select.Option value="arhivirano">Arhivirano</Select.Option>
-                        </Select>
-                        <Select 
-                            value={filters.sort} 
-                            onSelect={value => update(value, 'sort')} 
-                            className={isMobile?'mb-2 w-100':'mr-3'} 
-                            style={{ width: 120 }}>
-                            <Select.Option value="Najnovije">Najnovije</Select.Option>
-                            <Select.Option value="Najstarije">Najstarije</Select.Option>
-                        </Select>
-                </Col>
-            </Row>
-            <Divider className="mt-1 mb-3"/>
-            <div className="mb-2 d-flex justify-content-between">
-                <div>
-                    <Button onClick={unselect} disabled={Object.keys(props.selectedIds).length === 0} className={isMobile?'mb-2 w-100':'mr-2'} >Odselektuj sve</Button>
-                    <Button className={isMobile?'mb-2 w-100':'mr-2'}  onClick={()=>{
-                        if(Object.keys(props.selectedIds).length === 0) {
-                            message.error('Niste selektovali nijednu porudzbinu!');
-                            return;
-                        }
-                        setMultipleOrderStateModalVisibility(true)
-                    }}>Promeni status selektovanih</Button>
-                    <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2'} />
-                    {props.isAdmin && <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>}
-                    {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
-                        Selektovane porudžbine: {Object.keys(props.selectedIds).length}
-                    </div>}
+        <Card style={{height: 'calc(100vh - 110px'}} bodyStyle={{height: '100%'}}>
+            <div className='h-100 d-flex flex-column'>
+                <Row>
+                    <Col flex={'auto'} className='mb-3'>
+                            <Search
+                                bordered = {false}
+                                className={'input-modern ' + (isMobile?'mb-2 w-100':'mr-3')}
+                                value={filters.orderId}
+                                placeholder="Unesite broj porudžbine"
+                                onChange={e => update(e.target.value, 'orderId')}
+                                style={{ width: 300 }} />
+                            <Search
+                                bordered = {false}
+                                className={'input-modern ' + (isMobile?'mb-2 w-100':'mr-3')}
+                                value={filters.customerName}
+                                placeholder="Unesite ime kupca"
+                                onChange={e => update(e.target.value, 'customerName')}
+                                style={{ width: 300 }} />
+                            <RangePicker
+                                bordered = {false}
+                                className={'input-modern' + (isMobile?'mb-2 w-100':'mr-3')}
+                                value={filters.range}
+                                onChange={value => updateRange(value)}
+                                placeholder={['Pocetni datum', 'Krajnji datum']}
+                                format={'DD/MM/YYYY'}/>
+                            <Select 
+                                bordered = {false}
+                                value={filters.status} 
+                                onSelect={value => update(value, 'status')} 
+                                className={'input-modern text ' + (isMobile?'mb-2 w-100':'mr-3')}
+                                style={{ width: 120 }}>
+                                <Select.Option value="sve">Sve</Select.Option>
+                                <Select.Option value="poruceno">Poručeno</Select.Option>
+                                <Select.Option value="u izradi">U izradi</Select.Option>
+                                <Select.Option value="za isporuku">Za isporuku</Select.Option>
+                                <Select.Option value="isporuceno">Isporučeno</Select.Option>
+                                <Select.Option value="reklamacija">Reklamacija</Select.Option>
+                                <Select.Option value="arhivirano">Arhivirano</Select.Option>
+                            </Select>
+                            <Select 
+                                bordered = {false}
+                                value={filters.sort} 
+                                onSelect={value => update(value, 'sort')} 
+                                className={'input-modern text ' + (isMobile?'mb-2 w-100':'mr-3')}
+                                style={{ width: 120 }}>
+                                <Select.Option value="Najnovije">Najnovije</Select.Option>
+                                <Select.Option value="Najstarije">Najstarije</Select.Option>
+                            </Select>
+                    </Col>
+                </Row>
+                <Divider className="mt-1 mb-3"/>
+                <div className="mb-2 d-flex justify-content-between">
+                    <div>
+                        <Button type='text' onClick={unselect} disabled={Object.keys(props.selectedIds).length === 0} className={isMobile?'mb-2 w-100':'mr-2'} >Odselektuj sve</Button>
+                        <Button type='text' className={isMobile?'mb-2 w-100':'mr-2'}  onClick={()=>{
+                            if(Object.keys(props.selectedIds).length === 0) {
+                                message.error('Niste selektovali nijednu porudzbinu!');
+                                return;
+                            }
+                            setMultipleOrderStateModalVisibility(true)
+                        }}>Promeni status selektovanih</Button>
+                        <OrderFactoryPDFMultiple ids={Object.keys(props.selectedIds)} className={isMobile?'mb-2 w-100':'mr-2'} />
+                        {props.isAdmin && <Button onClick={deleteSelected} icon={<DeleteOutlined/>} className={isMobile?'mb-2 w-100':'mr-2'}  type='primary' danger>Obriši selektovane</Button>}
+                        {isMobile && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
+                            Selektovane porudžbine: {Object.keys(props.selectedIds).length}
+                        </div>}
+                    </div>
+                    <div>
+                        {isBrowser && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
+                            Selektovane porudžbine: {Object.keys(props.selectedIds).length}
+                        </div>}
+                    </div>
                 </div>
-                <div>
-                    {isBrowser && Object.keys(props.selectedIds).length > 0 && <div className={'d-flex align-self-center font-weight-bold text-primary'}>
-                        Selektovane porudžbine: {Object.keys(props.selectedIds).length}
-                    </div>}
+                <div className='d-flex flex-column justify-content-between h-100' style={{minHeight: 0}}>
+                    <Row className="mt-2 flex-shrink-1" style={{overflow: 'auto'}}>
+                        <Col span={24}>
+                            <List
+                                dataSource={props.orders} 
+                                renderItem={(item, index) => <OrderListItem item={item} index={index}/>}/>
+                        </Col>
+                    </Row>
+                    <Row justify="center" className="mt-2">
+                        <Button type='text' className="align-self-center" onClick={()=>load()}>Učitaj jos</Button>
+                    </Row>
                 </div>
             </div>
-            <Row className="mt-2" style={{height:'calc(75vh - 40px)', overflow: 'scroll'}}>
-                <Col span={24}>
-                    <List
-                        dataSource={props.orders} 
-                        renderItem={(item, index) => <OrderListItem item={item} index={index}/>}/>
-                </Col>
-            </Row>
-            <Row justify="center" className="mt-2">
-                <Button className="align-self-center" onClick={()=>load()}>Učitaj jos</Button>
-            </Row>
         </Card>
         <MultipleOrderStateModal visible={multipleOrderStateModalVisible} onCancel={()=>setMultipleOrderStateModalVisibility(false)}/>
         <OrderPreview/>

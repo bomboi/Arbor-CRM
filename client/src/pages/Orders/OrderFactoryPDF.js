@@ -273,7 +273,7 @@ export const OrderFactoryPDFMultiple = (props) => {
             onAfterPrint={()=>setShow(false)}>
             <PrintContextConsumer>
                 {({ handlePrint }) => (
-                    <Button className={props.className} onClick={() => {
+                    <Button type='text' className={props.className} onClick={() => {
                         console.log('PDF')
                         setShow(true);
                         setTimeout(()=> handlePrint(), 5)
@@ -302,7 +302,7 @@ const OrderFactoryPDF = (props) => {
                 onAfterPrint={()=>setShow(false)}>
                 <PrintContextConsumer>
                     {({ handlePrint }) => (
-                        <Button className={props.className} onClick={() => {
+                        <Button type='text' className={props.className} onClick={() => {
                             console.log('PDF')
                             setShow(true);
                             setTimeout(()=> handlePrint(), 5)

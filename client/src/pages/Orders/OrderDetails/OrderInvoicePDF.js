@@ -181,7 +181,7 @@ export const OrderInvoicePreviewPDF = connect(mapStateToPropsPreview)((props) =>
                 onAfterPrint={()=>setShow(false)}>
                 <PrintContextConsumer>
                     {({ handlePrint }) => (
-                        <Button onClick={() => {
+                        <Button type='text' onClick={() => {
                             if(props.check()) {
                                 setShow(true);
                                 setTimeout(()=> handlePrint(), 5)

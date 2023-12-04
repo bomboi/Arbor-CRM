@@ -42,7 +42,13 @@ const OrderListItem = (props) => {
 
     let [hasNotification, setHasNotification] = useState(props.item.hasNotification);
 
-    const open = () => {
+    const select = (e) => {
+        e.stopPropagation();
+        props.dispatch(orderListSlice.actions.toggleSelectOrder(props.item._id));
+    }
+
+    const open = (e) => {
+        e.stopPropagation();
         props.dispatch(orderPreviewSlice.actions.setLoading(true))
         Axios.get('/api/order/get-versions', {
             params: {
@@ -65,33 +71,32 @@ const OrderListItem = (props) => {
     }
 
     return (
-        <Card className={"mt-1 mb-1 " + (props.checked?"bg-light":"")} size={'small'}>
+        <Card 
+            bordered={false}
+            className={"order-list-item-hovered mt-1 mb-1 " + (props.checked?"order-list-item-selected":"")} 
+            size={'small'}
+            onClick={select}>
             <BrowserView>
                 <Row align={'middle'}>
                     <Col span = {2}>
                         <b>{props.item.orderId}</b>
                     </Col>
-                    <Col span = {4}>
+                    <Col span = {8}>
                         {props.item.customer.name}
                     </Col>
-                    <Col span={3}>
+                    <Col span={5}>
                         {props.item.totalAmount} <small>RSD</small>
                     </Col>
                     <Col span = {3}>
                         {moment(props.item.latestVersionData.data.orderInfo.date).format('DD. MM. YYYY.').toString()}
                     </Col>
-                    <Col span={2}>
-                        <Tag color={getTagColor(props.item.state)}>{props.item.state.toUpperCase()}</Tag>
-                    </Col>
-                    <Col span={2} offset={5}>
-                        {hasNotification && <Tag color={'gold'}>NOVE IZMENE</Tag>}
+                    <Col span={4}>
+                        <Tag className='tag-borderless' color={getTagColor(props.item.state)}>{props.item.state.toUpperCase()}</Tag>
                     </Col>
                     <Col span = {1}>
-                        <Checkbox checked={props.checked} onClick={(e)=>props.dispatch(orderListSlice.actions.toggleSelectOrder(props.item._id))}/>
+                        <Button type='text' onClick={open}>Otvori</Button>
                     </Col>
-                    <Col span = {2}>
-                        <Button onClick={open}>Otvori</Button>
-                    </Col>
+                    
                 </Row>
             </BrowserView>
             <MobileView>

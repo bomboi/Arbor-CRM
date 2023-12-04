@@ -109,3 +109,36 @@
 .flex-even {
   flex: 1;
 }
+
+.order-list-item-hovered:hover {
+  background-color: #f6f6f6;
+}
+
+.order-list-item-selected {
+  background-color: #e4f3fc !important;
+  color: #007bff!important;
+  border-color: #007bff !important;
+}
+
+.tag-borderless{
+  border-width: 0px !important;
+  padding: 5px !important
+}
+
+.ant-btn-text {
+  background-color: #f6f6f6 !important;
+  color: #808080 !important;
+}
+
+.ant-btn-text:hover {
+  background-color: #eaeaea !important;
+  color: #007bff !important;
+}
+
+.input-modern {
+  background-color: #f6f6f6 !important;
+}
+
+.input-modern.text {
+  color: #808080 !important;
+}
