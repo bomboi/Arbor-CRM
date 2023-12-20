@@ -21,12 +21,15 @@ const OrderInfo = (props) => {
         if(props.orderInfo.date === undefined) {
             props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'date', value: moment()}));
         }
-        if(!props.edit){
-            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineFrom', value: props.orderDefaults.DefaultDeadlineFrom}));
-            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineTo', value: props.orderDefaults.DefaultDeadlineTo}));
-        }
         console.log('Mounted!');
     }, []);
+
+    useEffect(() => {
+        if(!props.edit){
+            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineFrom', value: props.orderDefaults.defaultDeadlineStart}));
+            props.dispatch(newOrderInfoSlice.actions.updateOrderInfo({key: 'deadlineTo', value: props.orderDefaults.defaultDeadlineEnd}));
+        }
+    }, [props.orderDefaults]);
 
     const update = (value, key) => {
         console.log('key')

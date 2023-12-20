@@ -124,10 +124,7 @@ const OrderListItem = (props) => {
                         {hasNotification && <Tag color={'gold'}>NOVE IZMENE</Tag>}
                     </Col>
                 </Row>
-                <Row justify={'space-between'}>
-                    <Col span = {1}>
-                        <Checkbox checked={props.checked} onClick={(e)=>props.dispatch(orderListSlice.actions.toggleSelectOrder(props.item._id))}/>
-                    </Col>
+                <Row justify={'end'}>
                     <Col span = {20} align={'right'}>
                         <Button onClick={open}>Otvori</Button>
                     </Col>
