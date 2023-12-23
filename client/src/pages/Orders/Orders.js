@@ -7,6 +7,7 @@ import {
     Switch,
     Route
   } from "react-router-dom";
+import OrderPreview from './OrderPreview';
 
 const Orders = () => {
 
@@ -37,6 +38,9 @@ const Orders = () => {
             </Route>
             <Route exact path="/porudzbine/izmeni/:orderId">
                 <OrderDetails edit/>
+            </Route>
+            <Route exact path="/porudzbine/pregled/:orderId">
+                <OrderPreview/>
             </Route>
         </Switch>
     )
