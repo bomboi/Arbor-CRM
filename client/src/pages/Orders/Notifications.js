@@ -6,6 +6,8 @@ import { orderPreviewSlice } from '@reducers/ordersReducers';
 import { Button, List, message, Badge, Popover } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { isMobile } from 'react-device-detect';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { isBrowser } from 'react-device-detect';
 
 
 const Notification = (props) => {
@@ -37,6 +39,7 @@ const Notifications = (props) => {
 
     let [notifications, setNotifications] = useState([]);
     let [notificationBadge, setNotificationBadge] = useState(0);
+    const history = useHistory();
 
     let [notificationsPopover, setNotificationsPopover] = useState(false);
 
@@ -96,7 +99,12 @@ const Notifications = (props) => {
         }
         const id = notification.orderId._id;
         props.dispatch(orderPreviewSlice.actions.setLoading(true))
-        props.dispatch(orderPreviewSlice.actions.toggleShow());
+        if(isBrowser) {
+            props.dispatch(orderPreviewSlice.actions.toggleShow());
+        }
+        else {
+            history.push('/porudzbine/pregled/'+notification.orderId.orderId)
+        }
         setNotificationsPopover(false);
         Axios.get('/api/order/get-versions', {
             params: {
