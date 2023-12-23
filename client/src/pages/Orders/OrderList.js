@@ -232,7 +232,7 @@ const OrderList = (props) => {
             </div>
         </Card>
         <MultipleOrderStateModal visible={multipleOrderStateModalVisible} onCancel={()=>setMultipleOrderStateModalVisibility(false)}/>
-        <OrderPreview/>
+        {isBrowser && <OrderPreview/>}
     </div>
     )
 }

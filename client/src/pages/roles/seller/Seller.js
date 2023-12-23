@@ -17,7 +17,7 @@ import Axios from 'axios';
 import { isAdmin, loggedInUser } from '@selectors/appSelectors';
 import { userSlice } from '@reducers/appReducers';
 import { logout } from '../../../Redux/actions';
-import { isBrowser, MobileView, BrowserView } from 'react-device-detect';
+import { isBrowser, isMobile, MobileView, BrowserView } from 'react-device-detect';
 import { orderDefaultsSlice } from '../../../Redux/reducers/appReducers';
 
 const { Content, Sider } = Layout;
@@ -171,7 +171,7 @@ const Seller = (props) => {
                   </Menu>
             </Drawer>
           </MobileView>
-          <Content style={{ margin: '10px 16px 0px 16px' }} className='h-100'>
+          <Content style={{ margin: isMobile?'':'10px 16px 0px 16px' }} className='h-100'>
                 <MenuSwitch/>
           </Content>
         </Layout>

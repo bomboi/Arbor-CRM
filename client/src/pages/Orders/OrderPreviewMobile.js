@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { Modal, Row, Col, Button, Tag, Select, Spin, Skeleton } from 'antd';
-import { Popup, Tabs, Button as MobileButton, Card, ProgressBar, List, Divider, ActionSheet, Picker } from 'antd-mobile'
+import { Popup, Tabs, Button as MobileButton, Card, ProgressBar, List, Divider, ActionSheet, Picker, NavBar } from 'antd-mobile'
 import Title from 'antd/lib/typography/Title';
 import OrderPreviewComments from './OrderPreviewComments';
 import { Collapse } from 'antd';
@@ -8,6 +8,7 @@ import { getPrimaryTagHEXColor, getSecondaryTagHEXColor } from '../../utils';
 import OrderFactoryPDF from './OrderFactoryPDF';
 import { OrderInvoicePDF, OrderInvoicePreviewPDF } from './OrderDetails/OrderInvoicePDF';
 import moment from 'moment';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const SelectVersion = (props) => {
     const genOptions = (number) => {
@@ -36,6 +37,8 @@ const OrderPreviewMobile = (props) => {
     const [showActionSheet, toggleActionSheet] = useState(false);
     const [visible, setVisible] = useState(false)
 
+    const history = useHistory();
+
     const actions = [
         {
             text: 'Obrisi porudzbinu',
@@ -60,13 +63,8 @@ const OrderPreviewMobile = (props) => {
 
     return (
         props.order === undefined ? <></> :
-        <Popup 
-            showCloseButton
-            visible={props.visible} 
-            onClose={props.closePreview} 
-            onMaskClick={props.closePreview}
-            bodyStyle={{ height: '100vh' }}>
-                <div className='bg-light h-100' >
+        <>
+        {!props.loading && <NavBar onBack={()=>{history.push('/porudzbine')}}>Porudzbina: <b>#{props.order.orderId}</b></NavBar>}
                     <Tabs className='h-100'>
                         <Tabs.Tab title='Pregled' key='fruits' >
                             <div style={{height: '100%', overflowY: 'scroll' , margin:-12}} >
@@ -87,22 +85,7 @@ const OrderPreviewMobile = (props) => {
                 <Row>
                     <Col className="pb-4 pt-2" span={24}>
                         {props.loading? <Skeleton active paragraph={{rows:0}}/> :<>
-                            <div className="d-flex justify-content-between m-3">
-                                <div className="d-flex align-items-end">
-                                    <Title level={4} className="mb-0">#{props.order.orderId}</Title>
-                                </div>
-                                
-                            </div>
-                            <div className={"d-flex justify-content-between m-3"}>
-                                <div className="text-secondary mt-0">
-                                    <div>
-                                        izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName} 
-                                    </div>
-                                    <div>
-                                        trenutna verzija: {props.versions[props.version].changedBy.firstName} {props.versions[props.version].changedBy.lastName} ({moment(props.versions[props.version].dateCreated).format('DD. MM. YYYY.').toString()})
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <div className='d-flex flex-row justify-content-between mr-2 ml-2'>
                                 <div className="align-self-center flex-even">
                                         {!props.isAdmin ? 
@@ -155,6 +138,16 @@ const OrderPreviewMobile = (props) => {
                                     />
                                 </div>
                             </div>
+                            <div className={"d-flex justify-content-between m-3"}>
+                                <div className="text-secondary mt-0">
+                                    <div>
+                                        izdato od: {props.versions[0].changedBy.firstName} {props.versions[0].changedBy.lastName} 
+                                    </div>
+                                    <div>
+                                        trenutna verzija: {props.versions[props.version].changedBy.firstName} {props.versions[props.version].changedBy.lastName} ({moment(props.versions[props.version].dateCreated).format('DD. MM. YYYY.').toString()})
+                                    </div>
+                                </div>
+                            </div>
 
                         </>}
                         {!props.loading && <>
@@ -182,8 +175,9 @@ const OrderPreviewMobile = (props) => {
                                     {props.versions[props.version].data.orderInfo.note && <div>Napomena: {props.versions[props.version].data.orderInfo.note}</div>}
                                 </List.Item>
                                 <List.Item>
-                                    <ProgressBar percent={props.versions[props.version].data.orderInfo.avans / props.order.totalAmount * 100} />
-                                    <div>{props.versions[props.version].data.orderInfo.avans} / {props.order.totalAmount} RSD</div>
+                                    <div>Avans: {props.versions[props.version].data.orderInfo.avans} RSD</div>
+                                    <div>Preostalo: {props.order.totalAmount - props.versions[props.version].data.orderInfo.avans} RSD</div>
+                                    <div>Ukupno: {props.order.totalAmount} RSD</div>
                                 </List.Item>
                             </List> 
                         </>}
@@ -218,8 +212,7 @@ const OrderPreviewMobile = (props) => {
                         {!props.loading && <OrderPreviewComments comments = {props.order.comments}/> }
                     </Tabs.Tab>
                 </Tabs>
-                </div>
-        </Popup>
+        </>
     )
 }
 

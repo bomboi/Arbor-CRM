@@ -7,7 +7,7 @@ import Axios from 'axios';
 import { getTagColor } from '../../utils';
 import { isOrderChecked } from '../../Redux/selectors/ordersSelectors';
 import { orderListSlice } from '../../Redux/reducers/ordersReducers';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { BrowserView, MobileView, isMobile } from 'react-device-detect';
 import { useHistory } from 'react-router-dom';
 
 export const OrderListHeader = (props) => {
@@ -70,7 +70,9 @@ const OrderListItem = (props) => {
             })
         }).then(()=>{
             props.dispatch(orderPreviewSlice.actions.toggleShow());
-            history.push('/porudzbine/pregled/'+props.item.orderId);
+            if(isMobile) {
+                history.push('/porudzbine/pregled/'+props.item.orderId);
+            }
         })
     }
 
