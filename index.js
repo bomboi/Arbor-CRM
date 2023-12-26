@@ -14,15 +14,25 @@ const app = express()
 
 dotenv.config();
 
+let dbUri = '';
+
+console.log('Environment: ', process.env.NODE_ENV);
+if(process.env.NODE_ENV === 'production') {
+  dbUri = process.env.DB_CONNECT_PROD;
+}
+else {
+  dbUri = process.env.DB_CONNECT_DEV;
+}
+
 // Connect to database
 mongoose.connect(
-  process.env.DB_CONNECT, 
+  dbUri, 
   { useNewUrlParser: true, useUnifiedTopology: true },
   () => console.info('Connected to DB')
 );
   
 var store = new MongoDBStore({
-  uri: process.env.DB_CONNECT,
+  uri: dbUri,
   collection: 'sessions'
 });
   
