@@ -28,8 +28,8 @@ const shuffle = (string) => {
 }
 
 const calculateTotalPrice = (acc, value) => {
-    let articlePrice = parseInt(value.price) * parseFloat(value.quantity) * (100 - parseInt(value.discount)) / 100;
-    return parseInt(acc) + parseInt(articlePrice);
+    let articlePrice = parseFloat(value.price) * parseFloat(value.quantity) * (100 - parseFloat(value.discount)) / 100;
+    return parseFloat(acc) + parseFloat(articlePrice);
 }
 
 // ROUTES
